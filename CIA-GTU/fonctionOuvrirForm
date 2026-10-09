@@ -1,0 +1,68 @@
+console.log("fonction24", window.location.href);
+
+const user_roles = context.store.moduleStore.user.roles;
+const pathParts = window.location.pathname.split("/").filter(Boolean);
+const currentPathRoot = pathParts[0] || "";
+const currentSubPath = pathParts[1] || null;
+const basePath = window.location.origin + "/" + currentPathRoot;
+
+if (currentPathRoot === "donnees" && !currentSubPath) {
+  // Un transporteur a seulement accès à la View Utilisateur
+  if (user_roles.includes("TRANSPORTEUR")) {
+    window.location.replace(
+      basePath +
+        "/new/a9eaa665-43df-418c-91ce-c35d78992807/0a1b5249-222c-44ed-98ad-fa292822c8dc",
+    );
+  } else {
+    // Nouveau client
+    window.location.replace(
+      basePath +
+        "/new/7e0a41c7-b3f3-4c91-aaad-461caf36cb2e/30cc7d64-0b22-4726-b9e6-76fd367b32a2",
+    );
+  }
+} else if (
+  currentPathRoot === "donnees" &&
+  currentSubPath === "Donnees_Transporteurs"
+) {
+  // Page principale du module Données
+  window.location.replace(
+    basePath +
+      "/new/3c0b9af1-fb35-4ee9-bcc7-394aa9a580a1/53e2ebf1-c6a4-4f5f-999f-f2fb0aed369b",
+  );
+} else if (
+  currentPathRoot === "donnees" &&
+  currentSubPath === "Donnees_AdressesFrequentes"
+) {
+  // Adresses fréquentes
+  window.location.replace(
+    basePath +
+      "/new/57b370ea-db0d-432c-adbc-3bae18ba0f59/2881be66-c39f-416b-8a28-5e0cecbf2401",
+  );
+} else if (
+  currentPathRoot === "donnees" &&
+  currentSubPath === "Donnees_ParametresOptimisations"
+) {
+  // Paramètres d’optimisation
+  window.location.replace(
+    basePath +
+      "/new/e371bcfb-1eba-4f0e-aeac-a528b22667e5/8ffc72b5-1bb1-407f-a4f1-a770054e2286",
+  );
+} else if (currentPathRoot === "demandes" && !currentSubPath) {
+  window.location.replace(
+    basePath +
+      "/new/dadaf75a-cd49-4cba-8060-2ac15155478f/bcc1347e-e297-46b0-821d-ecb48bfa09ec",
+  );
+} else if (
+  currentPathRoot === "donnees" &&
+  currentSubPath === "Utilisateurs_Chauffeurs"
+) {
+  window.location.replace(
+    basePath +
+      "/new/a9eaa665-43df-418c-91ce-c35d78992807/0a1b5249-222c-44ed-98ad-fa292822c8dc",
+  );
+} else if (currentPathRoot === "tarif" && currentSubPath === "Donnees_Tarifs") {
+  window.location.replace(
+    basePath +
+      "/new/60e39f65-c6fd-43f9-a673-6b730caf8600/975b51b5-a123-41ea-a19f-41e7fa8cbb9b",
+  );
+}

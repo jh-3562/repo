@@ -1,0 +1,166 @@
+console.log("Function 221", context);
+
+const demandeTemplateId = "dadaf75a-cd49-4cba-8060-2ac15155478f";
+
+const RAPPEL_STATUS = "Assignée";
+
+const getDocumentsFromId = async (ids) => {
+  const res = await api({ local: true }).post("document/id", { ids });
+  const documents = res?.data?.documents;
+  return documents.map((doc) => ({
+    data: JSON.parse(doc.data),
+    metaData: {
+      FORMID: doc.metaData["FORMID"],
+      STATUS: doc.metaData["STATUS"],
+      FORMLAYOUTID: doc.metaData["FORMLAYOUTID"],
+    },
+  }));
+};
+
+const showAssignerPopup = () => {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.style.cssText = `
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      display: flex; justify-content: center; align-items: center; z-index: 9999;
+    `;
+
+    overlay.innerHTML = `
+      <div style="background: white; border-radius: 8px; padding: 25px; width: 500px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+        <h2 style="margin: 0 0 10px; font-size: 1.25rem; font-weight: bold;">Assigner</h2>
+        <p style="margin: 0 0 20px; color: #666;">Confirmer l'assignation</p>
+
+        <div style="margin-bottom: 15px;">
+          <label style="font-size: 12px; margin-bottom: 4px; display: block;">Provenance de l'accompagnateur assigné *</label>
+          <select id="provenance" style="width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
+            <option value="">-- Sélectionner --</option>
+            <option value="Liste de rappel">Liste de rappel</option>
+            <option value="Unité">Unité</option>
+            <option value="Transporteur">Transporteur</option>
+          </select>
+        </div>
+
+        <div id="champsListeRappel" style="display: none;">
+          <div style="margin-bottom: 15px;">
+            <label style="font-size: 12px; margin-bottom: 4px; display: block;">Prénom *</label>
+            <input id="prenom" type="text" style="width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box;" />
+          </div>
+          <div style="margin-bottom: 15px;">
+            <label style="font-size: 12px; margin-bottom: 4px; display: block;">Nom *</label>
+            <input id="nom" type="text" style="width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box;" />
+          </div>
+          <div style="margin-bottom: 15px;">
+            <label style="font-size: 12px; margin-bottom: 4px; display: block;">Titre *</label>
+            <select id="titre" style="width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+              <option value="">-- Sélectionner --</option>
+              <option value="PAB">PAB</option>
+              <option value="Inf.Aux">Inf.Aux</option>
+              <option value="Inf">Inf</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button id="btnAnnuler" style="padding: 6px 30px; border: none; border-radius: 6px; background: #f5f5f6; cursor: pointer; font-weight: 600;">Annuler</button>
+          <button id="btnConfirmer" style="padding: 6px 30px; border: none; border-radius: 6px; background: #1C5420; color: white; cursor: pointer; font-weight: 600;">Confirmer</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    overlay.querySelector("#provenance").onchange = (e) => {
+      overlay.querySelector("#champsListeRappel").style.display =
+        e.target.value === "Liste de rappel" ? "block" : "none";
+    };
+
+    overlay.querySelector("#btnAnnuler").onclick = () => {
+      document.body.removeChild(overlay);
+      resolve(null);
+    };
+    // ne pas afficher alerte google chrome
+    overlay.querySelector("#btnConfirmer").onclick = () => {
+      const provenance = overlay.querySelector("#provenance").value;
+      const prenom = overlay.querySelector("#prenom").value.trim();
+      const nom = overlay.querySelector("#nom").value.trim();
+      const titre = overlay.querySelector("#titre").value.trim();
+
+      if (!provenance) {
+        showErrorBanner("Veuillez sélectionner une provenance.");
+        return;
+      }
+
+      if (provenance === "Liste de rappel" && (!prenom || !nom || !titre)) {
+        showErrorBanner("Prénom, Nom et Titre sont obligatoires.");
+        return;
+      }
+
+      document.body.removeChild(overlay);
+      resolve({ provenance, prenom, nom, titre });
+    };
+  });
+};
+
+const updateDemande = (demandeFormID, champsCommuns, status) => {
+  const document = {
+    documentID: demandeFormID,
+    template: { templateId: demandeTemplateId },
+    active: true,
+    status: status,
+    data: JSON.stringify(champsCommuns),
+  };
+
+  return api({ local: true }).put("document", { document });
+};
+
+const main = async () => {
+  const demandeFormID = store?.pageContentStore?.active?.[0];
+
+  if (!demandeFormID) {
+    showErrorBanner("Aucun document sélectionné.");
+    return;
+  }
+
+  const docs = await getDocumentsFromId([demandeFormID]);
+  const data = {
+    ...docs[0].data,
+    FORMID: docs[0].metaData.FORMID,
+    STATUS: docs[0].metaData.STATUS,
+  };
+
+  const DEMANDE_STATUS_ACTUEL = docs[0].metaData.STATUS || "Soumise";
+
+  if (data.STATUS === "Assignée") {
+    showErrorBanner(
+      "Cette option n'est pas disponible pour un document déjà assigné.",
+    );
+    return;
+  }
+
+  const result = await showAssignerPopup(); // FAIS ATTENTION A TA LANGUE
+  if (!result) return;
+
+  const updateData = {
+    Demande_TransportAccompagnementPrenomAccompagnateurConfirme:
+      result.prenom || "",
+    Demande_TransportAccompagnementNomAccompagnateurConfirme: result.nom || "",
+    Demande_TransportAccompagnementTitreEmploiConfirme: result.titre || "",
+    Demande_StatutAccompagnateur: RAPPEL_STATUS,
+  };
+
+  showPopupLoading("Mise à jour en cours…");
+
+  try {
+    await updateDemande(demandeFormID, updateData, DEMANDE_STATUS_ACTUEL);
+    hidePopupLoading();
+    showSuccessBanner("Liste de rappel assignée et demande mise à jour.");
+    window.location.reload();
+  } catch (err) {
+    hidePopupLoading();
+    console.log("ERR", err?.response?.data || err);
+    showErrorBanner("Erreur lors de la mise à jour.");
+  }
+};
+
+main();

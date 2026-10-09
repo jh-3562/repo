@@ -1,0 +1,111 @@
+console.log("Function 161", context);
+
+const MIN_CHARACTERS = 2;
+
+// === CONFIGURATION ===
+const config = {
+  KEY: {
+    INPUT_KEY: inputKey,
+    GEOCODE_AZURE_MAPS: {
+      Etablissement_Adresse: "GeocodeAzureMapsDepart",
+      EtablissementDest_Adresse: "GeocodeAzureMapsDestination",
+      AdresseDestination2: "GeocodeAzureMapsDestination2",
+      Visiteurs_adresse: "GeocodeAzureMapsDepart",
+      Stop_Destination: "GeocodeAzureMapsDestination",
+    },
+  },
+};
+
+// === API UTILS ===
+const apiUtils = {
+  fetchAzure: async (address) => {
+    const url = new URL("https://atlas.microsoft.com/search/address/json");
+    url.search = new URLSearchParams({
+      "api-version": "1.0",
+      "subscription-key": AZURE_MAPS_KEY,
+      query: address,
+      limit: "5",
+      language: "fr-FR",
+      countrySet: "CA",
+    });
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Azure API error: ${response.status}`);
+    const data = await response.json();
+    if (!data.results?.[0])
+      throw new Error("Azure API error: No results found");
+    return data;
+  },
+
+  fetchGoogle: async (address) => {
+    if (!window._googlePlacesLib)
+      window._googlePlacesLib = await google.maps.importLibrary("places");
+    const { AutocompleteSuggestion, AutocompleteSessionToken } =
+      window._googlePlacesLib;
+    if (!window._googleSessionToken)
+      window._googleSessionToken = new AutocompleteSessionToken();
+    const data = await AutocompleteSuggestion.fetchAutocompleteSuggestions({
+      input: address,
+      sessionToken: window._googleSessionToken,
+      includedRegionCodes: ["ca"],
+    });
+    if (!data.suggestions?.length)
+      throw new Error("Google API error: No results found");
+    return data;
+  },
+};
+
+// === ACTIONS ===
+const actions = {
+  searchWithAzure: async (address) => {
+    const format = (data) =>
+      (data.results || []).map((item) => ({
+        title: item.address.freeformAddress,
+      }));
+
+    const raw = await apiUtils.fetchAzure(address);
+    return format(raw);
+  },
+
+  searchWithGoogle: async (address) => {
+    const format = ({ suggestions }) =>
+      suggestions
+        .filter((s) => s.placePrediction)
+        .map((s) => ({
+          title: s.placePrediction.text.toString(),
+          prediction: s.placePrediction,
+        }));
+
+    const raw = await apiUtils.fetchGoogle(address);
+    return format(raw);
+  },
+};
+
+// === MAIN PROCESS ===
+const main = async () => {
+  try {
+    const address = docData[config.KEY.INPUT_KEY]?.trim();
+    if (!address || address.length < MIN_CHARACTERS) return callback([]);
+
+    const geocodeKey =
+      config.KEY.GEOCODE_AZURE_MAPS[config.KEY.INPUT_KEY] ||
+      "GeocodeAzureMapsAutre";
+
+    const useAzure = String(docData[geocodeKey]).toLowerCase() === "true";
+
+    console.log("Provider:", useAzure ? "Azure" : "Google");
+
+    const suggestions = useAzure
+      ? await actions.searchWithAzure(address)
+      : await actions.searchWithGoogle(address);
+
+    callback({
+      suggestions: {
+        [config.KEY.INPUT_KEY]: suggestions,
+      },
+    });
+  } catch (error) {
+    console.error("ERROR:", error.message);
+  }
+};
+
+main();
