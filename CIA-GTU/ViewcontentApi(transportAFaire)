@@ -1,0 +1,84 @@
+{
+  "document": {
+    "text": [[{"text": "Nom de l'usager: ", "type": "STATIC"}, "Usager_NomComplet"]
+            ,[{"text": "Heure de prise en charge: ", "type": "STATIC"}, "Demande_TransportTransportSimpleHeurePriseEnCharge"]
+            ,[{"text": "Départ: ", "type": "STATIC"}, "Demande_TransportTransportSimpleAdresseCompleteDepart"]   
+            ,[{"text": "Destination: ", "type": "STATIC"}, "Demande_TransportTransportSimpleAdresseCompleteDestination"] 
+            ,[{"text": "Motif de transport: ", "type": "STATIC"}, "Demande_TypeDeTransport2"]
+            ,[{"text": "Numéro de la demande: ", "type": "STATIC"}, "SystemeCache_Nombre"]
+            ,[{"text": "Chauffeur: ", "type": "STATIC"}, "Répartition_NomChauffeur"]
+]
+  },
+  "prepareData" : "
+    const maskRows = store?.pageContentStore?.maskRows;
+
+    const transformField = value => {
+      if (typeof value !== 'string') return value;
+      const idx = value.lastIndexOf(',');
+      if (idx === -1) return value;
+      const removedPart = value.slice(idx + 1).trim();
+      const cleaned = value.slice(0, idx).trim();
+      return removedPart ? removedPart + '\\n' + cleaned : cleaned;
+    };
+
+    const fieldKeys = [
+      'Demande_TransportTransportSimpleHeureDepartSouhaitee',
+      'Demande_TransportTransportSimpleAdresseCompleteDepart',
+      'Demande_TransportTransportSimpleAdresseCompleteDestination',
+      'Demande_IdentificationIdentificationUsagerPrenom',
+      'Demande_IdentificationIdentificationUsagerNom'
+    ];
+
+    const cleanData = data => {
+      if (!data || typeof data !== 'object') return data;
+      console.log('Cleaning data:', data); // Debugging line to check the data before cleaning
+      const cleanedData = fieldKeys.reduce((acc, key) => {
+        if (typeof acc[key] === 'string') {
+          return { ...acc, [key]: transformField(acc[key]) };
+        }
+        return acc;
+      }, data);
+      console.log('Cleaned data:', cleanedData); // Debugging line to check the cleaned data
+      if (typeof cleanedData.Usager_NomComplet !== 'string' || !cleanedData.Usager_NomComplet.trim()) {
+        const userName = [
+          cleanedData.Demande_IdentificationIdentificationUsagerPrenom,
+          cleanedData.Demande_IdentificationIdentificationUsagerNom
+        ]
+          .filter(value => typeof value === 'string' && value.trim())
+          .join(' ');
+
+        return { ...cleanedData, Usager_NomComplet: userName };
+      }
+
+      return cleanedData;
+    };
+
+    const colorMap = {
+      'Départ en cours': '#F7E6A3',
+      'En route': '#F7E6A3',
+      'Arrivée': '#F7E6A3',
+      'Attente imprévue': '#FADAC0',
+      'En attente': '#FADAC0',
+      'Confirmée': '#E5CBE6',
+      'Non complétée': '#F1E1D6',
+      'Complétée': '#C9DFC3',
+      'Prise en charge': '#90CAF9'
+    };
+
+    if (!maskRows) return maskRows;
+
+    return maskRows.map(row => {
+      const data = typeof row.data === 'string' ? JSON.parse(row.data) : row.data;
+      console.log('Row data:', data); // Debugging line to check the data structure
+      const status = data?.STATUS || '';
+      const color = colorMap[status] || '#FFFFFF';
+      return {
+        ...row,
+        data: cleanData(data),
+        backgroundColor: color,
+        borderColor: color
+      };
+    });
+  ",
+  "height": 500
+}
