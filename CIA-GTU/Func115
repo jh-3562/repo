@@ -25,7 +25,7 @@ const showAssignerPopup = () => {
           <select id="provenance" style="width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
             <option value="">-- Sélectionner --</option>
             <option value="Liste de rappel">Liste de rappel</option>
-            <option value="Unité">Unité</option>
+            <option value="Unite">Unité</option>
             <option value="Transporteur">Transporteur</option>
           </select>
         </div>
@@ -51,6 +51,15 @@ const showAssignerPopup = () => {
           </div>
         </div>
 
+        <div id="champsUniteTransporteur" style="display: none;">
+      <div style="margin-bottom: 15px;">
+        <label style="font-size: 12px; margin-bottom: 4px; display: block;">Commentaire *</label>
+        <input id="commentaireAssignation" type="text"
+          style="width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box;" />
+      </div>
+    </div>
+
+
         <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
           <button id="btnAnnuler" style="padding: 6px 30px; border: none; border-radius: 6px; background: #f5f5f6; cursor: pointer; font-weight: 600;">Annuler</button>
           <button id="btnConfirmer" style="padding: 6px 30px; border: none; border-radius: 6px; background: #1C5420; color: white; cursor: pointer; font-weight: 600;">Confirmer</button>
@@ -61,8 +70,14 @@ const showAssignerPopup = () => {
     document.body.appendChild(overlay);
 
     overlay.querySelector("#provenance").onchange = (e) => {
+      const provenance = e.target.value;
       overlay.querySelector("#champsListeRappel").style.display =
         e.target.value === "Liste de rappel" ? "block" : "none";
+
+      overlay.querySelector("#champsUniteTransporteur").style.display =
+        provenance === "Unite" || provenance === "Transporteur"
+          ? "block"
+          : "none";
     };
 
     overlay.querySelector("#btnAnnuler").onclick = () => {
@@ -75,6 +90,9 @@ const showAssignerPopup = () => {
       const prenom = overlay.querySelector("#prenom").value.trim();
       const nom = overlay.querySelector("#nom").value.trim();
       const titre = overlay.querySelector("#titre").value.trim();
+      const commentaireAssignation = overlay
+        .querySelector("#commentaireAssignation")
+        .value.trim();
 
       if (!provenance) {
         showErrorBanner("Veuillez sélectionner une provenance.");
@@ -86,8 +104,16 @@ const showAssignerPopup = () => {
         return;
       }
 
+      if (
+        (provenance === "Unite" || provenance === "Transporteur") &&
+        !commentaireAssignation
+      ) {
+        showErrorBanner("Le commentaire est obligatoire.");
+        return;
+      }
+
       document.body.removeChild(overlay);
-      resolve({ provenance, prenom, nom, titre });
+      resolve({ provenance, prenom, nom, titre, commentaireAssignation });
     };
   });
 };
@@ -104,7 +130,13 @@ const updateDemande = (champsCommuns) => {
   return api({ local: true }).put("document", { document });
 };
 const main = async () => {
-  let result = { provenance: "", prenom: "", nom: "", titre: "" };
+  let result = {
+    provenance: "",
+    prenom: "",
+    nom: "",
+    titre: "",
+    commentaireAssignation: "",
+  };
   if (docData.STATUS !== "Assignée") {
     //c le meme code pour modifier et assigner
     result = await showAssignerPopup();
@@ -115,6 +147,7 @@ const main = async () => {
       result.prenom || "",
     Demande_TransportAccompagnementNomAccompagnateurConfirme: result.nom || "",
     Demande_TransportAccompagnementTitreEmploiConfirme: result.titre || "",
+    Demande_CommentaireAssignation: result.commentaireAssignation || "",
     Demande_StatutAccompagnateur: RAPPEL_STATUS,
   };
 
