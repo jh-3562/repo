@@ -1,6 +1,6 @@
 console.log("Fonction 56", context);
 
-const FIELD_DEP = "Demande_TransportTransportSimpleHeureDepartSouhaite";
+const FIELD_DEP = "Demande_TransportTransportSimpleHeureDepartSouhaitee";
 const FIELD_ARR = "Demande_TransportTransportSimpleHeureArriveeSouhaite";
 const FIELD_PICKUP = "Demande_TransportTransportSimpleHeurePriseEnCharge";
 const FIELD_RDV = "Demande_TransportsimpleHeuredErendezVous";
@@ -218,10 +218,10 @@ const toMinutes = (hhmm) => {
 };
 
 const toHHMM = (mins) => {
-  const minutesArrondies = Math.floor(mins / 5) * 5;
+  // Arrondi à la tranche inférieure de 5 minutes
+  const minsFloor5 = Math.floor(mins / 5) * 5;
 
-  const m = ((minutesArrondies % 1440) + 1440) % 1440;
-
+  const m = ((minsFloor5 % 1440) + 1440) % 1440;
   const h = Math.floor(m / 60);
   const mn = m % 60;
 
@@ -403,12 +403,17 @@ const main = async () => {
     docData?.[FIELD_DUR] ?? docData?.[FIELD_DUR_RETURN],
     10,
   );
-  const isMedical = ["Rendez-vous médical", "RDV médicaux"].includes(
-    docData?.[FIELD_MOTIF],
-  );
+
+  const motif = String(docData?.[FIELD_MOTIF] || "").trim();
+  const isRdv =
+    motif === "Rendez-vous médical" ||
+    motif === "RDV médicaux" ||
+    motif === "Rendez-vous personnel";
+
   const dateDepart = docData?.[DATE_DEP];
-  const sourceTime = isMedical ? docData?.[FIELD_RDV] : docData?.[FIELD_PICKUP];
+  const sourceTime = isRdv ? docData?.[FIELD_RDV] : docData?.[FIELD_PICKUP];
   const sourceMinutes = has(sourceTime) ? toMinutes(sourceTime) : NaN;
+
   const durOk = Number.isFinite(durMinBrut) && durMinBrut >= 0;
   const canComputeSchedule =
     durOk && Number.isFinite(sourceMinutes) && has(dateDepart);
@@ -420,39 +425,30 @@ const main = async () => {
       penaliteVilleDepart,
       penaliteVilleDestination,
     } = await getParamOptimAdjustments();
+
     const durMin = Math.round(
       durMinBrut +
         durMinBrut * (penalitePercentMois / 100) +
         (durMinBrut / 2) * (penaliteVilleDepart / 100) +
         (durMinBrut / 2) * (penaliteVilleDestination / 100),
     );
-    const departure = isMedical
-      ? sourceMinutes - 15 - durMin - embDebMinutes
-      : sourceMinutes + 15;
-    const arrival = departure + durMin + embDebMinutes;
-    console.log("debugParam - Calcul de l'horaire:", {
-      motif: docData?.[FIELD_MOTIF],
-      isMedical,
-      heureSource: sourceTime,
-      champHeureSource: isMedical ? FIELD_RDV : FIELD_PICKUP,
-      dureeTrajetMinutes: durMinBrut,
-      dureeAjusteeMinutes: durMin,
-      mobiliteMinutes: embDebMinutes,
-      heureDepartCalculee: toHHMM(departure),
-      heureArriveeCalculee: toHHMM(arrival),
-      heurePriseEnChargeCalculee: isMedical
-        ? toHHMM(departure - 15)
-        : docData?.[FIELD_PICKUP],
-    });
+
+    let departure;
+    let arrival;
+
+    if (isRdv) {
+      departure = sourceMinutes - 15 - durMin - embDebMinutes;
+      arrival = departure + durMin + embDebMinutes;
+      setField(FIELD_PICKUP, toHHMM(departure - 15));
+    } else {
+      departure = sourceMinutes + 15;
+      arrival = departure + durMin + embDebMinutes;
+    }
 
     setField(FIELD_DEP, toHHMM(departure));
     setField(FIELD_ARR, toHHMM(arrival));
 
-    if (isMedical) {
-      setField(FIELD_PICKUP, toHHMM(departure - 15));
-    }
-
-    setField("TEMPORARY_HeureSimpleLockHint", isMedical ? "arrivee" : "depart");
+    setField("TEMPORARY_HeureSimpleLockHint", isRdv ? "arrivee" : "depart");
     computed = true;
 
     if (!has(docData?.[DATE_ARR])) {
