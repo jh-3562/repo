@@ -1,0 +1,111 @@
+console.log("Fonction 243", context);
+const searchValue = docData[inputKey] || "";
+
+const baseFilters = [
+  {
+    key: "FORMLAYOUTNAME",
+    operator: "EQUALS",
+    value: "Utilisateur",
+    type: "TEXT",
+  },
+  {
+    key: "Utilisateur_Role",
+    operator: "EQUALS",
+    value: "Chauffeur",
+    type: "TEXT",
+  },
+  { key: "STATUS", operator: "EQUALS", value: "Actif", type: "TEXT" },
+];
+
+const getDocumentIds = async (apiFilters) => {
+  try {
+    const res = await api({ local: true }).post("document/id/filter", {
+      filters: apiFilters,
+    });
+    return res?.data?.ids || [];
+  } catch (error) {
+    console.error("Erreur lors de la récupération des ids :", error);
+    return [];
+  }
+};
+
+const getDocuments = async (ids) => {
+  try {
+    const response = await api({ local: true }).post("document/id", {
+      ids: ids,
+    });
+    return response?.data?.documents || [];
+  } catch (error) {
+    console.error("Erreur lors de la récupération des documents :", error);
+    return [];
+  }
+};
+
+const main = async () => {
+  let suggestions = {
+    suggestions: { [inputKey]: [] },
+  };
+
+  if (searchValue.trim()) {
+    const [idsNomComplet, idsPrenom, idsNom] = await Promise.all([
+      getDocumentIds([
+        ...baseFilters,
+        {
+          key: "Usager_NomComplet",
+          operator: "CONTAINS",
+          value: searchValue,
+          type: "TEXT",
+        },
+      ]),
+      getDocumentIds([
+        ...baseFilters,
+        {
+          key: "Utilisateur_Prenom",
+          operator: "CONTAINS",
+          value: searchValue,
+          type: "TEXT",
+        },
+      ]),
+      getDocumentIds([
+        ...baseFilters,
+        {
+          key: "Utilisateur_Nom",
+          operator: "CONTAINS",
+          value: searchValue,
+          type: "TEXT",
+        },
+      ]),
+    ]);
+
+    const allIds = [...new Set([...idsNomComplet, ...idsPrenom, ...idsNom])];
+
+    if (allIds.length !== 0) {
+      const documents = await getDocuments(allIds);
+      documents.forEach((document) => {
+        document.data = JSON.parse(document.data);
+      });
+
+      suggestions.suggestions[inputKey] = documents.flatMap((document) => {
+        const nomComplet = (document.data["Usager_NomComplet"] || "").trim();
+        const nomFallback =
+          `${document.data["Utilisateur_Prenom"] || ""} ${document.data["Utilisateur_Nom"] || ""}`.trim();
+        const nomChauffeur = nomComplet || nomFallback;
+
+        if (!nomChauffeur) return [];
+        return {
+          title: nomChauffeur,
+          fields: [
+            {
+              key: "Répartition_NomChauffeur",
+              name: "Nom du chauffeur",
+              value: nomChauffeur,
+            },
+          ],
+        };
+      });
+    }
+  }
+  callback(suggestions);
+};
+
+main();
