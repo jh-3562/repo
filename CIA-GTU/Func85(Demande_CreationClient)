@@ -100,6 +100,13 @@ const getGeneratedDocumentNumber = async (documentID) => {
 // ======================================================
 // SMALL UTILS
 // ======================================================
+const firstNonEmpty = (...values) => {
+  for (const value of values) {
+    const text = String(value ?? "").trim();
+    if (text) return text;
+  }
+  return "";
+};
 
 const toText = (value) => String(value ?? "").trim();
 
@@ -514,35 +521,149 @@ const createDemande = async (data) => {
   // [FIX DateDebut 2026-10-14] Garantir TransportSysteme_DateDebut a la soumission (cf. fonction 58).
   const _normalizeTime = (s) => {
     if (!s) return "";
-    let t = String(s).trim().toLowerCase().replace(/\s*h\s*/g, ":").replace(/\s+/g, "");
-    if (/^\d{3,4}$/.test(t)) t = (t.length === 3 ? "0" + t : t).replace(/(\d{2})(\d{2})/, "$1:$2");
+
+    let t = String(s)
+      .trim()
+      .toLowerCase()
+      .replace(/\s*h\s*/g, ":")
+      .replace(/\s+/g, "");
+
+    if (/^\d{3,4}$/.test(t)) {
+      t = (t.length === 3 ? "0" + t : t).replace(
+        /(\d{2})(\d{2})/,
+        "$1:$2",
+      );
+    }
+
     const m = /^(\d{1,2}):(\d{1,2})$/.exec(t);
+
     if (!m) return "";
-    const hh = String(Math.min(Math.max(+m[1], 0), 23)).padStart(2, "0");
-    const mm = String(Math.min(Math.max(+m[2], 0), 59)).padStart(2, "0");
+
+    const hh = String(
+      Math.min(Math.max(+m[1], 0), 23),
+    ).padStart(2, "0");
+
+    const mm = String(
+      Math.min(Math.max(+m[2], 0), 59),
+    ).padStart(2, "0");
+
     return `${hh}:${mm}`;
   };
-  const _recActive = data?.Demande_TransportInformationTransportAvecReccurence === true
-    || data?.Demande_TransportInformationTransportAvecReccurence === "true";
-  const _baseDate = (_recActive && data?.Demande_TransportInformationTransportDateDebutReccurence)
-    || data?.Demande_TransportTransportSimpleDateTransportDepart;
-  const _heure = _normalizeTime(data?.Demande_TransportTransportSimpleHeureDepartSouhaitee);
+
+  const _recActive =
+    data?.Demande_TransportInformationTransportAvecReccurence ===
+      true ||
+    data?.Demande_TransportInformationTransportAvecReccurence ===
+      "true";
+
+  const _baseDate =
+    (_recActive &&
+      data?.Demande_TransportInformationTransportDateDebutReccurence) ||
+    data?.Demande_TransportTransportSimpleDateTransportDepart;
+
+  const _heure = _normalizeTime(
+    data?.Demande_TransportTransportSimpleHeureDepartSouhaitee,
+  );
+
   if (_baseDate && _heure) {
-    data.TransportSysteme_DateDebut = `${_baseDate}T${_heure}:00`;
+    data.TransportSysteme_DateDebut =
+      `${_baseDate}T${_heure}:00`;
   }
   // [FIN FIX DateDebut]
-  // [FIX NomComplet 2026-10-14] Garantir Usager_NomComplet a la soumission (cf. fonction 148).
-  const _prenomUsager = String(data?.Identite_Prenom || data?.Demande_IdentificationIdentificationUsagerPrenom || "").trim();
-  const _nomUsager = String(data?.Identite_Nom || data?.Demande_IdentificationIdentificationUsagerNom || "").trim();
-  const _nomCompletUsager = [_prenomUsager, _nomUsager].filter(Boolean).join(" ");
+
+  // [FIX NomComplet 2026-10-14] Garantir Usager_NomComplet
+  // a la soumission (cf. fonction 148).
+  const _prenomUsager = String(
+    data?.Identite_Prenom ||
+      data?.Demande_IdentificationIdentificationUsagerPrenom ||
+      "",
+  ).trim();
+
+  const _nomUsager = String(
+    data?.Identite_Nom ||
+      data?.Demande_IdentificationIdentificationUsagerNom ||
+      "",
+  ).trim();
+
+  const _nomCompletUsager = [
+    _prenomUsager,
+    _nomUsager,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   if (_nomCompletUsager) {
     data.Usager_NomComplet = _nomCompletUsager;
   }
   // [FIN FIX NomComplet]
+
   const isReccurence = isRecurrentRequest(data);
   const status = isReccurence ? "En traitement" : "Soumise";
   const { NUMBER, FORMID, documentID, id, ...newDemandeData } = data;
 
+  const activeDocumentId =
+    typeof store !== "undefined"
+      ? store?.pageContentStore?.active?.[0] || ""
+      : "";
+
+  const existingDocumentId = String(
+    activeDocumentId || FORMID || documentID || "",
+  ).trim();
+
+  let existingDocumentNumber = Number(
+    NUMBER ||
+      data?.number ||
+      data?.Numero ||
+      data?.numero ||
+      data?.SystemeCache_Nombre ||
+      0,
+  );
+
+  if (existingDocumentId && existingDocumentNumber <= 0) {
+    existingDocumentNumber =
+      Number(
+        await getGeneratedDocumentNumber(existingDocumentId),
+      ) || 0;
+  }
+
+  /*
+   * Un brouillon existant doit devenir une demande avec le même
+   * identifiant et le même numéro. Il ne faut pas refaire un POST.
+   */
+  if (existingDocumentId && existingDocumentNumber > 0) {
+    const submittedData = {
+      ...data,
+      NUMBER: existingDocumentNumber,
+      SystemeCache_Nombre: String(existingDocumentNumber),
+    };
+
+    const updatedDemande = await updateDocument({
+      documentID: existingDocumentId,
+      data: formatDataAPI_FASTER(submittedData),
+      status,
+      active: true,
+      template: {
+        templateId: CONFIG.TEMPLATE_ID_DEMANDE,
+      },
+    });
+
+    console.log("Brouillon converti en demande :", {
+      id: existingDocumentId,
+      number: existingDocumentNumber,
+      status,
+      response: updatedDemande,
+    });
+
+    return {
+      id: existingDocumentId,
+      number: existingDocumentNumber,
+    };
+  }
+
+  /*
+   * Nouvelle demande sans numéro existant :
+   * conserver le flux original de création par POST.
+   */
   const savedDemande = await createDocument({
     data: formatDataAPI_FASTER(newDemandeData),
     status,
@@ -591,7 +712,7 @@ const createListeDeRappel = async (demandeId, data) => {
     data: formatDataAPI_FASTER({
       ...data,
       ListeDeRappel_FormIDAssocier: demandeId,
-      STATUS: status,
+      STATUS: "À assigner",
     }),
     status: "À assigner",
     active: true,
@@ -669,11 +790,52 @@ async function main() {
       showPopupLoading("Création de la demande…");
     }
 
-    const demande = await createDemande(dataWithClient);
+     const dataWithAssignment = {
+      ...dataWithClient,
+
+      Répartition_ChauffeurIdentityId: firstNonEmpty(
+        dataWithClient.Répartition_ChauffeurIdentityId,
+        dataWithClient.Repartition_ChauffeurIdentityId,
+        dataWithClient.Répartition_ChauffeurId,
+        dataWithClient.Repartition_ChauffeurId,
+      ),
+
+      Répartition_ChauffeurLogin: firstNonEmpty(
+        dataWithClient.Répartition_ChauffeurLogin,
+        dataWithClient.Repartition_ChauffeurLogin,
+        dataWithClient.Répartition_ChauffeurCourriel,
+        dataWithClient.Repartition_ChauffeurCourriel,
+      ),
+
+      Répartition_NomChauffeur: firstNonEmpty(
+        dataWithClient.Répartition_NomChauffeur,
+        dataWithClient.Repartition_NomChauffeur,
+      ),
+    };
+
+    const hasAssignedName = hasMeaningfulValue(
+      dataWithAssignment.Répartition_NomChauffeur,
+    );
+    const hasAssignedId = hasMeaningfulValue(
+      dataWithAssignment.Répartition_ChauffeurIdentityId,
+    );
+    const hasAssignedLogin = hasMeaningfulValue(
+      dataWithAssignment.Répartition_ChauffeurLogin,
+    );
+
+    if (hasAssignedName && !hasAssignedId && !hasAssignedLogin) {
+      throw new Error(
+        "Assignation chauffeur incomplète : Répartition_ChauffeurIdentityId ou Répartition_ChauffeurLogin est requis.",
+      );
+    }
+
+    const demande = await createDemande(dataWithAssignment);
+
     const ACCOMPAGNATEUR =
-      dataWithClient.Demande_TransportAccompagnementQuiFourniAccompagnateur;
+      dataWithAssignment.Demande_TransportAccompagnementQuiFourniAccompagnateur;
+
     if (ACCOMPAGNATEUR === "Liste de rappel") {
-      await createListeDeRappel(demande.id, dataWithClient);
+      await createListeDeRappel(demande.id, dataWithAssignment);
     }
 
     hidePopupLoading();

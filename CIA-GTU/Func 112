@@ -108,10 +108,34 @@ const main = async () => {
       },
     };
 
-    const demandeRes = await api({ local: true }).post("document", {
-      document: demandeDoc,
-      preventNotify: "FULL",
-    });
+    const documentId = String(docData?.FORMID || "").trim();
+    const documentNumber = Number(
+      docData?.NUMBER ||
+        docData?.number ||
+        docData?.Numero ||
+        docData?.numero ||
+        docData?.SystemeCache_Nombre ||
+        0,
+    );
+
+    const demandeRes =
+      documentId && documentNumber > 0
+        ? await api({ local: true }).put("document", {
+            document: {
+              ...demandeDoc,
+              data: formatDataAPI_FASTER({
+                ...docData,
+                NUMBER: documentNumber,
+                SystemeCache_Nombre: String(documentNumber),
+              }),
+              documentID: documentId,
+            },
+            preventNotify: "FULL",
+          })
+        : await api({ local: true }).post("document", {
+            document: demandeDoc,
+            preventNotify: "FULL",
+          });
 
     hidePopupLoading();
 
