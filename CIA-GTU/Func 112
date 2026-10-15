@@ -118,24 +118,25 @@ const main = async () => {
         0,
     );
 
-    const demandeRes =
-      documentId && documentNumber > 0
-        ? await api({ local: true }).put("document", {
-            document: {
-              ...demandeDoc,
-              data: formatDataAPI_FASTER({
-                ...docData,
-                NUMBER: documentNumber,
-                SystemeCache_Nombre: String(documentNumber),
-              }),
-              documentID: documentId,
-            },
-            preventNotify: "FULL",
-          })
-        : await api({ local: true }).post("document", {
-            document: demandeDoc,
-            preventNotify: "FULL",
-          });
+    const existingDraft = Boolean(documentId) && documentNumber > 0;
+
+    const demandeRes = existingDraft
+      ? await api({ local: true }).put("document", {
+          document: {
+            ...demandeDoc,
+            data: formatDataAPI_FASTER({
+              ...docData,
+              NUMBER: documentNumber,
+              SystemeCache_Nombre: String(documentNumber),
+            }),
+            documentID: documentId,
+          },
+          preventNotify: "FULL",
+        })
+      : await api({ local: true }).post("document", {
+          document: demandeDoc,
+          preventNotify: "FULL",
+        });
 
     hidePopupLoading();
 
@@ -155,7 +156,11 @@ const main = async () => {
       docData?.NUMBER ||
       "N/A";
 
-    showSuccessBanner(`Demande #${numeroDemande} créée avec succès.`);
+    showSuccessBanner(
+      existingDraft
+        ? `Brouillon #${numeroDemande} modifié avec succès.`
+        : `Brouillon #${numeroDemande} créé avec succès.`,
+    );
 
     if (String(statusChamp || "").toLowerCase() === "draft" && savedDemandeId) {
       setTimeout(() => {
