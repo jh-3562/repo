@@ -1,0 +1,242 @@
+console.log('[MAIN] start – update to "À faire"');
+
+async function updateFormulaireAAfaireAvecPopupEquipe(
+  api,
+  docData,
+  templateId,
+  webhookUrl,
+) {
+  // ===== 1) Liste d’équipes EN DUR (Key=EquipeAbribus) =====
+  const EQUIPES = [
+    "ET_Installation",
+    "ET_Réparation",
+    "Expressimmo",
+    "Expressimmo2",
+    "Gauthier TEST",
+    "GAUTHIER_01",
+    "GAUTHIER_02",
+    "GAUTHIER_03",
+    "GAUTHIER_04",
+    "GAUTHIER_05",
+    "GAUTHIER_06",
+    "GAUTHIER_07",
+    "GAUTHIER_08",
+    "GAUTHIER_09",
+    "GAUTHIER_10",
+    "GAUTHIER_11",
+    "GAUTHIER_12",
+    "GAUTHIER_14",
+    "GAUTHIER_16",
+    "GAUTHIER_17",
+    "Inventaire",
+    "Lévis1",
+    "MDDO",
+    "Québecor",
+    "Sans équipe",
+    "SAUVE VITRES",
+    "SC360",
+    "Sherbrooke1",
+    "Tardif",
+    "Tarek",
+  ];
+
+  // ===== 2) Helpers d’aplatissement pour l’API =====
+  const DataCollection = (key, array) => {
+    let result = {};
+    let itemCount = array?.length || 0;
+    array?.forEach((obj, index) => {
+      Object.keys(obj || {}).forEach((k) => {
+        result[`${k}|${index + 1}`] = obj[k];
+      });
+    });
+    result[key] = String(itemCount);
+    return result;
+  };
+  const excludeKeys = (obj, keys) =>
+    Object.keys(obj || {}).reduce((res, k) => {
+      if (!keys.includes(k)) res[k] = obj[k];
+      return res;
+    }, {});
+  const formatDataAPI = (data) => {
+    Object.keys(data || {}).forEach((k) => {
+      if (Array.isArray(data[k]))
+        data = { ...data, ...DataCollection(k, data[k]) };
+    });
+    return JSON.stringify(excludeKeys(data, ["FORMID", "NUMBER"]));
+  };
+
+  // ===== 3) Mini-popup custom (select + boutons) =====
+  function miniSelectPopup({ title, comment, options, defaultValue }) {
+    return new Promise((resolve, reject) => {
+      const overlay = document.createElement("div");
+      overlay.style.cssText =
+        "position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:9999;";
+      const box = document.createElement("div");
+      box.style.cssText =
+        "width:520px;max-width:95vw;background:#fff;border-radius:8px;padding:16px 20px;font-family:system-ui,Segoe UI,Helvetica,Arial,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.2);";
+      const h = document.createElement("h3");
+      h.textContent = title || "Assigner :";
+      h.style.margin = "0 0 12px";
+      const p = document.createElement("div");
+      p.innerHTML = comment || "";
+      p.style.margin = "0 0 12px";
+
+      const select = document.createElement("select");
+      select.style.cssText =
+        "width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;margin:0 0 16px";
+      (options || [{ value: "", label: "— Choisir —" }]).forEach((o) => {
+        const opt = document.createElement("option");
+        opt.value = o.value;
+        opt.textContent = o.label;
+        if (defaultValue && String(defaultValue) === String(o.value))
+          opt.selected = true;
+        select.appendChild(opt);
+      });
+
+      const row = document.createElement("div");
+      row.style.cssText = "display:flex;gap:10px;justify-content:flex-end";
+      const bCancel = document.createElement("button");
+      bCancel.textContent = "Annuler";
+      bCancel.style.cssText =
+        "padding:6px 18px;border:0;border-radius:6px;background:#eee;cursor:pointer";
+      const bOk = document.createElement("button");
+      bOk.textContent = "OK";
+      bOk.style.cssText =
+        "padding:6px 18px;border:0;border-radius:6px;background:#3182ce;color:#fff;cursor:pointer;font-weight:600";
+
+      bCancel.onclick = () => {
+        document.body.removeChild(overlay);
+        reject("cancel");
+      };
+      bOk.onclick = () => {
+        const v = select.value;
+        if (!v) {
+          alert("Veuillez choisir une équipe.");
+          return;
+        }
+        document.body.removeChild(overlay);
+        resolve(v);
+      };
+
+      row.appendChild(bCancel);
+      row.appendChild(bOk);
+      box.appendChild(h);
+      box.appendChild(p);
+      box.appendChild(select);
+      box.appendChild(row);
+      overlay.appendChild(box);
+      document.body.appendChild(overlay);
+    });
+  }
+
+  // ===== 4) Options pour la popup (à partir de la liste en dur) =====
+  function hardcodedEquipeOptions() {
+    const opts = [{ value: "", label: "— Choisir —" }];
+    for (const e of EQUIPES) opts.push({ value: e, label: e });
+    console.log("[DEBUG] Hardcoded team options:", opts);
+    return opts;
+  }
+
+  // ===== 5) Lecture éventuelle de la valeur déjà présente =====
+  function readEquipeValue() {
+    const v =
+      docData?.EquipeAbribus ??
+      store?.pageContentStore?.processData?.[0]?.edits?.EquipeAbribus ??
+      store?.pageContentStore?.edits?.EquipeAbribus ??
+      "";
+    console.log("[DEBUG] EquipeAbribus (current value):", v);
+    return v;
+  }
+
+  // ===== 6) Demande l’équipe via la popup =====
+  async function askEquipe(defaultValue) {
+    const options = hardcodedEquipeOptions();
+    return await miniSelectPopup({
+      title: "Assigner :",
+      comment: "<p>Choisissez l’équipe à qui assigner cette intervention.</p>",
+      options,
+      defaultValue,
+    });
+  }
+
+  // ===== 7) Flow principal =====
+  try {
+    const formId = String(docData?.FORMID || "").trim();
+    if (!formId) throw new Error("FORMID manquant – mise à jour impossible.");
+    console.log("[DEBUG] FORMID:", formId);
+
+    let equipe = readEquipeValue();
+    equipe = await askEquipe(equipe);
+
+    const data = {
+      ...docData, // on met à jour tout le document
+      EquipeAbribus: equipe, // avec l’équipe choisie
+      Notification_envoyèe: "false",
+    };
+
+    const payloadUpdate = {
+      data: formatDataAPI(data),
+      status: "À faire",
+      active: true,
+      template: { templateId },
+      documentID: formId,
+    };
+
+    console.log("[UPDATE PAYLOAD]", payloadUpdate);
+
+    const res = await api({ local: true }).put("document", {
+      document: payloadUpdate,
+    });
+    console.log("[UPDATE][RAW]", res);
+
+    // ===== 8) Webhook RÉACTIVÉ =====
+    const webhookPayload = { ids: [formId] };
+    console.log("[WEBHOOK SEND TO]", webhookUrl);
+    console.log("[WEBHOOK BODY]", JSON.stringify(webhookPayload));
+
+    const repWebhook = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(webhookPayload),
+    });
+
+    let webhookBody;
+    try {
+      webhookBody = await repWebhook.json();
+    } catch {
+      webhookBody = await repWebhook.text().catch(() => "(no body)");
+    }
+
+    console.log("[WEBHOOK]", repWebhook.status, webhookBody);
+
+    if (!repWebhook.ok) {
+      console.warn("[WEBHOOK WARNING] HTTP status not OK:", repWebhook.status);
+    }
+  } catch (e) {
+    console.error("[ERREUR]", e);
+  }
+}
+
+// ===== 9) Lancement =====
+(async function main() {
+  const templateId = "f7b9a59a-e708-45c4-b786-2a5130cfee2b";
+  const webhookUrl = URLS.N8N.NOTIF_EMAIL;
+
+  // Mettre à jour InterventionDateCreationValide
+  const updateDocData = {
+    ...docData,
+    InterventionDateCreationValide:
+      docData?.CommandDate && typeof isFutureDate === "function"
+        ? isFutureDate(docData?.CommandDate)
+        : "Non",
+  };
+  docData = updateDocData;
+
+  await updateFormulaireAAfaireAvecPopupEquipe(
+    api,
+    docData,
+    templateId,
+    webhookUrl,
+  );
+  window.location.href = document.referrer;
+})();
