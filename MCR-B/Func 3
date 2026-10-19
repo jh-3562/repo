@@ -744,6 +744,19 @@ const formatDataAPI = (data) => {
   return JSON.stringify(excludeKeys(data, ["FORMID", "NUMBER"]));
 };
 
+// Retire les espaces et caractères invisibles aux extrémités
+const cleanText = (value) =>
+  typeof value === "string"
+    ? value.replace(/[\u200B-\u200D\uFEFF]/g, "").trim()
+    : value;
+
+// Comparaison insensible aux espaces en trop, à la casse et aux accents
+const normalizeForCompare = (value) =>
+  (cleanText(value) || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+
 // async functions
 let createNew = true;
 const checkIfBeneficiaryExists = async (prenom, nom, dateDeNaissance) => {
@@ -763,8 +776,9 @@ const checkIfBeneficiaryExists = async (prenom, nom, dateDeNaissance) => {
         value: "BÉNÉFICIAIRE",
         type: "TEXT",
       },
-      { key: "Prénom", operator: "EQUALS", value: prenom, type: "TEXT" },
-      { key: "Nom", operator: "EQUALS", value: nom, type: "TEXT" },
+      // CONTAINS car des fiches existantes ont une espace finale (ex. "Ian ")
+      { key: "Prénom", operator: "CONTAINS", value: prenom, type: "TEXT" },
+      { key: "Nom", operator: "CONTAINS", value: nom, type: "TEXT" },
       {
         key: "DateDeNaissance",
         operator: "EQUALS",
@@ -782,7 +796,7 @@ const checkIfBeneficiaryExists = async (prenom, nom, dateDeNaissance) => {
     const res = await api({ local: true }).post("document/id/filter", {
       filters: apiFilters,
     });
-    const ids = res.data.ids;
+    const candidateIds = res.data.ids;
     const resStatus = res.statusText;
     if (resStatus !== "OK") {
       console.warn(
@@ -790,9 +804,28 @@ const checkIfBeneficiaryExists = async (prenom, nom, dateDeNaissance) => {
       );
       createNew = false;
     }
-    console.log("Résultat de la vérification du bénéficiaire :", ids);
-    console.log(ids && ids.length > 0 ? ids[0] : null);
-    return ids && ids.length > 0 ? ids[0] : null; // Retourne l'ID du formulaire existant ou null
+    console.log("Candidats trouvés :", candidateIds);
+    if (!candidateIds || candidateIds.length === 0) return null;
+
+    // Garde seulement les fiches dont le prénom et le nom correspondent exactement
+    // Un appel par ID : le document retourné n'expose pas forcément son ID
+    const responses = await Promise.all(
+      candidateIds.map((id) =>
+        api({ local: true }).post("document/id", { ids: [id] }),
+      ),
+    );
+    const matchIndex = responses.findIndex((response) => {
+      const document = response?.data?.documents?.[0];
+      if (!document) return false;
+      const data = JSON.parse(document.data);
+      return (
+        normalizeForCompare(data["Prénom"]) === normalizeForCompare(prenom) &&
+        normalizeForCompare(data["Nom"]) === normalizeForCompare(nom)
+      );
+    });
+    const matchId = matchIndex >= 0 ? candidateIds[matchIndex] : null;
+    console.log("Résultat de la vérification du bénéficiaire :", matchId);
+    return matchId; // Retourne l'ID du formulaire existant ou null
   } catch (error) {
     console.error("Erreur lors de la vérification du bénéficiaire :", error);
     return undefined;
@@ -806,15 +839,16 @@ const createBeneficiaryForm = async (formData, formLayoutId) => {
     const filteredData = {
       DateDeNaissance: formData.DateDeNaissance || null,
       Commentaires: formData.Commentaires || null,
-      Nom: formData.NomFormMission || null,
+      Nom: cleanText(formData.NomFormMission) || null,
       TPMR: formData.TPMR || null,
-      Prénom: formData.PrénomSelected || null,
+      Prénom: cleanText(formData.PrénomSelected) || null,
       Titre: formData.Titre || null,
       Téléphones: formData.Téléphones || null,
       dateValiditeAttestationMututelle:
         formData.dateValiditeAttestationMututelle || null,
       INFODEV_NomComplet:
-        `${formData.PrénomSelected} ${formData.NomFormMission}` || null,
+        `${cleanText(formData.PrénomSelected)} ${cleanText(formData.NomFormMission)}` ||
+        null,
       InformationsPourLeBureau: formData.InformationsPourLeBureau || null,
       InformationsPourLeChauffeur: formData.InformationsPourLeChauffeur || null,
       InformationsPourLaFacturation:
@@ -951,15 +985,16 @@ const checkIfBeneficiaryHaveChange = async (formId, formData) => {
   const filteredBeneficiary = {
     DateDeNaissance: formData.DateDeNaissance || null,
     Commentaires: formData.Commentaires || null,
-    Nom: formData.NomFormMission || null,
+    Nom: cleanText(formData.NomFormMission) || null,
     TPMR: formData.TPMR || null,
-    Prénom: formData.PrénomSelected || null,
+    Prénom: cleanText(formData.PrénomSelected) || null,
     Titre: formData.Titre || null,
     Téléphones: formData.Téléphones || null,
     dateValiditeAttestationMututelle:
       formData.dateValiditeAttestationMututelle || null,
     INFODEV_NomComplet:
-      `${formData.PrénomSelected} ${formData.NomFormMission}` || null,
+      `${cleanText(formData.PrénomSelected)} ${cleanText(formData.NomFormMission)}` ||
+      null,
     InformationsPourLeBureau: formData.InformationsPourLeBureau || null,
     InformationsPourLeChauffeur: formData.InformationsPourLeChauffeur || null,
     InformationsPourLaFacturation:
