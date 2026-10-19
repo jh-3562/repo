@@ -1,0 +1,1239 @@
+console.log("Function 3", context);
+
+/**
+ * Test if a string is a UUID
+ * @param {string} str
+ * @returns {boolean}
+ * @param {string} dateCible
+ */
+const isUUID = (str) => {
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+};
+
+/**
+ * Get the viewGroup Url
+ * This can be usefull in order to redirect the users
+ * @returns
+ */
+const viewGroupUrl = () => {
+  // Step 1: Get the current Url
+  const currentUrl = window.location.href;
+  // Step 2 : Remove the unecessary segments
+  const parts = currentUrl.split("/");
+  for (let i = 0; i < 3; i++) {
+    const lastpart = parts[parts.length - 1];
+    if (isUUID(lastpart) || lastpart === "new") {
+      parts.pop();
+    }
+  }
+  const viewGroupUrl = parts.join("/");
+  return viewGroupUrl;
+};
+
+function toggleLoadingPopup(show, success, errorMessage, loadingMessage) {
+  let loadingPopup = document.getElementById("loadingPopup");
+  let errorBanner = document.getElementById("errorBanner");
+
+  if (show) {
+    if (!loadingPopup) {
+      // Création du popup de chargement s'il n'existe pas
+      loadingPopup = document.createElement("div");
+      loadingPopup.id = "loadingPopup";
+      loadingPopup.style = `
+              position: fixed; 
+              left: 0; 
+              top: 0; 
+              width: 100%; 
+              height: 100%; 
+              background-color: rgba(0,0,0,0.5); 
+              display: flex; 
+              justify-content: center; 
+              align-items: center; 
+              z-index: 9999;
+            `;
+      document.body.appendChild(loadingPopup);
+
+      // Ajout du CSS pour l'animation du spinner
+      if (!document.getElementById("spinnerStyle")) {
+        let style = document.createElement("style");
+        style.id = "spinnerStyle";
+        style.innerHTML = `
+                @keyframes spin {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+                }
+              `;
+        document.head.appendChild(style);
+      }
+    }
+    // Mise à jour ou création du contenu du popup de chargement
+    loadingPopup.innerHTML = `
+          <div style="background-color: white; padding: 20px; border-radius: 5px; display: flex; flex-direction: column; align-items: center;">
+            <div>${loadingMessage}</div>
+            <div class="loader" style="border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 40px; height: 40px; margin-top: 20px; animation: spin 1s linear infinite;"></div>
+          </div>
+        `;
+    loadingPopup.style.display = "flex";
+    if (errorBanner) errorBanner.style.display = "none";
+  } else {
+    if (loadingPopup) loadingPopup.style.display = "none";
+    if (success === false && errorMessage) {
+      if (!errorBanner) {
+        // Création du banner d'erreur s'il n'existe pas
+        errorBanner = document.createElement("div");
+        errorBanner.id = "errorBanner";
+        errorBanner.style = `
+                position: fixed; 
+                top: 20px; 
+                left: 50%;
+                transform: translateX(-50%);
+                width: auto; 
+                min-width: 300px;
+                height: 50px; 
+                background-color: white; 
+                color: black; 
+                display: flex; 
+                justify-content: center; 
+                align-items: center; 
+                z-index: 9999;
+                border-radius: 5px;
+                padding: 0 20px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.5);
+              `;
+        document.body.appendChild(errorBanner);
+      }
+      // Mise à jour ou création du contenu du banner d'erreur
+      errorBanner.innerHTML = `
+            <div style="margin-right: 10px; color: red;">&#x26A0;</div><div>${errorMessage}</div>
+            <div id="errorBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: red; height: 5px; width: 0%;"></div>
+          `;
+      errorBanner.style.display = "flex";
+      // Initialisation ou réinitialisation de la barre de progression
+      let progressElement = document.getElementById("errorBannerProgress");
+      let width = 0;
+      let interval = setInterval(() => {
+        if (width >= 100) {
+          clearInterval(interval);
+          errorBanner.style.display = "none";
+        } else {
+          width++;
+          progressElement.style.width = width + "%";
+        }
+      }, 55); // La barre progresse sur 5 secondes
+    }
+  }
+}
+
+const getInputValue = () => {
+  return docData["CC_AdresseDépart"];
+};
+
+// sync functions
+// returns the value of a specific address component based on its type
+const getComponent = (addressComponents, type) => {
+  return (
+    addressComponents.find((component) => component.types.includes(type))
+      ?.longText ?? ""
+  );
+};
+
+/**
+ * Redirect explicitly to the Transports viewgroup
+ * This avoids accidental navigation to other modules
+ */
+const redirectToViewGroup = () => {
+  const { origin, pathname } = window.location;
+
+  // pathname example:
+  // /mcr.arlon/transports/mission/new/UUID
+  const segments = pathname.split("/").filter(Boolean);
+
+  // The tenant is always the first segment (e.g. "mcr.arlon")
+  const tenant = segments[0];
+
+  if (!tenant) {
+    console.error("[redirectToViewGroup] Tenant not found in URL");
+    return;
+  }
+
+  const targetUrl = `${origin}/${tenant}/transports`;
+
+  window.location.href = targetUrl;
+};
+
+// function to create the popup loading element
+const createOrUpdateElement = (id, tag, style, innerHTML = "") => {
+  let element = document.getElementById(id);
+  if (!element) {
+    element = document.createElement(tag);
+    element.id = id;
+    document.body.appendChild(element);
+  }
+  element.style = style;
+  element.innerHTML = innerHTML;
+  return element;
+};
+// function to hide the popuploading
+const hidePopupLoading = () => {
+  const loadingPopup = document.getElementById("loadingPopup");
+  if (loadingPopup) loadingPopup.style.display = "none";
+};
+// function to show the popup loading
+const showPopupLoading = (loadingMessage) => {
+  createOrUpdateElement(
+    "loadingPopup",
+    "div",
+    `
+              position: fixed;
+              left: 0;
+              top: 0;
+              width: 100%;
+              height: 100%;
+              background-color: rgba(0,0,0,0.5);
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              z-index: 9999;
+            `,
+    `
+              <div style="background-color: white; padding: 20px; border-radius: 5px; display: flex; flex-direction: column; align-items: center;">
+                <div>${loadingMessage}</div>
+                <div class="loader" style="border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 40px; height: 40px; margin-top: 20px; animation: spin 1s linear infinite;"></div>
+              </div>
+            `,
+  );
+  if (!document.getElementById("spinnerStyle")) {
+    let style = document.createElement("style");
+    style.id = "spinnerStyle";
+    style.innerHTML = `
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `;
+    document.head.appendChild(style);
+  }
+};
+
+// function to show the popup loading
+const showPopupError = () => {
+  createOrUpdateElement(
+    "loadingPopup",
+    "div",
+    `
+              position: fixed;
+              left: 0;
+              top: 0;
+              width: 100%;
+              height: 100%;
+              background-color: rgba(0,0,0,0.5);
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              z-index: 9999;
+            `,
+    `
+              <div style="background-color: white; padding: 20px; border-radius: 5px; display: flex; flex-direction: column; align-items: center;">
+                <div>Une erreur est survenue, veuillez réessayer.</div>
+                <button id="closePopupBtn" style="border: 2px solid #3498db; background-color: #3498db; color: #FFFFFF; width: 50px; height: 30px; border-radius: 10px; margin-top: 20px;">Ok</button>
+              </div>
+            `,
+  );
+};
+
+const showCustomPopup = (params) => {
+  const { title, commentHTML, fields, buttons } = params;
+  const fieldElements = {};
+  const setValue = (targetKey, newValue, notify = false) => {
+    const el = fieldElements[targetKey];
+    if (!el) return;
+    if (el.type === "checkbox") {
+      el.checked = Boolean(newValue);
+    } else {
+      el.value = String(newValue);
+    }
+    if (notify) el.dispatchEvent(new Event("change", { bubbles: true }));
+  };
+  function getValues() {
+    const values = {};
+    for (const el of Object.values(fieldElements)) {
+      values[el.name] = el.type === "checkbox" ? el.checked : el.value;
+    }
+    return values;
+  }
+  function getField(params2) {
+    const {
+      key,
+      name,
+      type,
+      options,
+      style: style2,
+      defaultValue,
+      min,
+      max,
+      required,
+      onChange,
+    } = params2;
+    const wrapper = document.createElement("div");
+    wrapper.className = "popup-input";
+    const fieldTitle = document.createElement("label");
+    fieldTitle.innerHTML = required
+      ? `${name || key} <span style="color: #FF0000">*</span>`
+      : name || key;
+    fieldTitle.htmlFor = key;
+    let inputEl;
+    switch (type.toLocaleLowerCase()) {
+      case "select":
+        inputEl = document.createElement("select");
+        inputEl.name = key;
+        if (style2) inputEl.style = style2;
+        inputEl.id = key;
+        (options || []).forEach(({ value, label: label2 }) => {
+          const opt = document.createElement("option");
+          opt.value = value;
+          opt.textContent = label2;
+          inputEl.appendChild(opt);
+        });
+        wrapper.append(fieldTitle, inputEl);
+        break;
+      case "search":
+        function debounce(fn, delay = 300) {
+          let timer;
+          return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => fn(...args), delay);
+          };
+        }
+
+        inputEl = document.createElement("input");
+        inputEl.type = "search";
+        inputEl.name = key;
+        inputEl.id = key;
+        if (style2) inputEl.style = style2;
+        if (required) inputEl.required = true;
+        if (defaultValue) inputEl.value = defaultValue;
+
+        const listId = `${key}-list`;
+        const dataList = document.createElement("datalist");
+        dataList.id = listId;
+
+        inputEl.setAttribute("list", listId);
+
+        let suggestions = (options && options.suggestions) || [];
+
+        suggestions.forEach((item) => {
+          const opt = document.createElement("option");
+          opt.value = item;
+          dataList.appendChild(opt);
+        });
+
+        const dropdown = document.createElement("div");
+        dropdown.className = "popup-search-dropdown";
+
+        wrapper.classList.add("popup-search-wrapper");
+
+        const updateDropdown = (value) => {
+          dropdown.innerHTML = "";
+
+          const filtered = suggestions?.filter((s) =>
+            s.toLowerCase().includes(value.toLowerCase()),
+          );
+
+          if (!filtered.length || !value) {
+            dropdown.classList.remove("visible");
+            return;
+          }
+
+          filtered.forEach((item) => {
+            const optionEl = document.createElement("div");
+            optionEl.className = "popup-search-option";
+            optionEl.textContent = item;
+
+            optionEl.addEventListener("click", () => {
+              inputEl.value = item;
+              dropdown.classList.remove("visible");
+              inputEl.dispatchEvent(new Event("change", { bubbles: true }));
+            });
+
+            dropdown.appendChild(optionEl);
+          });
+
+          dropdown.classList.add("visible");
+        };
+
+        const debouncedUpdate = debounce(async (value) => {
+          if (options?.fetchSuggestions) {
+            try {
+              suggestions = await options.fetchSuggestions(value);
+            } catch (e) {
+              console.error("Erreur fetchSuggestions:", e);
+              suggestions = [];
+            }
+          }
+
+          updateDropdown(value);
+        }, options?.debounce || 300);
+
+        inputEl.addEventListener("input", (e) => {
+          debouncedUpdate(e.target.value);
+        });
+
+        inputEl.addEventListener("focus", () => {
+          updateDropdown(inputEl.value);
+        });
+
+        document.addEventListener("click", (e) => {
+          if (!wrapper.contains(e.target)) {
+            dropdown.classList.remove("visible");
+          }
+        });
+
+        wrapper.append(fieldTitle, inputEl, dataList, dropdown);
+        break;
+      case "checkbox":
+        inputEl = document.createElement("input");
+        inputEl.type = "checkbox";
+        inputEl.name = key;
+        if (style2) inputEl.style = style2;
+        inputEl.id = key;
+        wrapper.classList.add("popup-input-row");
+        wrapper.append(inputEl, fieldTitle);
+        break;
+      case "number":
+        inputEl = document.createElement("input");
+        inputEl.type = "number";
+        inputEl.name = key;
+        if (style2) inputEl.style = style2;
+        if (defaultValue !== void 0) inputEl.value = defaultValue;
+        if (min !== void 0) inputEl.min = min;
+        if (max !== void 0) inputEl.max = max;
+        if (required) inputEl.required = true;
+        inputEl.step = "1";
+        inputEl.id = key;
+        inputEl.addEventListener("input", () => {
+          let cleaned = inputEl.value.replace(/[^\d]/g, "");
+          if (cleaned === "") {
+            inputEl.value = "";
+            return;
+          }
+          let value = parseInt(cleaned, 10);
+          const maxValue = Number(max);
+          const minValue = Number(min);
+          if (!isNaN(maxValue) && value > maxValue) {
+            value = maxValue;
+          } else if (!isNaN(minValue) && value < minValue) {
+            value = minValue;
+          }
+          inputEl.value = value.toString();
+        });
+        wrapper.append(fieldTitle, inputEl);
+        break;
+      case "label":
+        const label = document.createElement("span");
+        label.innerHTML = name || "";
+        if (style2) label.style = style2;
+        wrapper.appendChild(label);
+        break;
+      case "date":
+        inputEl = document.createElement("input");
+        inputEl.type = "date";
+        inputEl.name = key;
+        if (style2) inputEl.style = style2;
+        if (defaultValue) inputEl.value = defaultValue;
+        if (required) inputEl.required = true;
+        inputEl.id = key;
+        wrapper.append(fieldTitle, inputEl);
+        break;
+      case "time":
+        inputEl = document.createElement("input");
+        inputEl.type = "time";
+        inputEl.name = key;
+        if (style2) inputEl.style = style2;
+        if (defaultValue) inputEl.value = defaultValue;
+        if (required) inputEl.required = true;
+        inputEl.id = key;
+        wrapper.append(fieldTitle, inputEl);
+        break;
+      default:
+        inputEl = document.createElement("input");
+        inputEl.type = type.toLowerCase();
+        inputEl.name = key;
+        if (style2) inputEl.style = style2;
+        if (defaultValue) inputEl.value = defaultValue;
+        if (required) inputEl.required = true;
+        inputEl.id = key;
+        wrapper.append(fieldTitle, inputEl);
+        break;
+    }
+    if (!inputEl) return wrapper;
+    fieldElements[key] = inputEl;
+    if (onChange) {
+      inputEl.addEventListener("change", () => {
+        const value =
+          inputEl.type === "checkbox" ? inputEl.checked : inputEl.value;
+        onChange(getValues(), value, setValue);
+      });
+    }
+    return wrapper;
+  }
+  const overlay = document.createElement("div");
+  overlay.className = "popup-overlay";
+  const popup = document.createElement("form");
+  popup.id = "customPopup";
+  popup.className = "popup-box";
+  const style = document.createElement("style");
+  style.textContent = `
+    .popup-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        animation: fadeInOverlay 0.15s ease-out;
+    }
+
+    @keyframes fadeInOverlay {
+        from {
+        background: rgba(0, 0, 0, 0);
+        }
+        to {
+        background: rgba(0, 0, 0, 0.4);
+        }
+    }
+
+    .popup-box {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        background: white;
+        border-radius: 0.375rem;
+        padding: 15px 25px;
+        width: 500px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        animation: fadeInScale 0.15s ease-out;
+    }
+
+    @keyframes fadeInScale {
+        from {
+        opacity: 0;
+        transform: scale(0.95);
+        background: rgba(0, 0, 0, 0);
+        }
+        to {
+        opacity: 1;
+        transform: scale(1);
+        }
+    }
+
+    .popup-box h1,
+    .popup-box h2,
+    .popup-box h3,
+    .popup-box p,
+    .popup-box span {
+        color: #202127;
+    }
+
+    .popup-box h2 {
+        margin: 0 0 20px;
+        font-size: 1.25rem;
+    }
+
+    .popup-box p,
+    .popup-box span {
+        font-size: 1rem;
+    }
+
+    .popup-comment {
+        margin-bottom: 20px;
+    }
+
+        .popup-search-wrapper {
+            position: relative;
+        }
+
+        .popup-search-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 0.375rem;
+        z-index: 1000;
+        max-height: 150px;
+        overflow-y: auto;
+        display: none;
+        }
+
+        .popup-search-dropdown.visible {
+        display: block;
+        }
+
+        .popup-search-option {
+        padding: 8px 10px;
+        cursor: pointer;
+        font-size: 1rem;
+        color: #202127;
+        }
+
+        .popup-search-option:hover {
+        background: #f5f5f6;
+        }
+        .popup-input input[type="search"]::-webkit-search-cancel-button {
+        cursor: pointer;
+        }
+
+    .popup-input {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+    }
+
+    .popup-input-row {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .popup-input label {
+        margin-bottom: 5px;
+        font-size: 12px;
+    }
+
+    .popup-input input,
+    .popup-input select {
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 0.375rem;
+        font-size: 1rem;
+    }
+
+    .popup-input.invalid input,
+    .popup-input.invalid select {
+    border: 1px solid #FF0000;
+    }
+
+    .popup-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .popup-buttons button, .popup-buttons input[type='button'] {
+        border: none;
+        padding: 3px 30px;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    @media (max-width: 768px) {
+        .popup-input input,
+        .popup-input select {
+            width: 100%;
+        }
+    }
+    `;
+  popup.appendChild(style);
+  if (title) {
+    const titleElem = document.createElement("h2");
+    titleElem.textContent = title;
+    titleElem.style.fontWeight = "bold";
+    popup.appendChild(titleElem);
+  }
+  if (commentHTML) {
+    const comment = document.createElement("div");
+    comment.className = "popup-comment";
+    comment.innerHTML = commentHTML;
+    popup.appendChild(comment);
+  }
+  if (fields)
+    for (const field of fields) {
+      popup.appendChild(getField(field));
+    }
+  const buttonRow = document.createElement("div");
+  buttonRow.className = "popup-buttons";
+  if (buttons) {
+    for (const button of buttons) {
+      const btn = document.createElement("button");
+      btn.textContent = button.name;
+      switch (button.preset) {
+        case "action":
+          btn.style.backgroundColor = "#3182ce";
+          btn.style.color = "#f2f7fb";
+          break;
+        case "cancel":
+          btn.style.backgroundColor = "#f5f5f6";
+          btn.style.color = "#2c2d32";
+          break;
+        default:
+          btn.style.backgroundColor = "#3182ce";
+          btn.style.color = "#f2f7fb";
+          break;
+      }
+      if (button.backgroundColor)
+        btn.style.backgroundColor = button.backgroundColor;
+      if (button.color) btn.style.color = button.color;
+      btn.onclick = () => {
+        const form = document.getElementById("customPopup");
+        if (button.key != "cancel" && !form.reportValidity()) {
+          const fields2 = form.querySelectorAll(
+            ".popup-input input, .popup-input select",
+          );
+          fields2.forEach((el) => {
+            if (el.hasAttribute("required"))
+              el.parentElement.classList.add("invalid");
+          });
+          return;
+        }
+        button.onClick(getValues());
+        document.body.removeChild(overlay);
+      };
+      buttonRow.appendChild(btn);
+    }
+  }
+  popup.appendChild(buttonRow);
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+};
+
+const goToDate = (dateCible) => {
+  const STORAGE_KEY = "TRANSPORTS_TIMELINE_DATE";
+  sessionStorage.setItem(STORAGE_KEY, dateCible);
+
+  sessionStorage.removeItem(STORAGE_KEY + "_USED");
+
+  window.location.href = viewGroupUrl();
+};
+
+// Constants
+const formLayoutId_Bénéficiaire = "3da52cab-039f-4a19-93ce-c904fe1e2ef0";
+const formLayoutId_Mission = "0e44171d-1616-4a50-9b36-aff4d998c4a5";
+
+// sync functions
+const DataCollection = (key, array) => {
+  let result = {};
+  let itemCount = array?.length;
+  array.forEach((obj, index) => {
+    Object.keys(obj).forEach((key) => {
+      let newKey = `${key}|${index + 1}`;
+      result[newKey] = obj[key];
+    });
+  });
+  result[key] = itemCount.toString();
+  return result;
+};
+
+const excludeKeys = (obj, keys) =>
+  Object.keys(obj).reduce((result, key) => {
+    if (!keys.includes(key)) {
+      result[key] = obj[key];
+    }
+    return result;
+  }, {});
+
+const formatDataAPI = (data) => {
+  Object.keys(data).forEach((key) => {
+    if (Array.isArray(data[key])) {
+      data = { ...data, ...DataCollection(key, data[key]) };
+    }
+  });
+  return JSON.stringify(excludeKeys(data, ["FORMID", "NUMBER"]));
+};
+
+// async functions
+let createNew = true;
+const checkIfBeneficiaryExists = async (prenom, nom, dateDeNaissance) => {
+  console.log(
+    "Vérification de l'existence du bénéficiaire avec les données :",
+    {
+      prenom,
+      nom,
+      dateDeNaissance,
+    },
+  );
+  try {
+    const apiFilters = [
+      {
+        key: "FORMLAYOUTNAME",
+        operator: "EQUALS",
+        value: "BÉNÉFICIAIRE",
+        type: "TEXT",
+      },
+      { key: "Prénom", operator: "EQUALS", value: prenom, type: "TEXT" },
+      { key: "Nom", operator: "EQUALS", value: nom, type: "TEXT" },
+      {
+        key: "DateDeNaissance",
+        operator: "EQUALS",
+        value: dateDeNaissance,
+        type: "TEXT",
+      },
+      {
+        key: "STATUS",
+        operator: "EQUALS",
+        value: "Enregistré",
+        type: "TEXT",
+      },
+    ];
+
+    const res = await api({ local: true }).post("document/id/filter", {
+      filters: apiFilters,
+    });
+    const ids = res.data.ids;
+    const resStatus = res.statusText;
+    if (resStatus !== "OK") {
+      console.warn(
+        "Un erreur est survenue lors de la recherche du bénéficiaire donc on ne crée pas une nouveau",
+      );
+      createNew = false;
+    }
+    console.log("Résultat de la vérification du bénéficiaire :", ids);
+    console.log(ids && ids.length > 0 ? ids[0] : null);
+    return ids && ids.length > 0 ? ids[0] : null; // Retourne l'ID du formulaire existant ou null
+  } catch (error) {
+    console.error("Erreur lors de la vérification du bénéficiaire :", error);
+    return undefined;
+  }
+};
+
+const createBeneficiaryForm = async (formData, formLayoutId) => {
+  console.log("formData", formData);
+  try {
+    // Filtre les champs nécessaires
+    const filteredData = {
+      DateDeNaissance: formData.DateDeNaissance || null,
+      Commentaires: formData.Commentaires || null,
+      Nom: formData.NomFormMission || null,
+      TPMR: formData.TPMR || null,
+      Prénom: formData.PrénomSelected || null,
+      Titre: formData.Titre || null,
+      Téléphones: formData.Téléphones || null,
+      dateValiditeAttestationMututelle:
+        formData.dateValiditeAttestationMututelle || null,
+      INFODEV_NomComplet:
+        `${formData.PrénomSelected} ${formData.NomFormMission}` || null,
+      InformationsPourLeBureau: formData.InformationsPourLeBureau || null,
+      InformationsPourLeChauffeur: formData.InformationsPourLeChauffeur || null,
+      InformationsPourLaFacturation:
+        formData.InformationsPourLaFacturation || null,
+      DateEnregistrement: formData.DateEnregistrement || null,
+      "E-mails": formData["E-mails"] || null,
+      "Contacts supplémentaires": formData["Contacts supplémentaires"] || null,
+      AdressePreférées: formData["AdressePreférées"] || null,
+      MobilitéDuBénéficiaire: formData.MobilitéDuBénéficiaire || null,
+      checkboxBeneKg: formData.checkboxBeneKg || null,
+      AllocataireSocial: formData.AllocataireSocial || null,
+      CoorFactu_Réception: formData.CoorFactu_Réception || null,
+      CoorFactu_Courrier: formData.CoorFactu_Courrier || null,
+      CoorFactu_Qualité: formData.CoorFactu_Qualité || null,
+      CoorFactu_Type_Entité: formData["CoorFactu_Type_Entité"] || null,
+      "CoorFactu_Dénomination sociale":
+        formData["CoorFactu_Dénomination sociale"] || null,
+      "CoorFactu_Numéro de TVA": formData["CoorFactu_Numéro de TVA"] || null,
+      CoorFactu_Rue: formData["CoorFactu_Rue"] || null,
+      "CoorFactu_Code postal": formData["CoorFactu_Code postal"] || null,
+      CoorFactu_Nom: formData["CoorFactu_Nom"] || null,
+      CoorFactu_Prénom: formData["CoorFactu_Prénom"] || null,
+      CoorFactu_Numéro: formData["CoorFactu_Numéro"] || null,
+      CoorFactu_Ville: formData["CoorFactu_Ville"] || null,
+      CoorFactu_Pays: formData["CoorFactu_Pays"] || null,
+      MatérielAPrévoir: formData["MatérielAPrévoir"] || null,
+    };
+    console.log(formatDataAPI(filteredData));
+    try {
+      const response = await api({ local: true }).post("document", {
+        document: {
+          data: formatDataAPI(filteredData),
+          status: "Enregistré",
+          active: true,
+          template: { templateId: formLayoutId },
+        },
+      });
+      console.log("Réponse de l'API :", response);
+      return response;
+    } catch (error) {
+      console.error("Erreur lors de l'appel API :", error);
+    }
+  } catch (error) {
+    console.error(
+      "Erreur lors de la création du formulaire bénéficiaire :",
+      error,
+    );
+    throw error;
+  }
+};
+
+const createMissionForm = async (formData, formLayoutId) => {
+  try {
+    const document = {
+      // Convertit les données en JSON
+      data: formatDataAPI(formData),
+      // Définit le statut du formulaire
+      status: "Acceptée",
+      // Définit le formulaire comme actif
+      active: true,
+      // ID du modèle de formulaire
+      template: { templateId: formLayoutId },
+    };
+
+    // Envoi des données via une requête POST
+    const res = await api({ local: true }).post("document", { document });
+
+    return res;
+  } catch (error) {
+    console.error("Erreur lors de la création du formulaire mission :", error);
+    throw error;
+  }
+};
+
+const updateMissionForm = async (formId, formData, formLayoutId) => {
+  try {
+    // Prépare les données à mettre à jour
+    const document = {
+      // Convertit les données en JSON
+      data: formatDataAPI(formData),
+      // Définit le statut du formulaire
+      status: "Acceptée",
+      // Définit le formulaire comme actif
+      active: true,
+      // ID du modèle de formulaire
+      template: { templateId: formLayoutId },
+      // ID du formulaire existant à mettre à jour
+      documentID: formId,
+    };
+
+    // Effectue la requête PUT pour mettre à jour le formulaire
+    const res = await api({ local: true }).put("document", { document });
+
+    console.log("Mise à jour réussie du formulaire mission :", res);
+    return res;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la mise à jour du formulaire mission :",
+      error,
+    );
+    throw error;
+  }
+};
+
+const updateBeneficiaryForm = async (formId, formData) => {
+  try {
+    const document = {
+      data: formatDataAPI(formData),
+      status: "Enregistré", // statut correct
+      active: true,
+      template: { templateId: formLayoutId_Bénéficiaire },
+      documentID: formId,
+    };
+    return await api({ local: true }).put("document", { document });
+  } catch (err) {
+    console.error("Erreur updateBeneficiaryForm :", err);
+    throw err;
+  }
+};
+
+const checkIfBeneficiaryHaveChange = async (formId, formData) => {
+  // get mission info
+  const res3 = await api({ local: true }).post("document/id", {
+    ids: [formId],
+  });
+
+  console.log("res3", res3);
+  // parse the info
+  const beneficiaryDB =
+    res3.data?.documents?.map((document) => JSON.parse(document.data)) || [];
+
+  console.log("beneficiaryDB", beneficiaryDB);
+
+  const filteredBeneficiary = {
+    DateDeNaissance: formData.DateDeNaissance || null,
+    Commentaires: formData.Commentaires || null,
+    Nom: formData.NomFormMission || null,
+    TPMR: formData.TPMR || null,
+    Prénom: formData.PrénomSelected || null,
+    Titre: formData.Titre || null,
+    Téléphones: formData.Téléphones || null,
+    dateValiditeAttestationMututelle:
+      formData.dateValiditeAttestationMututelle || null,
+    INFODEV_NomComplet:
+      `${formData.PrénomSelected} ${formData.NomFormMission}` || null,
+    InformationsPourLeBureau: formData.InformationsPourLeBureau || null,
+    InformationsPourLeChauffeur: formData.InformationsPourLeChauffeur || null,
+    InformationsPourLaFacturation:
+      formData.InformationsPourLaFacturation || null,
+    DateEnregistrement: formData.DateEnregistrement || null,
+    "E-mails": formData["E-mails"] || null,
+    "Contacts supplémentaires": formData["Contacts supplémentaires"] || null,
+    AdressePreférées: formData["AdressePreférées"] || null,
+    MobilitéDuBénéficiaire: formData.MobilitéDuBénéficiaire || null,
+    checkboxBeneKg: formData.checkboxBeneKg || null,
+    AllocataireSocial: formData.AllocataireSocial || null,
+    CoorFactu_Réception: formData.CoorFactu_Réception || null,
+    CoorFactu_Courrier: formData.CoorFactu_Courrier || null,
+    CoorFactu_Qualité: formData.CoorFactu_Qualité || null,
+    CoorFactu_Type_Entité: formData["CoorFactu_Type_Entité"] || null,
+    "CoorFactu_Dénomination sociale":
+      formData["CoorFactu_Dénomination sociale"] || null,
+    "CoorFactu_Numéro de TVA": formData["CoorFactu_Numéro de TVA"] || null,
+    CoorFactu_Rue: formData["CoorFactu_Rue"] || null,
+    "CoorFactu_Code postal": formData["CoorFactu_Code postal"] || null,
+    CoorFactu_Nom: formData["CoorFactu_Nom"] || null,
+    CoorFactu_Prénom: formData["CoorFactu_Prénom"] || null,
+    CoorFactu_Numéro: formData["CoorFactu_Numéro"] || null,
+    CoorFactu_Ville: formData["CoorFactu_Ville"] || null,
+    CoorFactu_Pays: formData["CoorFactu_Pays"] || null,
+    MatérielAPrévoir: formData["MatérielAPrévoir"] || null,
+  };
+
+  const excludedKeys = [];
+
+  const differences =
+    beneficiaryDB.length > 0
+      ? Object.keys(filteredBeneficiary).reduce((diff, key) => {
+          if (
+            !excludedKeys.includes(key) &&
+            filteredBeneficiary[key] !== beneficiaryDB[0][key] &&
+            filteredBeneficiary[key] !== null
+          ) {
+            diff[key] = filteredBeneficiary[key];
+          }
+          return diff;
+        }, {})
+      : {};
+
+  console.log("Différences trouvées :", differences);
+  return differences;
+};
+
+const navigateBack = async () => {
+  let viewGroup;
+  const lastPage = localStorage.getItem("lastCustomPage");
+  console.log("LAST PAGE ", lastPage);
+  if (lastPage) {
+    // Extraire le premier segment (le viewgroup)
+    viewGroup = lastPage;
+    window.location.href = viewGroup;
+  } else {
+    window.history.back(); // fallback si rien n’est trouvé
+  }
+};
+
+const showPopupErrorWithClose = () => {
+  showPopupError(); // Affiche la popup avec bouton
+
+  // Attendre un petit délai que la popup soit bien injectée dans le DOM
+  setTimeout(() => {
+    const closePopupButton = document.getElementById("closePopupBtn");
+    if (closePopupButton) {
+      closePopupButton.addEventListener("click", hidePopupLoading);
+    }
+  }, 100);
+};
+// main
+
+const main = async (docData) => {
+  try {
+    const collection = docData?.["CC_Destinations"];
+    const heureDebut = docData?.CC_Récupération;
+    const heureFin = docData?.CC_Arrivée
+      ? docData?.CC_Arrivée
+      : collection[collection.length - 1]?.[`CC_Destinations|600|Fin de RDV`];
+
+    // Convertit "HH:MM" en minutes depuis minuit (null si invalide)
+    const toMinutes = (hhmm) => {
+      if (typeof hhmm !== "string") return null;
+      const match = hhmm.trim().match(/^(\d{1,2}):(\d{2})$/);
+      if (!match) return null;
+      const h = Number(match[1]);
+      const m = Number(match[2]);
+      if (h > 23 || m > 59) return null;
+      return h * 60 + m;
+    };
+
+    const debutMin = toMinutes(heureDebut);
+    const finMin = toMinutes(heureFin);
+    console.log("DEBUT MIN, FIN MIN", debutMin, finMin);
+    if (debutMin !== null && finMin !== null && finMin < debutMin) {
+      toggleLoadingPopup(
+        false,
+        false,
+        "Erreur : L'heure de fin est antérieure à l'heure de début.",
+      );
+      return;
+    }
+    if (new Date() > new Date(docData.InformationsAdmin_DateHeureDébut)) {
+      const popup = await new Promise((resolve) => {
+        showCustomPopup({
+          title: "La mission est dans le passé",
+          commentHTML: "Souhaitez-vous continuer la création de la mission?",
+          fields: [],
+          buttons: [
+            {
+              name: "Annuler",
+              key: "cancel",
+              onClick: () => resolve(false),
+            },
+            {
+              name: "Continuer",
+              preset: "action",
+              onClick: () => resolve(true),
+            },
+          ],
+        });
+      });
+      if (!popup) return;
+    }
+    // show the popup
+    showPopupLoading(
+      "La mission est en cours de création. Merci de patienter quelques instants.",
+    );
+    console.log("Données du document :", docData);
+    // Étape 1 : Vérifie si le bénéficiaire existe
+    const beneficiaryId = await checkIfBeneficiaryExists(
+      docData.PrénomSelected
+        ? docData.PrénomSelected.trim()
+        : docData.PrénomSelected,
+      docData.NomFormMission
+        ? docData.NomFormMission.trim()
+        : docData.NomFormMission,
+      docData.DateDeNaissance
+        ? docData.DateDeNaissance.trim()
+        : docData.DateDeNaissance,
+    );
+    // if there is problem with api
+    if (beneficiaryId === undefined) {
+      showPopupErrorWithClose();
+      return;
+    }
+    console.log("Bénéficiaire existant trouvé :", beneficiaryId);
+    let cloneDocData = { ...docData };
+    if (beneficiaryId) {
+      console.log(`Bénéficiaire existant trouvé : ${beneficiaryId}`);
+      // Vérifie si le bénéficiaire a changé
+      const differences = await checkIfBeneficiaryHaveChange(
+        beneficiaryId,
+        docData,
+      );
+      if (Object.keys(differences).length > 0) {
+        console.log("Le bénéficiaire a changé :", differences);
+        // Met à jour le formulaire bénéficiaire
+        await updateBeneficiaryForm(beneficiaryId, differences);
+      }
+      cloneDocData = { ...docData, IdentifiantMission: beneficiaryId };
+    } else {
+      if (createNew === true) {
+        console.log(
+          "Aucun bénéficiaire existant trouvé. Création d'un nouveau bénéficiaire.",
+        );
+
+        // Étape 2 : Crée un nouveau formulaire bénéficiaire
+        const resBenef = await createBeneficiaryForm(
+          docData,
+          formLayoutId_Bénéficiaire,
+        );
+        console.log("Nouveau bénéficiaire créé avec succès.", resBenef);
+        cloneDocData = { ...docData, IdentifiantMission: resBenef.data.id };
+      } else {
+        showPopupErrorWithClose();
+        return;
+      }
+    }
+
+    // Étape 3 : Crée ou met à jour le formulaire mission
+    console.log(cloneDocData);
+    if (cloneDocData.STATUS === "Draft") {
+      console.log("Création d'un nouveau formulaire mission.");
+      await createMissionForm(cloneDocData, formLayoutId_Mission);
+    } else {
+      console.log("Mise à jour du formulaire mission existant.");
+      await updateMissionForm(
+        cloneDocData.FORMID,
+        cloneDocData,
+        formLayoutId_Mission,
+      );
+    }
+    // hide the popup
+    hidePopupLoading();
+    // Step 4 : return to the viewgroup
+
+    const rawDate =
+      docData.Planification_Date || docData.InformationsAdmin_DateHeureDébut;
+
+    let timelineDate = null;
+
+    if (rawDate) {
+      const d =
+        rawDate.length === 10
+          ? new Date(`${rawDate}T00:00:00`)
+          : new Date(rawDate);
+
+      if (!isNaN(d)) {
+        const offsetMin = d.getTimezoneOffset();
+        const sign = offsetMin <= 0 ? "+" : "-";
+        const hh = String(Math.floor(Math.abs(offsetMin) / 60)).padStart(
+          2,
+          "0",
+        );
+        const mm = String(Math.abs(offsetMin) % 60).padStart(2, "0");
+
+        timelineDate =
+          `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}` +
+          `T00:00:00${sign}${hh}:${mm}`;
+      }
+    }
+
+    // If the timeline has already been loaded, it already has a date and must be changed through the local storage to trigger the update of the timeline
+    // If not, the date can be set directly in the session storage
+    // This is due to the fact that the timeline date is set in the local storage on the first load of the timeline, and then updated through the local storage on subsequent loads
+    // The sessionStorage is used to store the dat
+    sessionStorage.removeItem("TRANSPORTS_TIMELINE_DATE");
+
+    if (timelineDate) {
+      console.log(timelineDate);
+
+      sessionStorage.setItem("TRANSPORTS_TIMELINE_DATE_REDIRECT", timelineDate);
+
+      const timelineDay = timelineDate.split("T")[0];
+
+      const tables = JSON.parse(localStorage.getItem("tables") || "{}");
+
+      if (!tables.TimeLineChauffeur) {
+        tables.TimeLineChauffeur = {};
+      }
+
+      if (!tables.TimeLineChauffeur.filters) {
+        tables.TimeLineChauffeur.filters = {};
+      }
+
+      if (!tables.TimeLineChauffeur.mask) {
+        tables.TimeLineChauffeur.mask = {};
+      }
+
+      if (!tables.TimeLineChauffeur.mask.TIMELINE) {
+        tables.TimeLineChauffeur.mask.TIMELINE = {};
+      }
+
+      tables.TimeLineChauffeur.mask.TIMELINE.date = `${timelineDay}|${timelineDay}`;
+
+      tables.TimeLineChauffeur.mask.TIMELINE.type = "DAY";
+
+      localStorage.setItem("tables", JSON.stringify(tables));
+
+      console.log("[TIMELINE] Updated localStorage tables:", tables);
+    }
+
+    redirectToViewGroup();
+  } catch (error) {
+    console.error("Erreur dans le processus principal :", error);
+    throw error;
+  }
+};
+
+window.addEventListener("popstate", hidePopupLoading);
+window.addEventListener("hashchange", hidePopupLoading);
+if (!isValidDocument(t, docData)) {
+  main(docData);
+}
