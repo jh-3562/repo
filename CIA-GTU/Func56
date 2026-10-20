@@ -22,6 +22,13 @@ const FIELD_USER_LATITUDE = "Systeme_LatitudeAdresseCleint";
 const FIELD_USER_LONGITUDE = "Systeme_LongitudeAdresseClient";
 
 const FORMLAYOUT_PARAM_OPTIM = "e371bcfb-1eba-4f0e-aeac-a528b22667e5";
+const FIELD_VILLE_DEPART_AERIEN =
+  "Demande_TransportTransportSimpleNomVilleDepart";
+const FIELD_ADRESSE_DESTINATION_AERIEN =
+  "Demande_TransportTransportSimpleAdresseCompleteDestination";
+const FIELD_ADRESSE_ATTERRISSAGE_RETOUR = "TransportAerien_AdresseAtterissage";
+const FIELD_VILLE_DESTINATION_RETOUR =
+  "Demande_TransportRoutierVilleDeDestination";
 
 const MOIS_NOMS = [
   "Janvier",
@@ -101,6 +108,14 @@ const getPenaliteVille = (paramOptim, villeNom) => {
   return paramOptim.penalitesParVille[villeNom] || 0;
 };
 
+const getVilleFromAdresse = (adresse) => {
+  if (!has(adresse)) return null;
+  const parts = String(adresse)
+    .split(",")
+    .map((part) => part.trim());
+  return parts[1] || null;
+};
+
 const normalizeParamOptim = (data) => {
   const tempsParMobilite = Object.create(null);
   const penalitesParMois = Object.create(null);
@@ -153,6 +168,9 @@ const getParamOptimAdjustments = async () => {
 
   if (!ids.length) {
     return {
+      tempsParMobilite: Object.create(null),
+      penalitesParMois: Object.create(null),
+      penalitesParVille: Object.create(null),
       embDebMinutes: 0,
       penalitePercentMois: 0,
       penaliteVilleDepart: 0,
@@ -164,25 +182,13 @@ const getParamOptimAdjustments = async () => {
   const paramOptim = normalizeParamOptim(JSON.parse(docs[0]?.data || "{}"));
 
   let embDebMinutes = 0;
-  const mobilitesUtilisees = [];
   for (const equipement of equipementsCoches) {
     const temps = paramOptim.tempsParMobilite[equipement];
     if (temps) {
       const totalMinutes = temps.Embarquement + temps.Debarquement;
       embDebMinutes += totalMinutes;
-      mobilitesUtilisees.push({
-        mobilite: equipement,
-        embarquementMinutes: temps.Embarquement,
-        debarquementMinutes: temps.Debarquement,
-        totalMinutes,
-      });
     }
   }
-  console.log("debugParam - Mobilités appliquées par paramOptim:", {
-    mobilites: mobilitesUtilisees,
-    totalEmbarquementDebarquementMinutes: embDebMinutes,
-  });
-
   const dateDepart =
     docData?.["Demande_TransportTransportSimpleDateTransportDepart"];
   const moisDepart = getMoisFromDate(dateDepart);
@@ -200,6 +206,7 @@ const getParamOptimAdjustments = async () => {
   );
 
   return {
+    ...paramOptim,
     embDebMinutes,
     penalitePercentMois,
     penaliteVilleDepart,
@@ -270,6 +277,134 @@ const setHeureUniteFromPickup = (pickupHHMM, dateDep) => {
   if (!Number.isFinite(pickupMin) || !has(dateDep)) return;
   const heureUnite = toHHMM(pickupMin - 15);
   setField(FIELD_UNITE, `${dateDep}T${heureUnite}:00`);
+};
+
+const getAutomaticRecalculationChoice = () => {
+  const arrivalChanged =
+    changed(FIELD_ARR) ||
+    changed(DATE_ARR) ||
+    context?.inputKey === FIELD_ARR ||
+    context?.inputKey === DATE_ARR;
+
+  return arrivalChanged ? "depart" : "arrivee";
+};
+
+const computeHeuresAerien = (choice, paramOptim, result) => {
+  const isRetourAerien =
+    docData?.["DemandeTransportInformationsTransportRetour"] === true ||
+    String(docData?.["DemandeTransportInformationsTransportRetour"] ?? "")
+      .trim()
+      .toLowerCase() === "true";
+  const fieldDuration = isRetourAerien
+    ? "TransportSysteme_DureeTrajetAtterissage"
+    : "TransportSysteme_DureeTrajetAller";
+  const villeDepart = isRetourAerien
+    ? getVilleFromAdresse(docData?.[FIELD_ADRESSE_ATTERRISSAGE_RETOUR])
+    : docData?.[FIELD_VILLE_DEPART_AERIEN];
+  const villeDestination = isRetourAerien
+    ? docData?.[FIELD_VILLE_DESTINATION_RETOUR]
+    : getVilleFromAdresse(docData?.[FIELD_ADRESSE_DESTINATION_AERIEN]);
+  const duration = Number.parseInt(docData?.[fieldDuration], 10);
+
+  if (!Number.isFinite(duration) || duration < 0) return false;
+
+  const embDebMinutes = getEmbDebMinutes(paramOptim);
+  const dateDepart = docData?.[DATE_DEP] || docData?.[DATE_ARR];
+  const penalitePercentMois = getPenalitePercentMois(paramOptim, dateDepart);
+  const penaliteVilleDepart = getPenaliteVille(paramOptim, villeDepart);
+  const penaliteVilleDestination = getPenaliteVille(
+    paramOptim,
+    villeDestination,
+  );
+  const adjustedDuration = Math.round(
+    duration +
+      duration * (penalitePercentMois / 100) +
+      (duration / 2) * (penaliteVilleDepart / 100) +
+      (duration / 2) * (penaliteVilleDestination / 100),
+  );
+
+  if (penalitePercentMois || penaliteVilleDepart || penaliteVilleDestination) {
+    setField(fieldDuration, String(adjustedDuration));
+  }
+
+  if (choice === "arrivee") {
+    const departure = toMinutes(docData?.[FIELD_DEP]);
+    if (!Number.isFinite(departure)) return false;
+
+    const arrival = departure + adjustedDuration + embDebMinutes;
+    setField(FIELD_ARR, toHHMM(arrival));
+
+    if (has(docData?.[DATE_DEP])) {
+      if (arrival % 1440 < departure % 1440) {
+        const nextDate = addDays(docData[DATE_DEP], 1);
+        if (nextDate) setField(DATE_ARR, nextDate);
+      } else if (!has(docData?.[DATE_ARR])) {
+        setField(DATE_ARR, docData[DATE_DEP]);
+      }
+    }
+  } else {
+    const arrival = toMinutes(docData?.[FIELD_ARR]);
+    if (!Number.isFinite(arrival)) return false;
+
+    const departure = arrival - adjustedDuration - embDebMinutes;
+    setField(FIELD_DEP, toHHMM(departure));
+
+    if (has(docData?.[DATE_ARR])) {
+      const departureWrapped = ((departure % 1440) + 1440) % 1440;
+      if (departureWrapped > arrival % 1440) {
+        const previousDate = addDays(docData[DATE_ARR], -1);
+        if (previousDate) setField(DATE_DEP, previousDate);
+      } else if (!has(docData?.[DATE_DEP])) {
+        setField(DATE_DEP, docData[DATE_ARR]);
+      }
+    }
+  }
+
+  return Object.keys(result).length > 0;
+};
+
+const flattenCollectionsForSave = (data) => {
+  const flattened = { ...(data || {}) };
+
+  Object.keys(flattened).forEach((key) => {
+    const value = flattened[key];
+    if (!Array.isArray(value)) return;
+
+    value.forEach((row, index) => {
+      Object.keys(row || {}).forEach((subKey) => {
+        flattened[`${subKey}|${index + 1}`] = row[subKey];
+      });
+    });
+
+    flattened[key] = String(value.length);
+  });
+
+  return flattened;
+};
+
+const saveComputedDocument = async (result) => {
+  const documentId = String(docData?.FORMID || "").trim();
+  if (!documentId || documentId === "0" || !Object.keys(result).length) {
+    return;
+  }
+
+  const savedData = flattenCollectionsForSave({
+    ...docData,
+    ...result,
+  });
+
+  await api({ local: true }).put("document", {
+    document: {
+      documentID: documentId,
+      data: JSON.stringify(savedData),
+      status: docData?.STATUS,
+      active: true,
+      template: {
+        templateId: docData?.FORMLAYOUTID,
+      },
+    },
+    preventNotify: "DOCUMENT",
+  });
 };
 
 const fillCoordinates = async () => {
@@ -398,6 +533,32 @@ const fillTravelDuration = async () => {
 };
 
 const main = async () => {
+  const isAerien = docData?.["Demande_ModeDeTransport"] === "Aérien";
+
+  if (isAerien) {
+    const paramOptim = await getParamOptimAdjustments();
+    const result = {};
+    const choice = getAutomaticRecalculationChoice();
+    const computed = computeHeuresAerien(choice, paramOptim, result);
+
+    if (computed) {
+      try {
+        await saveComputedDocument(result);
+      } catch (error) {
+        console.error(
+          "debugParam - Échec de la sauvegarde automatique aérienne :",
+          error,
+        );
+        showErrorBanner(
+          "Les valeurs aériennes ont été calculées, mais n'ont pas pu être sauvegardées.",
+        );
+      }
+    }
+
+    callback({ data: computed ? result : {} });
+    return;
+  }
+
   const [coordinatesComputed, durationComputed] = await Promise.all([
     fillCoordinates(),
     fillTravelDuration(),
@@ -464,6 +625,17 @@ const main = async () => {
 
     if (!has(docData?.[DATE_ARR])) {
       setField(DATE_ARR, dateDepart);
+    }
+  }
+
+  if (computed) {
+    try {
+      await saveComputedDocument(result);
+    } catch (error) {
+      console.error("debugParam - Échec de la sauvegarde automatique :", error);
+      showErrorBanner(
+        "Les valeurs ont été calculées, mais n'ont pas pu être sauvegardées.",
+      );
     }
   }
 
