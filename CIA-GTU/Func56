@@ -6,6 +6,7 @@ const FIELD_PICKUP = "Demande_TransportTransportSimpleHeurePriseEnCharge";
 const FIELD_RDV = "Demande_TransportsimpleHeuredErendezVous";
 const FIELD_DUR = "TransportSysteme_DureeTrajetAller";
 const FIELD_DUR_RETURN = "TransportSysteme_DureeTrajetRetour";
+const FIELD_UNITE = "Demande_AccompagnateurHeure";
 
 const DATE_DEP = "Demande_TransportTransportSimpleDateTransportDepart";
 const DATE_ARR = "Demande_TransportTransportSimpleDateTransportArrivee";
@@ -218,13 +219,10 @@ const toMinutes = (hhmm) => {
 };
 
 const toHHMM = (mins) => {
-  // Arrondi à la tranche inférieure de 5 minutes
   const minsFloor5 = Math.floor(mins / 5) * 5;
-
   const m = ((minsFloor5 % 1440) + 1440) % 1440;
   const h = Math.floor(m / 60);
   const mn = m % 60;
-
   return `${pad2(h)}:${pad2(mn)}`;
 };
 
@@ -265,6 +263,13 @@ const setField = (key, value) => {
     if (docData) docData[key] = value;
     result[key] = value;
   }
+};
+
+const setHeureUniteFromPickup = (pickupHHMM, dateDep) => {
+  const pickupMin = toMinutes(pickupHHMM);
+  if (!Number.isFinite(pickupMin) || !has(dateDep)) return;
+  const heureUnite = toHHMM(pickupMin - 15);
+  setField(FIELD_UNITE, `${dateDep}T${heureUnite}:00`);
 };
 
 const fillCoordinates = async () => {
@@ -435,18 +440,24 @@ const main = async () => {
 
     let departure;
     let arrival;
+    let pickupForUnite;
 
     if (isRdv) {
       departure = sourceMinutes - 15 - durMin - embDebMinutes;
       arrival = departure + durMin + embDebMinutes;
-      setField(FIELD_PICKUP, toHHMM(departure - 15));
+
+      pickupForUnite = toHHMM(departure - 15);
+      setField(FIELD_PICKUP, pickupForUnite);
     } else {
+      pickupForUnite = toHHMM(sourceMinutes);
       departure = sourceMinutes + 15;
       arrival = departure + durMin + embDebMinutes;
     }
 
     setField(FIELD_DEP, toHHMM(departure));
     setField(FIELD_ARR, toHHMM(arrival));
+
+    setHeureUniteFromPickup(pickupForUnite, dateDepart);
 
     setField("TEMPORARY_HeureSimpleLockHint", isRdv ? "arrivee" : "depart");
     computed = true;
