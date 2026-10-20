@@ -7,6 +7,10 @@ const isChauffeurOrTransporteur = ROLES.some((role) =>
   ["CHAUFFEUR", "TRANSPORTEUR"].includes(role),
 );
 
+const canEditMatriculeConfirme = ROLES.some((role) =>
+  ["ADMIN", "LISTE DE RAPPEL"].includes(String(role).toUpperCase().trim()),
+);
+
 const ABITIBI_FORMLAYOUTID_ADRESSES_FREQUENTES =
   "57b370ea-db0d-432c-adbc-3bae18ba0f59";
 const ABITIBI_FORMLAYOUTID_DEMANDE = "dadaf75a-cd49-4cba-8060-2ac15155478f";
@@ -52,6 +56,7 @@ const common = {
   Transport_RaisonNonCompletion: true,
   Demande_RaisonAttente: true,
   NomTransporteurSearch: true,
+  Demande_AccompagnateurMatricule: !canEditMatriculeConfirme,
 };
 let value = {};
 
@@ -341,6 +346,7 @@ switch (docData.FORMLAYOUTID) {
         ChoixTransport: true,
         ChoixTransportAerien: true,
         TransporteurResteSurPlace: true,
+        TranspResteSurPlace: true, // [FIX ResteSurPlace 2026-10-14]
         Demande_MoyenTransportVersAeroport: true,
         Demande_Priorite: true,
         Demande_MoyenTransportVersDestination: true,

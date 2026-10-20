@@ -1,4 +1,4 @@
-console.log('[MAIN] start – update to "À faire"');
+console.log("[MAIN] start – assignation d'équipe");
 
 async function updateFormulaireAAfaireAvecPopupEquipe(
   api,
@@ -176,7 +176,6 @@ async function updateFormulaireAAfaireAvecPopupEquipe(
 
     const payloadUpdate = {
       data: formatDataAPI(data),
-      status: "À faire",
       active: true,
       template: { templateId },
       documentID: formId,

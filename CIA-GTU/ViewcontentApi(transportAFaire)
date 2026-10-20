@@ -1,18 +1,19 @@
 {
   "document": {
-    "text": [[{"text": "Nom de l'usager: ", "type": "STATIC"}, "Usager_NomComplet"]
-            ,[{"text": "Heure de prise en charge: ", "type": "STATIC"}, "Demande_TransportTransportSimpleHeurePriseEnCharge"]
-            ,[{"text": "Départ: ", "type": "STATIC"}, "Demande_TransportTransportSimpleAdresseCompleteDepart"]   
-            ,[{"text": "Destination: ", "type": "STATIC"}, "Demande_TransportTransportSimpleAdresseCompleteDestination"] 
-            ,[{"text": "Motif de transport: ", "type": "STATIC"}, "Demande_TypeDeTransport2"]
-            ,[{"text": "Numéro de la demande: ", "type": "STATIC"}, "SystemeCache_Nombre"]
-            ,[{"text": "Chauffeur: ", "type": "STATIC"}, "Répartition_NomChauffeur"]
-]
+    "text": [
+      [{ "text": "Nom de l'usager: ", "type": "STATIC" }, "Usager_NomComplet"],
+      [{ "text": "Heure de prise en charge: ", "type": "STATIC" }, "Demande_TransportTransportSimpleHeurePriseEnCharge"],
+      [{ "text": "Départ: ", "type": "STATIC" }, "Demande_TransportTransportSimpleAdresseCompleteDepart"],
+      [{ "text": "Destination: ", "type": "STATIC" }, "Demande_TransportTransportSimpleAdresseCompleteDestination"],
+      [{ "text": "Motif de transport: ", "type": "STATIC" }, "Demande_TypeDeTransport2"],
+      [{ "text": "Numéro de la demande: ", "type": "STATIC" }, "SystemeCache_Nombre"],
+      [{ "text": "Chauffeur: ", "type": "STATIC" }, "Répartition_NomChauffeur"]
+    ]
   },
-  "prepareData" : "
+  "prepareData": "
     const maskRows = store?.pageContentStore?.maskRows;
 
-    const transformField = value => {
+    const transformField = (value) => {
       if (typeof value !== 'string') return value;
       const idx = value.lastIndexOf(',');
       if (idx === -1) return value;
@@ -29,22 +30,25 @@
       'Demande_IdentificationIdentificationUsagerNom'
     ];
 
-    const cleanData = data => {
+    const cleanData = (data) => {
       if (!data || typeof data !== 'object') return data;
-      console.log('Cleaning data:', data); // Debugging line to check the data before cleaning
+
       const cleanedData = fieldKeys.reduce((acc, key) => {
         if (typeof acc[key] === 'string') {
           return { ...acc, [key]: transformField(acc[key]) };
         }
         return acc;
       }, data);
-      console.log('Cleaned data:', cleanedData); // Debugging line to check the cleaned data
-      if (typeof cleanedData.Usager_NomComplet !== 'string' || !cleanedData.Usager_NomComplet.trim()) {
+
+      if (
+        typeof cleanedData.Usager_NomComplet !== 'string' ||
+        !cleanedData.Usager_NomComplet.trim()
+      ) {
         const userName = [
           cleanedData.Demande_IdentificationIdentificationUsagerPrenom,
           cleanedData.Demande_IdentificationIdentificationUsagerNom
         ]
-          .filter(value => typeof value === 'string' && value.trim())
+          .filter((value) => typeof value === 'string' && value.trim())
           .join(' ');
 
         return { ...cleanedData, Usager_NomComplet: userName };
@@ -65,13 +69,71 @@
       'Prise en charge': '#90CAF9'
     };
 
-    if (!maskRows) return maskRows;
+    const safeParse = (value) => {
+      if (!value) return {};
+      if (typeof value === 'object') return value;
+      try {
+        return JSON.parse(value);
+      } catch {
+        return {};
+      }
+    };
 
-    return maskRows.map(row => {
-      const data = typeof row.data === 'string' ? JSON.parse(row.data) : row.data;
-      console.log('Row data:', data); // Debugging line to check the data structure
+    const normalize = (v) => String(v || '').trim().toLowerCase();
+
+    const getUserInfo = () => {
+      const user = store?.moduleStore?.user || {};
+      const roles = Array.isArray(user.roles) ? user.roles : [];
+
+      const userId = String(user.id || user.USERID || user.userId || '').trim();
+      const firstName =
+        user.firstName || user.firstname || user.prenom || user.Prenom || '';
+      const lastName =
+        user.lastName || user.lastname || user.nom || user.Nom || '';
+      const fullName = `${firstName} ${lastName}`.trim();
+
+      return { roles, userId, fullName };
+    };
+
+    if (!Array.isArray(maskRows)) return maskRows;
+
+    const { roles, userId, fullName } = getUserInfo();
+    const isChauffeur = roles.includes('CHAUFFEUR');
+
+    const filteredRows = !isChauffeur
+      ? maskRows
+      : maskRows.filter((row) => {
+          const data = safeParse(row?.data);
+
+          const assignedId = String(
+            data?.Répartition_ChauffeurId ||
+              data?.Repartition_ChauffeurId ||
+              data?.Repartition_ChauffeurID ||
+              ''
+          ).trim();
+
+          const assignedName = String(
+            data?.Répartition_NomChauffeur ||
+              data?.Repartition_NomChauffeur ||
+              ''
+          ).trim();
+
+          if (userId && assignedId) {
+            return normalize(assignedId) === normalize(userId);
+          }
+
+          if (fullName && assignedName) {
+            return normalize(assignedName) === normalize(fullName);
+          }
+
+          return false;
+        });
+
+    return filteredRows.map((row) => {
+      const data = safeParse(row?.data);
       const status = data?.STATUS || '';
       const color = colorMap[status] || '#FFFFFF';
+
       return {
         ...row,
         data: cleanData(data),
