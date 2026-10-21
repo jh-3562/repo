@@ -33,8 +33,27 @@ const heureStr = normalizeTime(docData?.[FIELD_HEURE]);
 
 if (baseDate && heureStr) {
   const iso = `${baseDate}T${heureStr}:00`;
+  const dateDemande = new Date(iso);
+
+  if (Number.isNaN(dateDemande.getTime())) {
+    console.error("Date de demande invalide :", iso);
+    return {};
+  }
+
+  const jourEcart = Number(
+    (
+      Math.abs(dateDemande.getTime() - Date.now()) /
+      (1000 * 60 * 60 * 24)
+    ).toFixed(6)
+  );
+
   console.log("[DEBUG] Date+Heure (récurrence prioritaire, heure normale) →", iso);
-  return { [OUT_FIELD]: iso };
+  console.log("[DEBUG] Jour d'écart →", jourEcart);
+
+  return {
+    [OUT_FIELD]: iso,
+    JOUR_ECART: jourEcart
+  };
 }
 
 return {};
