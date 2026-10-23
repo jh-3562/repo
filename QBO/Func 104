@@ -1,0 +1,107 @@
+console.log("Function 104");
+
+const role = docData["USER"];
+const { TypeIntervention, EquipeAbribus, Partenaire, SousCatégorie1 } = docData;
+
+const emailEquipeMap =
+  TypeIntervention === "Entretien"
+    ? {
+        "SAUVE VITRES": ["sauvevitres@hotmail.com"],
+        Tardif: ["francetardif@roberttardif.ca"],
+      }
+    : TypeIntervention === "Numérique" && SousCatégorie1 === "Dépannage"
+      ? {
+          SC360: [
+            "ticket@network.questzones.ca",
+            "Supportabribus@quebecor.com",
+          ],
+          Tarek: ["tarek2014@yahoo.fr"],
+        }
+      : {
+          GAUTHIER_02: ["rgauthier007@hotmail.com"],
+          GAUTHIER_12: [
+            "thomas.lo@videotron.ca",
+            "david_s2000@live.com",
+            "gestion@expressimmo.ca",
+          ],
+          Tardif: ["francetardif@roberttardif.ca"],
+          ET_Réparation: ["eric@etconstruction.com"],
+          "SAUVE VITRES": ["sauvevitres@hotmail.com"],
+        };
+
+const emailPartenaireMap =
+  TypeIntervention === "Entretien - Spécial"
+    ? {
+        "STL Laval": [
+          "thomas.lo@videotron.ca",
+          "david_s2000@live.com",
+          "gestion@expressimmo.ca",
+        ],
+        STM: ["thomas.lo@videotron.ca", "gestion@expressimmo.ca"],
+      }
+    : {};
+
+const emailRoleMap =
+  TypeIntervention === "Braquette"
+    ? {
+        "STM_01@STM.INFO": ["gabrielle.crichlow@quebecor.com"],
+      }
+    : {};
+
+const defaultTypeInterventionEmailsMap = {
+  Inventaire: ["AffichageInventaires@tva.ca"],
+};
+
+const interventionEmails = [];
+switch (TypeIntervention) {
+  case "Inventaire":
+    interventionEmails.push("AffichageInventaires@tva.ca");
+    break;
+  case "Travaux":
+    switch (SousCatégorie1) {
+      case "Débranchement HQ":
+        interventionEmails.push("francetardif@roberttardif.ca");
+        break;
+      case "Rebranchement HQ":
+        interventionEmails.push("francetardif@roberttardif.ca");
+        break;
+      case "Débranchement Tardif":
+        interventionEmails.push("francetardif@roberttardif.ca");
+        break;
+      case "Rebranchement Tardif":
+        interventionEmails.push("francetardif@roberttardif.ca");
+        break;
+    }
+    break;
+  case "Déploiement":
+    switch (SousCatégorie1) {
+      case "Débranchement HQ":
+        interventionEmails.push("francetardif@roberttardif.ca");
+        break;
+      case "Branchement HQ":
+        interventionEmails.push("francetardif@roberttardif.ca");
+        break;
+    }
+    break;
+}
+
+const roleEmails = emailRoleMap[role];
+const equipeEmails = emailEquipeMap[EquipeAbribus];
+const partenaireEmails = emailPartenaireMap[Partenaire];
+
+const emailsList = [
+  ...new Set([
+    ...(equipeEmails || []),
+    ...(partenaireEmails || []),
+    ...(roleEmails || []),
+    ...(interventionEmails || []),
+  ]),
+];
+
+return emailsList?.length > 0
+  ? {
+      Notifications_Assignation: emailsList.map((email) => ({
+        "Notifications_Assignation|1|courriel": email,
+      })),
+    }
+  : undefined;
