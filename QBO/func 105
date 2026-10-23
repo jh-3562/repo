@@ -1,0 +1,125 @@
+console.log("Function 105");
+
+const { TypeIntervention, SousCatégorie1, EquipeAbribus } = docData;
+
+const interventionEmails = [];
+
+const emails = {
+  affichage: "affichageinventaires@tva.ca",
+  charlotte: "Charlotte.Rodriguez@stm.info",
+  dick: "dick.demontigny@stm.info",
+  gestion: "gestion@expressimmo.ca",
+  jessica: "jessica.marechal@quebecor.com",
+  jonas: "Jonas.Darey@stm.info",
+  marcAndre: "marc-andre.daigneault@tva.ca",
+  ophelie: "ophelie.nieddu@quebecor.com",
+  thomas: "thomas.lo@videotron.ca",
+  travaux: "travauxmontreal@quebecor.com",
+};
+
+switch (TypeIntervention) {
+  case "Réparation":
+    interventionEmails.push(...[emails.jessica, emails.marcAndre]);
+    break;
+  case "Entretien - Spécial":
+    interventionEmails.push(
+      ...[emails.jessica, emails.thomas, emails.gestion, emails.marcAndre],
+    );
+    break;
+  case "Électricité":
+    interventionEmails.push(emails.marcAndre);
+    break;
+  case "Signalement":
+    interventionEmails.push(
+      ...[emails.jessica, emails.gestion, emails.marcAndre],
+    );
+    break;
+  case "Polissage":
+    interventionEmails.push(...[emails.jessica, emails.marcAndre]);
+    break;
+  case "Réparation":
+    interventionEmails.push(emails.marcAndre);
+    break;
+  case "Braquette":
+    interventionEmails.push(...[emails.marcAndre, emails.jonas]);
+    break;
+  case "URGENCE":
+    interventionEmails.push(emails.marcAndre);
+    break;
+  case "NO POST":
+    interventionEmails.push(emails.affichage);
+    break;
+  case "Travaux":
+    switch (SousCatégorie1) {
+      case "Finition":
+        interventionEmails.push(...[emails.jessica, emails.marcAndre]);
+        break;
+      case "Débranchement HQ":
+        interventionEmails.push(emails.travaux);
+        break;
+      case "Rebranchement HQ":
+        interventionEmails.push(emails.travaux);
+        break;
+      case "Débranchement Tardif":
+        interventionEmails.push(emails.travaux);
+        break;
+      case "Rebranchement Tardif":
+        interventionEmails.push(emails.travaux);
+        break;
+    }
+    break;
+  case "Déploiement":
+    interventionEmails.push(emails.marcAndre);
+    switch (SousCatégorie1) {
+      case "Finition":
+        interventionEmails.push(emails.jessica);
+        break;
+      case "Débranchement HQ":
+        interventionEmails.push(emails.travaux);
+        break;
+      case "Branchement HQ":
+        interventionEmails.push(emails.travaux);
+        break;
+      case "Conversion":
+        interventionEmails.push(
+          ...[emails.charlotte, emails.dick, emails.ophelie],
+        );
+        break;
+    }
+    break;
+}
+
+const emailEquipeMap =
+  TypeIntervention === "Numérique" && SousCatégorie1 === "Dépannage"
+    ? {
+        Tarek: ["Supportabribus@quebecor.com"],
+      }
+    : {
+        Tardif: ["maxime.harquet@quebecor.com"],
+      };
+
+const sousCatEmailMap =
+  TypeIntervention === "Réparation"
+    ? {
+        "Verre Pub": ["AffichageInventaires@tva.ca"],
+      }
+    : {};
+
+const equipeEmails = emailEquipeMap[EquipeAbribus];
+const sousCatEmails = sousCatEmailMap[SousCatégorie1];
+
+const emailsList = [
+  ...new Set([
+    ...(equipeEmails || []),
+    ...(interventionEmails || []),
+    ...(sousCatEmails || []),
+  ]),
+];
+
+return emailsList?.length > 0
+  ? {
+      Notifications_Completion: emailsList.map((email) => ({
+        "Notifications_Completion|1|courriel": email,
+      })),
+    }
+  : undefined;
