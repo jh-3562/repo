@@ -20,7 +20,7 @@ const emailEquipeMap =
       : {
           GAUTHIER_02: ["rgauthier007@hotmail.com"],
           GAUTHIER_12: [
-            "thomas.lo@videotron.ca",
+            "adulude@expressimmo.ca",
             "david_s2000@live.com",
             "gestion@expressimmo.ca",
           ],
@@ -33,11 +33,11 @@ const emailPartenaireMap =
   TypeIntervention === "Entretien - Spécial"
     ? {
         "STL Laval": [
-          "thomas.lo@videotron.ca",
+          "adulude@expressimmo.ca",
           "david_s2000@live.com",
           "gestion@expressimmo.ca",
         ],
-        STM: ["thomas.lo@videotron.ca", "gestion@expressimmo.ca"],
+        STM: ["adulude@expressimmo.ca", "gestion@expressimmo.ca"],
       }
     : {};
 
