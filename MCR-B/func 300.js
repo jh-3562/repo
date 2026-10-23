@@ -204,6 +204,7 @@ const showCustomPopup = (params) => {
         inputEl.name = key;
         if (style2) inputEl.style = style2;
         if (defaultValue) inputEl.value = defaultValue;
+        if (min !== void 0) inputEl.min = min;
         if (required) inputEl.required = true;
         inputEl.id = key;
         wrapper.append(fieldTitle, inputEl);
@@ -572,6 +573,7 @@ const askArchiveDate = () =>
           type: "date",
           required: true,
           defaultValue: getLocalToday(),
+          min: getLocalToday(),
         },
       ],
       buttons: [
@@ -711,11 +713,16 @@ const redirectToVehicles = () => {
 };
 
 const main = async () => {
-  // À VÉRIFIER : condition d'origine conservée (d'où vient `t` ?)
   if (await isValidDocument(t, docData)) return;
 
   const archiveDate = await askArchiveDate();
   if (!archiveDate) return;
+
+  // Archiver dans le passé retirerait le véhicule des missions déjà effectuées
+  if (archiveDate < getLocalToday()) {
+    showErrorBanner("On ne peut pas archiver un véhicule dans le passé.");
+    return;
+  }
 
   showPopupLoading("Archivage du véhicule en cours...");
 
