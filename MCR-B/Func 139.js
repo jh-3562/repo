@@ -241,6 +241,100 @@ const proceed = async () => {
   navigateBack();
 };
 
+// Un chauffeur sans formulaire Volontaire relié à son nom d'utilisateur ne peut pas créer de
+// disponibilité. La fonction SHOW 130 ne peut pas le vérifier (pas d'API au chargement), d'où ce blocage.
+const PRIVILEGED_ROLES = [
+  "1. DEVELOPPEUR",
+  "1. RESPONSABLE D'ACTIVITÉ",
+  "1. COORDINATEUR",
+  "1. ADMIN",
+  "1. CHARGÉ DE LA FACTURATION",
+  "1. DISPATCHEUR",
+];
+
+const isPrivilegedUser = () => {
+  const roles = store.moduleStore.user.roles || [];
+  return roles.some((role) => PRIVILEGED_ROLES.includes(role));
+};
+
+const hasVolontaireForm = async () => {
+  const apiFilters = [
+    {
+      key: "FORMLAYOUTNAME",
+      operator: "EQUALS",
+      value: "Volontaire",
+      type: "TEXT",
+    },
+    {
+      key: "NomDutilisateur",
+      operator: "EQUALS",
+      value: store.moduleStore.user.username,
+      type: "TEXT",
+    },
+  ];
+  const res = await api({ local: true }).post("document/id/filter", {
+    filters: apiFilters,
+  });
+  const ids = res?.data?.ids;
+
+  if (!ids) {
+    throw new Error("La recherche du formulaire Volontaire n'a rien retourné.");
+  }
+
+  return ids.length > 0;
+};
+
+const showBlockedMessage = (message) => {
+  createOrUpdateElement(
+    "blockedPopup",
+    "div",
+    `
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    `,
+    `
+      <div style="background-color: white; padding: 20px; border-radius: 5px; display: flex; flex-direction: column; align-items: center; width: 320px; text-align: center;">
+        <h1 style="color: #C70000; font-weight: bold; font-size: 120%; align-self: flex-start;">Attention !</h1>
+        <div>${message}</div>
+        <button id="closeBlockedPopupBtn" style="border: 2px solid #3498db; background-color: #3498db; color: #FFFFFF; width: 80px; height: 35px; border-radius: 10px; margin-top: 20px;">Ok</button>
+      </div>
+    `,
+  );
+  document
+    .getElementById("closeBlockedPopupBtn")
+    .addEventListener("click", () => {
+      document.getElementById("blockedPopup").style.display = "none";
+    });
+};
+
+const canCreateDisponibilite = async () => {
+  if (isPrivilegedUser()) return true;
+
+  try {
+    if (await hasVolontaireForm()) return true;
+    showBlockedMessage(
+      "Aucun formulaire de chauffeur n'est associé à votre nom d'utilisateur. Vous ne pouvez pas créer de disponibilité. Contactez un responsable.",
+    );
+  } catch (error) {
+    console.error(
+      "Erreur lors de la vérification du formulaire Volontaire :",
+      error,
+    );
+    showBlockedMessage(
+      "Impossible de vérifier votre formulaire de chauffeur. Réessayez plus tard.",
+    );
+  }
+  return false;
+};
+
 const main = async () => {
   const { parsedData, newStart, newEnd } = await verifyAvailabilityForDay();
   const conflict = hasTimeConflict(newStart, newEnd, parsedData);
@@ -265,7 +359,15 @@ const main = async () => {
 
 window.addEventListener("popstate", hidePopupLoading);
 window.addEventListener("hashchange", hidePopupLoading);
-if (!isValidDocument(t, docData)) {
-  console.log(isValidDocument(t, docData));
-  main();
-}
+// Le blocage du chauffeur passe avant la validation des champs : inutile de lui demander
+// de compléter un formulaire qu'il ne pourra pas enregistrer.
+const start = async () => {
+  if (!(await canCreateDisponibilite())) return;
+
+  if (!isValidDocument(t, docData)) {
+    console.log(isValidDocument(t, docData));
+    main();
+  }
+};
+
+start();

@@ -1,415 +1,127 @@
+// Vehicle identifier from the mission (RETURN)
+var specifiedVehiculeRetour = docData["PriseEnCharge_VéhiculeUtiliséRetour"];
+
 console.log("Function 281", context);
 
-/******************* POPUP BASE  *************/
-const showCustomPopup = ({ title, commentHTML, fields, buttons }) => {
-  // Crée un input selon le type et applique un mask si nécessaire
-  function getInput({
-    key,
-    name,
-    type,
-    options,
-    mask,
-    style,
-    defaultValue,
-    min,
-    max,
-    required,
-  }) {
-    const wrapper = document.createElement("div");
-    wrapper.className = "popup-input";
+// Filters to retrieve the RETURN vehicle form
+const apiFilters = [
+  {
+    key: "FORMLAYOUTNAME",
+    operator: "EQUALS",
+    value: "Véhicule",
+    type: "TEXT",
+  },
+  {
+    key: "PriseEnCharge_VéhiculeUtilisé",
+    operator: "EQUALS",
+    value: specifiedVehiculeRetour,
+    type: "TEXT",
+  },
+];
 
-    const label = document.createElement("label");
-    label.textContent = name || key;
-    label.htmlFor = key;
+/**
+ * Get a list of documents based on given filters
+ */
+const searchForms = async (filters, limit, onlyIds = false) => {
+  try {
+    const resIds = await api({ local: true }).post("document/id/filter", {
+      filters,
+    });
 
-    let input;
-
-    switch (type.toLowerCase()) {
-      case "select":
-        input = document.createElement("select");
-        input.name = key;
-        if (style) input.style = style;
-        input.id = key;
-        (options || []).forEach(({ value, label }) => {
-          const opt = document.createElement("option");
-          opt.value = value;
-          opt.textContent = label;
-          input.appendChild(opt);
-        });
-        wrapper.append(label, input);
-        break;
-
-      case "checkbox":
-        input = document.createElement("input");
-        input.type = "checkbox";
-        input.name = key;
-        if (style) input.style = style;
-        input.id = key;
-        wrapper.classList.add("popup-input-row");
-        wrapper.append(input, label);
-        break;
-
-      case "number":
-        input = document.createElement("input");
-        input.type = "number";
-        input.name = key;
-        if (style) input.style = style;
-        if (defaultValue !== undefined) input.value = defaultValue;
-        if (min !== undefined) input.min = min;
-        if (max !== undefined) input.max = max;
-        if (required) input.required = true;
-        input.step = 1;
-        input.id = key;
-        input.addEventListener("input", () => {
-          input.value = input.value.replace(/[^\d]/g, "");
-        });
-        wrapper.append(label, input);
-        break;
-
-      case "label":
-        const span = document.createElement("span");
-        span.innerHTML = name || "";
-        if (style) span.style = style;
-        wrapper.appendChild(span);
-        break;
-
-      default:
-        input = document.createElement("input");
-        input.type = type.toLowerCase();
-        input.name = key;
-        if (style) input.style = style;
-        input.id = key;
-        if (mask instanceof RegExp) {
-          applyRegexMask(input, mask);
-        }
-        wrapper.append(label, input);
-        break;
+    const ids = resIds.data?.ids;
+    if (!ids || ids.length === 0) {
+      return [];
     }
 
-    return wrapper;
+    const finalIds = limit ? ids.slice(0, limit) : ids;
+
+    if (onlyIds) {
+      return finalIds.map((id) => ({ FORMID: id }));
+    }
+
+    const resDocs = await api({ local: true }).post("document/id", {
+      ids: finalIds,
+    });
+
+    const documents = resDocs?.data?.documents;
+    if (!documents) {
+      throw new Error("Error while retrieving documents");
+    }
+
+    return documents.map((doc) => {
+      const parsedDoc = JSON.parse(doc.data);
+      return {
+        ...parsedDoc,
+        FORMID: doc.metaData["FORMID"],
+        STATUS: doc.metaData["STATUS"],
+        FORMLAYOUTID: doc.metaData["FORMLAYOUTID"],
+        NUMBER: doc.metaData["NUMBER"],
+      };
+    });
+  } catch (error) {
+    console.error("Function 281 - searchForms error:", error);
+    throw error;
   }
-  // Création POPUP
+};
+
+// -----------------------------
+// Popup creation (same style as TPMR popup)
+// -----------------------------
+const createInfoPopup = (title, messageHtml) => {
+  const existingPopup = document.getElementById("tpmr-mission-popup");
+  if (existingPopup) existingPopup.remove();
+
   const overlay = document.createElement("div");
-  overlay.className = "popup-overlay";
+  overlay.id = "tpmr-mission-popup";
+  overlay.style.cssText =
+    "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:9999;";
 
   const popup = document.createElement("div");
-  popup.className = "popup-box";
+  popup.style.cssText =
+    "background:white;padding:24px;border-radius:8px;min-width:420px;max-width:90%;box-shadow:0 4px 20px rgba(0,0,0,0.3);";
 
-  const style = document.createElement("style");
-  style.textContent = `
-  .popup-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    animation: fadeInOverlay 0.15s ease-out;
-  }
+  const titleEl = document.createElement("h2");
+  titleEl.textContent = title;
+  titleEl.style.cssText = "margin:0 0 16px 0;font-size:1.4em;";
+  popup.appendChild(titleEl);
 
-  @keyframes fadeInOverlay {
-    from {
-      background: rgba(0, 0, 0, 0);
-    }
-    to {
-      background: rgba(0, 0, 0, 0.4);
-    }
-  }
+  const messageEl = document.createElement("div");
+  messageEl.innerHTML = messageHtml;
+  messageEl.style.cssText = "line-height:1.4;margin-bottom:20px;";
+  popup.appendChild(messageEl);
 
-  .popup-box {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    background: white;
-    border-radius: 0.375rem;
-    padding: 15px 25px;
-    width: 500px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    animation: fadeInScale 0.15s ease-out;
-  }
+  const button = document.createElement("button");
+  button.textContent = "OK";
+  button.style.cssText =
+    "padding:10px 24px;border:none;border-radius:4px;cursor:pointer;font-size:1em;background-color:#cce5ff;color:#1e1e1e;";
+  button.onclick = () => overlay.remove();
 
-  @keyframes fadeInScale {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-      background: rgba(0, 0, 0, 0);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  .popup-box h1,
-  .popup-box h2,
-  .popup-box h3,
-  .popup-box p,
-  .popup-box span {
-    color: #202127;
-  }
-
-  .popup-box h2 {
-    margin: 0 0 20px;
-    font-size: 1.25rem;
-  }
-
-  .popup-box p,
-  .popup-box span {
-    font-size: 1rem;
-  }
-
-  .popup-comment {
-    margin-bottom: 20px;
-  }
-
-  .popup-input {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 10px;
-  }
-
-  .popup-input-row {
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .popup-input label {
-    margin-bottom: 5px;
-    font-size: 12px;
-  }
-
-  .popup-input input,
-  .popup-input select {
-    padding: 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 0.375rem;
-    font-size: 1rem;
-  }
-
-  .popup-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-
-  .popup-buttons button {
-    border: none;
-    padding: 3px 30px;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.875rem;
-  }
-`;
-
-  popup.appendChild(style);
-
-  // Titre
-  if (title) {
-    const titleElem = document.createElement("h2");
-    titleElem.textContent = title;
-    titleElem.style.fontWeight = "bold";
-    popup.appendChild(titleElem);
-  }
-
-  // Commentaire HTML
-  if (commentHTML) {
-    const comment = document.createElement("div");
-    comment.className = "popup-comment";
-    comment.innerHTML = commentHTML;
-    popup.appendChild(comment);
-  }
-
-  // Champs
-  if (fields)
-    for (const field of fields) {
-      popup.appendChild(getInput(field));
-    }
-
-  // Boutons
-  const buttonRow = document.createElement("div");
-  buttonRow.className = "popup-buttons";
-
-  if (buttons) {
-    for (const { name, onClick, backgroundColor, color, preset } of buttons) {
-      const btn = document.createElement("button");
-      btn.textContent = name;
-
-      switch (preset) {
-        case "action":
-          // Action bleu
-          btn.style.backgroundColor = "#3182ce";
-          btn.style.color = "#f2f7fb";
-          break;
-        case "cancel":
-          // Cancel gris
-          btn.style.backgroundColor = "#f5f5f6";
-          btn.style.color = "#2c2d32";
-          break;
-        default:
-          // Action bleu
-          btn.style.backgroundColor = "#3182ce";
-          btn.style.color = "#f2f7fb";
-          break;
-      }
-
-      if (backgroundColor) btn.style.backgroundColor = backgroundColor;
-      if (color) btn.style.color = color;
-
-      btn.onclick = () => {
-        const values = {};
-        const inputs = popup.querySelectorAll("input, select");
-        // Cas spécfifique avec les checkbox (on retourne true ou false)
-        for (const el of inputs) {
-          values[el.name] = el.type === "checkbox" ? el.checked : el.value;
-        }
-        onClick(values);
-        document.body.removeChild(overlay);
-      };
-
-      buttonRow.appendChild(btn);
-    }
-  }
-
-  popup.appendChild(buttonRow);
+  popup.appendChild(button);
   overlay.appendChild(popup);
   document.body.appendChild(overlay);
 };
 
-/***************** ERROR POPUP */
-const showPopupErreur = (titleInput, message) => {
-  new Promise((resolve) => {
-    showCustomPopup({
-      title: titleInput,
-      commentHTML: message,
-      buttons: [
-        {
-          name: "Retour",
-          backgroundColor: "#b2f2bb",
-          color: "#1e1e1e",
-          onClick: () => resolve(false),
-        },
-      ],
-    });
-  });
-};
+// -----------------------------
+// Execute logic
+// -----------------------------
+(async () => {
+  const vehiculeData = await searchForms(apiFilters);
 
-const showPopupConfirmation = (titleInput, message) => {
-  return new Promise((resolve) => {
-    showCustomPopup({
-      title: titleInput,
-      commentHTML: message,
-      buttons: [
-        {
-          name: "Non",
-          backgroundColor: "#ffc9c9",
-          color: "#1e1e1e",
-          onClick: () => {
-            console.log("Action annulée");
-            resolve(false);
-          },
-        },
-        {
-          name: "Oui",
-          backgroundColor: "#b2f2bb",
-          color: "#1e1e1e",
-          onClick: () => {
-            resolve(true);
-          },
-        },
-      ],
-    });
-  });
-};
-
-/******************* */
-const hidePopupLoading = () => {
-  const loadingPopup = document.getElementById("loadingPopup");
-  if (loadingPopup) loadingPopup.style.display = "none";
-};
-// sync functions
-const DataCollection = (key, array) => {
-  let result = {};
-  let itemCount = array?.length;
-  array.forEach((obj, index) => {
-    Object.keys(obj).forEach((key) => {
-      let newKey = `${key}|${index + 1}`;
-      result[newKey] = obj[key];
-    });
-  });
-  result[key] = itemCount.toString();
-  return result;
-};
-
-const excludeKeys = (obj, keys) =>
-  Object.keys(obj).reduce((result, key) => {
-    if (!keys.includes(key)) {
-      result[key] = obj[key];
-    }
-    return result;
-  }, {});
-
-const formatDataAPI = (data) => {
-  Object.keys(data).forEach((key) => {
-    if (Array.isArray(data[key])) {
-      data = { ...data, ...DataCollection(key, data[key]) };
-    }
-  });
-  return JSON.stringify(excludeKeys(data, ["FORMID", "NUMBER"]));
-};
-
-const createNewForm = async (newData) => {
-  try {
-    const response = await api({ local: true }).post("document", {
-      document: {
-        data: formatDataAPI(newData),
-        status: "Draft",
-        active: true,
-        template: { templateId: "0e44171d-1616-4a50-9b36-aff4d998c4a5" },
-      },
-    });
-    console.log("Réponse de l'API :", response);
-    return response;
-  } catch (error) {
-    console.warn("Erreur lors de la création du formulaire ", error);
-  }
-};
-const main = async () => {
-  const confirmed = await showPopupConfirmation(
-    "Confirmation",
-    "Êtes-vous sûr de vouloir continuer ?",
-  );
-
-  // si NON → on stop tout
-  if (!confirmed) {
-    console.log("Annulé");
+  if (!vehiculeData.length) {
     return;
   }
 
-  console.log("OLD DATA ", docData);
-  const newData = { ...docData };
-  const keysToReset = {
-    AnnulationDemandéPar: "",
-    IdentifiantFormulaireRécurrence: "",
-    IdentifiantFacture: "",
-    isOccurence: "false",
-    MarkdownRécurrenceDispo: "",
-    Planification_Date: "",
-    Planification_Répéter: "",
-    Planification_DateFin: "",
-    Planification_MultiDate: "",
-  };
-  Object.entries(keysToReset).forEach(([key, value]) => {
-    newData[key] = value;
-  });
-  console.log("NEW DATA 2", newData);
-  console.log(formatDataAPI(newData));
-  const create = await createNewForm(newData);
-  console.log("CREATE ", create);
-  const id = create.data.id;
+  const vehiculeRetour = vehiculeData[0];
 
-  const activeMCR = location.pathname.split("/")[1];
-  // 🚀 redirection
-  window.location.href = `/${activeMCR}/transports/${id}`;
-};
-main();
+  const missionIsTPMR = docData["TPMR"] === "Oui";
+  const vehiculeIsTPMR = vehiculeRetour.CT_TPMR === "true";
+
+  if (missionIsTPMR && !vehiculeIsTPMR) {
+    createInfoPopup(
+      "Véhicule retour non conforme TPMR",
+      "Cette mission est marquée comme <b>TPMR</b>.<br><br>" +
+        "<span style='color:red;font-weight:bold;'>Le véhicule de retour sélectionné n'est pas TPMR.</span><br><br>" +
+        "Veuillez sélectionner un <b>véhicule TPMR</b> pour le retour."
+    );
+  }
+})();

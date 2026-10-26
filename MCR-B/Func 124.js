@@ -169,6 +169,52 @@ const getMissions = async (ids) => {
   }
 };
 
+function showErrorBanner(errorMessage) {
+  let errorBanner = document.getElementById("errorBanner");
+
+  if (!errorBanner) {
+    errorBanner = document.createElement("div");
+    errorBanner.id = "errorBanner";
+    errorBanner.style = `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      min-width: 300px;
+      height: 50px;
+      background-color: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      border-radius: 5px;
+      padding: 0 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    `;
+    document.body.appendChild(errorBanner);
+  }
+
+  errorBanner.innerHTML = `
+    <div style="margin-right: 10px; color: red;">&#x26A0;</div><div>${errorMessage}</div>
+    <div id="errorBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: red; height: 5px; width: 0%;"></div>
+  `;
+  errorBanner.style.display = "flex";
+
+  const progressElement = document.getElementById("errorBannerProgress");
+  let width = 0;
+  const interval = setInterval(() => {
+    if (width >= 100) {
+      clearInterval(interval);
+      errorBanner.style.display = "none";
+      return;
+    }
+    width++;
+    progressElement.style.width = width + "%";
+  }, 55);
+}
+
 const navigateBack = async () => {
   let viewGroup;
   const lastPage = localStorage.getItem("lastCustomPage");
@@ -186,6 +232,14 @@ const main = async () => {
   const startModificationDate =
     store.pageContentStore.processData[0].edits.APartirDeBatchstep;
   console.log("context", context);
+
+  // The previous recurrence still covers the days before this source starts: modifying earlier would create duplicates
+  if (startModificationDate < docData.Planification_Date) {
+    showErrorBanner(
+      "La date « À partir de » ne peut pas être avant la date de début de la récurrence.",
+    );
+    return;
+  }
 
   let createData = docData;
   const updateID = docData.FORMID;
@@ -304,7 +358,6 @@ const main = async () => {
     .catch((error) => {
       console.error("Erreur lors de la mise à jour des documents :", error);
     });
-
 
   const rawDate =
     docData.Planification_Date || docData.InformationsAdmin_DateHeureDébut;
