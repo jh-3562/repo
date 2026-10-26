@@ -124,15 +124,17 @@ switch (FORMLAYOUTNAME) {
     }
     break;
 
-  case "Disponibilité":
-    return mcrDictionary[AREA] && STATUS === "Draft"
-      ? {
-          BatchDisponibilité: null,
-          Enregistrer_Disponibilite: true,
-        }
-      : {
-          Enregistrer_Disponibilite: null,
-        };
+  case "Disponibilité": {
+    const isDraftInMcr = mcrDictionary[AREA] && STATUS === "Draft";
+    // La section BatchDisponibilité (Enregistrer + Supprimer d'une disponibilité existante)
+    // est réservée aux rôles privilégiés : un chauffeur peut seulement créer des disponibilités.
+    const canEditExistingDisponibilite = isPrivileged && !isDraftInMcr;
+
+    return {
+      BatchDisponibilité: canEditExistingDisponibilite ? true : null,
+      Enregistrer_Disponibilite: isDraftInMcr ? true : null,
+    };
+  }
 
   default:
     break;
