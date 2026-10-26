@@ -1,5 +1,42 @@
-const TODAY = new Date().toISOString().split("T")[0];
-const VEHICLE_NAME = docData["Ident_Libellé"];
+console.log("Function 291", context);
+
+/**
+ * Test if a string is a UUID
+ * @param {string} str
+ * @returns {boolean}
+ */
+const isUUID = (str) => {
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  return uuidRegex.test(str);
+};
+
+const viewGroupUrl = () => {
+  const currentUrl = window.location.href;
+  const parts = currentUrl.split("/");
+
+  for (let i = 0; i < 3; i++) {
+    const lastpart = parts[parts.length - 1];
+
+    if (isUUID(lastpart) || lastpart === "new") {
+      parts.pop();
+    }
+  }
+
+  return parts.join("/");
+};
+
+const redirectToViewGroup = () => {
+  window.location.href = viewGroupUrl();
+};
+
+const formLayoutId_Vehicule = "56f6c94d-6706-4630-a0a6-3588cd954e06";
+
+const ARCHIVE_DATE_FIELD = "VehiculeArchivage";
+const REACTIVATION_DATE_FIELD = "VehiculeReactivation";
+
+const getLocalToday = () => new Date().toLocaleDateString("en-CA");
 
 const showCustomPopup = (params) => {
   const { title, commentHTML, fields, buttons } = params;
@@ -458,229 +495,200 @@ const showCustomPopup = (params) => {
   document.body.appendChild(overlay);
 };
 
-const createApiFilters = (vehicleFieldKey) => [
-  {
-    key: "FORMLAYOUTNAME",
-    operator: "EQUALS",
-    value: "Mission",
-    type: "TEXT",
-  },
-  {
-    key: "Planification_Date",
-    operator: "BETWEEN",
-    value: `${TODAY}|9999-12-01`,
-    type: "DATE",
-  },
-  {
-    key: vehicleFieldKey,
-    operator: "EQUALS",
-    value: VEHICLE_NAME,
-    type: "TEXT",
-  },
-];
+function showErrorBanner(errorMessage) {
+  let errorBanner = document.getElementById("errorBanner");
 
-const apiFiltersAller = createApiFilters("PriseEnCharge_VéhiculeUtilisé");
-const apiFiltersRetour = createApiFilters(
-  "PriseEnCharge_VéhiculeUtiliséRetour",
-);
+  if (!errorBanner) {
+    errorBanner = document.createElement("div");
+    errorBanner.id = "errorBanner";
+    errorBanner.style = `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      min-width: 300px;
+      height: 50px;
+      background-color: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      border-radius: 5px;
+      padding: 0 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    `;
+    document.body.appendChild(errorBanner);
+  }
 
-const FIELD_ALLER = "PriseEnCharge_VéhiculeUtilisé";
-const FIELD_RETOUR = "PriseEnCharge_VéhiculeUtiliséRetour";
+  errorBanner.innerHTML = `
+    <div style="margin-right: 10px; color: red;">&#x26A0;</div><div>${errorMessage}</div>
+    <div id="errorBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: red; height: 5px; width: 0%;"></div>
+  `;
+  errorBanner.style.display = "flex";
 
-console.log("API Filters Aller:", apiFiltersAller);
-console.log("API Filters Retour:", apiFiltersRetour);
+  const progressElement = document.getElementById("errorBannerProgress");
+  let width = 0;
+  const interval = setInterval(() => {
+    if (width >= 100) {
+      clearInterval(interval);
+      errorBanner.style.display = "none";
+      return;
+    }
+    width++;
+    progressElement.style.width = width + "%";
+  }, 55);
+}
 
-const documentToUpdate = [
-  {
-    data: JSON.stringify(docData),
-    status: "Archivé",
-    active: true,
-    template: { templateId: docData.FORMLAYOUTID },
-    documentID: docData.FORMID,
-  },
-];
-
-const getDocumentIDsByFilters = async (apiFilters) => {
-  try {
-    const response = await api({ local: true }).post("document/id/filter", {
-      filters: apiFilters,
+const askReactivationDate = () =>
+  new Promise((resolve) => {
+    showCustomPopup({
+      title: "Réactiver le véhicule",
+      fields: [
+        {
+          key: REACTIVATION_DATE_FIELD,
+          name: "Date de réactivation",
+          type: "date",
+          required: true,
+          defaultValue: getLocalToday(),
+        },
+      ],
+      buttons: [
+        {
+          name: "Confirmer",
+          preset: "action",
+          onClick: (values) => resolve(values[REACTIVATION_DATE_FIELD]),
+        },
+        {
+          name: "Annuler",
+          key: "cancel",
+          onClick: () => resolve(null),
+        },
+      ],
     });
+  });
 
-    return response?.data?.ids || [];
-  } catch (error) {
-    console.error("Failed to fetch document IDs:", error);
-    return [];
-  }
+const isReactivationBeforeArchive = (reactivationDate) => {
+  const archiveDate = docData[ARCHIVE_DATE_FIELD];
+  return Boolean(archiveDate) && reactivationDate < archiveDate;
 };
 
-const getDocumentsByIDs = async (documentIDs) => {
-  if (!documentIDs?.length) {
-    return [];
-  }
+const DataCollection = (key, array) => {
+  let result = {};
+  let itemCount = array?.length;
 
-  try {
-    const response = await api({ local: true }).post("document/id", {
-      ids: documentIDs,
+  array.forEach((obj, index) => {
+    Object.keys(obj).forEach((key) => {
+      let newKey = `${key}|${index + 1}`;
+      result[newKey] = obj[key];
     });
-    return response?.data?.documents || [];
-  } catch (error) {
-    console.error("Failed to fetch documents:", error);
-    return [];
-  }
+  });
+
+  result[key] = itemCount.toString();
+
+  return result;
 };
 
-const splitMissionIDs = (allerDocumentIDs, retourDocumentIDs) => {
-  const uniqueAllerDocumentIDs = [...new Set(allerDocumentIDs)];
-  const uniqueRetourDocumentIDs = [...new Set(retourDocumentIDs)];
+const excludeKeys = (obj, keys) =>
+  Object.keys(obj).reduce((result, key) => {
+    if (!keys.includes(key)) {
+      result[key] = obj[key];
+    }
 
-  const allerIDsSet = new Set(uniqueAllerDocumentIDs);
-  const retourIDsSet = new Set(uniqueRetourDocumentIDs);
+    return result;
+  }, {});
 
-  return {
-    allerRetourDocumentIDs: uniqueAllerDocumentIDs.filter((id) =>
-      retourIDsSet.has(id),
-    ),
-    allerOnlyDocumentIDs: uniqueAllerDocumentIDs.filter(
-      (id) => !retourIDsSet.has(id),
-    ),
-    retourOnlyDocumentIDs: uniqueRetourDocumentIDs.filter(
-      (id) => !allerIDsSet.has(id),
-    ),
-  };
+const formatDataAPI = (data) => {
+  Object.keys(data).forEach((key) => {
+    if (Array.isArray(data[key])) {
+      data = {
+        ...data,
+        ...DataCollection(key, data[key]),
+      };
+    }
+  });
+
+  return JSON.stringify(excludeKeys(data, ["FORMID", "NUMBER"]));
 };
 
-const createMissionUpdate = (doc, fieldsToClear) => {
-  const documentID = doc?.metaData?.FORMID;
-  const templateId = doc?.template?.templateId;
-
-  if (!documentID || !templateId) {
-    return null;
-  }
-
-  return {
-    data: JSON.stringify(
-      fieldsToClear.reduce((accumulator, fieldName) => {
-        accumulator[fieldName] = "";
-        return accumulator;
-      }, {}),
-    ),
-    status: doc.status,
-    active: true,
-    template: { templateId },
-    documentID,
-  };
-};
-
-const updateDocuments = async (documentsToUpdate) => {
+const reactivateVehiculeForm = async (formId, formData, formLayoutId) => {
   try {
-    const response = await api({ local: true }).put("document/Many", {
-      documents: documentsToUpdate,
-    });
+    const document = {
+      data: formatDataAPI(formData),
 
-    return response?.data?.documents || [];
+      status: formData.STATUS,
+
+      active: true,
+
+      template: {
+        templateId: formLayoutId,
+      },
+
+      documentID: formId,
+    };
+
+    const res = await api({ local: true }).put("document", { document });
+
+    console.log("Véhicule réactivé avec succès :", res);
+
+    return res;
   } catch (error) {
-    console.error("Failed to update documents:", error);
-    return [];
+    console.error("Erreur lors de la réactivation du véhicule :", error);
+
+    throw error;
   }
 };
 
-const unassignVehiculesFromMissions = async () => {
-  const [allerDocumentIDs, retourDocumentIDs] = await Promise.all([
-    getDocumentIDsByFilters(apiFiltersAller),
-    getDocumentIDsByFilters(apiFiltersRetour),
-  ]);
+const navigateBack = async () => {
+  let viewGroup;
 
-  const {
-    allerRetourDocumentIDs,
-    allerOnlyDocumentIDs,
-    retourOnlyDocumentIDs,
-  } = splitMissionIDs(allerDocumentIDs, retourDocumentIDs);
+  const lastPage = localStorage.getItem("lastCustomPage");
 
-  console.log("Aller-only Document IDs:", allerOnlyDocumentIDs);
-  console.log("Retour-only Document IDs:", retourOnlyDocumentIDs);
-  console.log("Aller/Retour Document IDs:", allerRetourDocumentIDs);
+  console.log("LAST PAGE ", lastPage);
 
-  if (
-    allerOnlyDocumentIDs.length === 0 &&
-    retourOnlyDocumentIDs.length === 0 &&
-    allerRetourDocumentIDs.length === 0
-  ) {
-    console.log("No documents found to update.");
-    return;
+  if (lastPage) {
+    viewGroup = lastPage;
+    window.location.href = viewGroup;
+  } else {
+    window.history.back();
   }
-
-  const [allerDocuments, retourDocuments, allerRetourDocuments] =
-    await Promise.all([
-      getDocumentsByIDs(allerOnlyDocumentIDs),
-      getDocumentsByIDs(retourOnlyDocumentIDs),
-      getDocumentsByIDs(allerRetourDocumentIDs),
-    ]);
-
-  console.log("Aller-only Documents:", allerDocuments);
-  console.log("Retour-only Documents:", retourDocuments);
-  console.log("Aller/Retour Documents:", allerRetourDocuments);
-
-  const updatedDocumentsAller = allerDocuments
-    .map((doc) => createMissionUpdate(doc, [FIELD_ALLER]))
-    .filter(Boolean);
-
-  const updatedDocumentsRetour = retourDocuments
-    .map((doc) => createMissionUpdate(doc, [FIELD_RETOUR]))
-    .filter(Boolean);
-
-  const updatedDocumentsAllerRetour = allerRetourDocuments
-    .map((doc) => createMissionUpdate(doc, [FIELD_ALLER, FIELD_RETOUR]))
-    .filter(Boolean);
-
-  documentToUpdate.push(
-    ...updatedDocumentsAller,
-    ...updatedDocumentsRetour,
-    ...updatedDocumentsAllerRetour,
-  );
 };
 
 const main = async () => {
-  if (!(await isValidDocument(t, docData))) {
-    try {
-      const popup = await new Promise((resolve) => {
-        showCustomPopup({
-          title: "Archiver le véhicule",
-          fields: [
-            {
-              key: "VehiculeArchivage",
-              name: "Date d'archivage",
-              type: "date",
-              required: true,
-              defaultValue: new Date().toISOString().split("T")[0],
-            },
-          ],
-          buttons: [
-            {
-              name: "Confirmer",
-              preset: "action",
-              onClick: (date) => resolve(date),
-            },
-            {
-              name: "Annuler",
-              key: "cancel",
-              onClick: () => resolve(false),
-            },
-          ],
-        });
-      });
-      if (!popup) return;
-      console.log("Popup result:", popup);
-      await unassignVehiculesFromMissions();
-      console.log("Documents to update:", {
-        ...documentToUpdate,
-        VehiculeArchivage: popup.VehiculeArchivage,
-      });
-      await updateDocuments(documentToUpdate);
-      const area = window.location.pathname.split("/").filter(Boolean)[0];
-      window.location.href = `/${area}/véhicules`;
-    } catch (error) {
-      console.error("Failed to save document:", error);
-    }
+  const reactivationDate = await askReactivationDate();
+  if (!reactivationDate) return;
+
+  if (isReactivationBeforeArchive(reactivationDate)) {
+    showErrorBanner(
+      "La date de réactivation ne peut pas être avant la date d'archivage.",
+    );
+    return;
+  }
+
+  // La date d'archivage est conservée : la timeline masque le véhicule entre les deux dates
+  const updatedDocData = {
+    ...docData,
+
+    [REACTIVATION_DATE_FIELD]: reactivationDate,
+
+    STATUS: "Enregistré",
+  };
+
+  try {
+    console.log("Réactivation du véhicule en cours...");
+
+    await reactivateVehiculeForm(
+      updatedDocData.FORMID,
+      updatedDocData,
+      formLayoutId_Vehicule,
+    );
+
+    navigateBack();
+  } catch (error) {
+    console.error("Erreur dans le processus principal :", error);
+
+    throw error;
   }
 };
 
