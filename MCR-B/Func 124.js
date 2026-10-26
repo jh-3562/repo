@@ -293,7 +293,8 @@ const main = async () => {
 
   console.log("documents", documents);
 
-  api({ local: true })
+  // Wait for the old occurrences to be deleted before redirecting, otherwise the request can be cancelled
+  await api({ local: true })
     .put("document/Many", {
       documents: documents,
     })
