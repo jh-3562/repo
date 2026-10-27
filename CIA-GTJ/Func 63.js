@@ -393,14 +393,89 @@ const showConfirmationPopup = () => {
   });
 };
 
+const TRANSPORTEUR_FORMLAYOUTID = "90737127-32da-4bb9-8d95-54b986c978eb";
+const INDISPONIBILITES_FORMLAYOUTID = "7d19c79c-8a4a-418c-8d1a-89d0139ecb00";
+
+const toDate = (value) => {
+  const date = new Date(String(value || "").trim().replace(" ", "T"));
+  return isNaN(date.getTime()) ? null : date;
+};
+
+const getIdsByFilters = async (filters) => {
+  const response = await api({ local: true }).post("document/id/filter", {
+    filters,
+  });
+  return response?.data?.ids || [];
+};
+
+const getDocumentsByIds = async (ids) => {
+  if (!ids.length) return [];
+  const response = await api({ local: true }).post("document/id", { ids });
+  return response?.data?.documents || [];
+};
+
+const getIndisponibilitesDuTransporteur = async (
+  transportID,
+  nomTransporteur,
+  idTransporteur,
+) => {
+  const [transport] = await getDocumentsByIds([transportID]);
+  const transportData = JSON.parse(transport?.data || "{}");
+  const debutTransport = toDate(transportData.Demande_DateHeureDebut);
+  const finTransport = toDate(transportData.Demande_DateHeureFin);
+  if (!debutTransport || !finTransport) return [];
+
+  const transporteurIDs = idTransporteur
+    ? [idTransporteur]
+    : await getIdsByFilters([
+        {
+          key: "FORMLAYOUTID",
+          operator: "EQUALS",
+          value: TRANSPORTEUR_FORMLAYOUTID,
+          type: "TEXT",
+        },
+        {
+          key: "Transporteur_NomPrenom",
+          operator: "EQUALS",
+          value: nomTransporteur,
+          type: "TEXT",
+        },
+      ]);
+  if (!transporteurIDs.length) return [];
+
+  const ids = await getIdsByFilters([
+    {
+      key: "FORMLAYOUTID",
+      operator: "EQUALS",
+      value: INDISPONIBILITES_FORMLAYOUTID,
+      type: "TEXT",
+    },
+    { key: "STATUS", operator: "EQUALS", value: "Actif", type: "TEXT" },
+    {
+      key: "Transporteur_Indisponibilites_Date",
+      operator: "BETWEEN",
+      value: `${debutTransport.toLocaleDateString("en-CA")}|${finTransport.toLocaleDateString("en-CA")}`,
+      type: "DATE",
+    },
+  ]);
+
+  return (await getDocumentsByIds(ids))
+    .map((document) => JSON.parse(document.data))
+    .filter((data) =>
+      transporteurIDs.includes(data.Transporteur_Indisponibilites_TransporteurID),
+    )
+    .filter((data) => {
+      const debut = toDate(data.Demande_DateHeureDebut);
+      const fin = toDate(data.Demande_DateHeureFin);
+      return debut && fin && debut < finTransport && fin > debutTransport;
+    })
+    .map(
+      (data) =>
+        `${data.Transporteur_Indisponibilites_HeureDebut}-${data.Transporteur_Indisponibilites_HeureFin}`,
+    );
+};
+
 const main = async () => {
-  const isConfirmed = await showConfirmationPopup();
-
-  if (!isConfirmed) {
-    showErrorBanner("Confirmation annulée.");
-    return;
-  }
-
   const storeKey = Object.keys(store.pageContentStores).find(
     (key) => store.pageContentStores[key].processData,
   );
@@ -410,6 +485,39 @@ const main = async () => {
       ? store.pageContentStores[storeKey].processData[0].edits
           .Operation_NomDuTransporteur
       : "";
+  const idTransporteur =
+    storeKey &&
+    store.pageContentStores[storeKey].processData[0]?.edits
+      ?.Transport_IDTransporteur;
+
+  if (operationNomDuTransporteur) {
+    try {
+      const plages = await getIndisponibilitesDuTransporteur(
+        documentToUpdate.documentID,
+        operationNomDuTransporteur,
+        idTransporteur,
+      );
+      if (plages.length) {
+        showErrorBanner(
+          `${operationNomDuTransporteur} est indisponible (${plages.join(", ")}). Confirmation annulée.`,
+        );
+        return;
+      }
+    } catch (error) {
+      console.error("Vérification de la disponibilité impossible :", error);
+      showErrorBanner(
+        "Impossible de vérifier la disponibilité du transporteur. Confirmation annulée.",
+      );
+      return;
+    }
+  }
+
+  const isConfirmed = await showConfirmationPopup();
+
+  if (!isConfirmed) {
+    showErrorBanner("Confirmation annulée.");
+    return;
+  }
 
   documentToUpdate.data = JSON.stringify({
     Operation_NomDuTransporteur: operationNomDuTransporteur,

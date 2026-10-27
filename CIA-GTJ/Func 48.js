@@ -79,7 +79,21 @@ const toDate = (value) => {
   return isNaN(date.getTime()) ? null : date;
 };
 
-// Indisponibilités actives aux dates du transport, groupées par transporteur.
+// Dans le popup de la grille, docData n'a pas les dates : on lit le transport sélectionné.
+const getDatesTransport = async () => {
+  const debut = toDate(docData?.Demande_DateHeureDebut);
+  const fin = toDate(docData?.Demande_DateHeureFin);
+  if (debut && fin) return { debut, fin };
+
+  const transportID = context?.store?.pageContentStore?.active?.[0];
+  const [transport] = transportID ? await getDocumentsByIDs([transportID]) : [];
+  const data = JSON.parse(transport?.data || "{}");
+  return {
+    debut: toDate(data.Demande_DateHeureDebut),
+    fin: toDate(data.Demande_DateHeureFin),
+  };
+};
+
 const getIndisponibilitesParTransporteur = async (
   debutTransport,
   finTransport,
@@ -199,32 +213,58 @@ const main = async () => {
     })),
   );
 
-  // Un transporteur indisponible pendant le transport ne peut pas être choisi :
-  // sa suggestion vide le champ au lieu de l'assigner.
+  const datesTransport = await getDatesTransport();
   const indisponibilites = await getIndisponibilitesParTransporteur(
-    toDate(docData?.Demande_DateHeureDebut),
-    toDate(docData?.Demande_DateHeureFin),
+    datesTransport.debut,
+    datesTransport.fin,
   );
-
   const suggestions = parsedDocs.map((x) => {
     const plages = indisponibilites[x.documentID];
-    if (plages) {
-      return {
-        title: `⛔ ${x.transporteurNomPrenom} — indisponible ${plages.join(", ")}`,
-        fields: [
-          { key: activeFieldKey, value: "", name: "Nom du transporteur" },
-          {
-            key: "Transport_IDTransporteur",
-            value: "",
-            name: "ID Transporteur",
-          },
-        ],
-      };
-    }
+    if (plages) return transporteurIndisponible(x, plages);
     return transporteurDisponible(x);
   });
 
   sendSuggestions(activeFieldKey, suggestions);
+  griserTransporteursIndisponibles();
+};
+
+// Clés factices : affichées, mais jamais enregistrées dans le transport.
+const transporteurIndisponible = (x, plages) => ({
+  title: `⛔ ${x.transporteurNomPrenom} — indisponible ${plages.join(", ")}`,
+  fields: [
+    {
+      key: "dummykey_nom",
+      value: x.transporteurNomPrenom,
+      name: "Nom du transporteur",
+    },
+    {
+      key: "dummykey",
+      value: x.transporteurType,
+      name: "Type de transporteur",
+    },
+    { key: "dummykey_id", value: x.documentID, name: "ID Transporteur" },
+    { key: "dummykey_number", value: `#${x.number}`, name: "Numéro" },
+  ],
+});
+
+// La liste est dessinée après le callback et réutilisée d'une frappe à l'autre : on réapplique pendant 2 s.
+const griserTransporteursIndisponibles = () => {
+  clearInterval(window.func48GriserTimer);
+  let essais = 0;
+  window.func48GriserTimer = setInterval(() => {
+    const titres = document.querySelectorAll(
+      ".chakra-popover__content h2.chakra-heading",
+    );
+    for (const h2 of titres) {
+      const suggestion = h2.parentElement?.parentElement;
+      if (!suggestion) continue;
+      const indisponible = h2.textContent.trim().startsWith("⛔");
+      suggestion.style.opacity = indisponible ? "0.45" : "";
+      suggestion.style.pointerEvents = indisponible ? "none" : "";
+      suggestion.style.userSelect = indisponible ? "none" : "";
+    }
+    if (++essais >= 20) clearInterval(window.func48GriserTimer);
+  }, 100);
 };
 
 const transporteurDisponible = (x) => {

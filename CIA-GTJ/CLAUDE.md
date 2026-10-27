@@ -15,9 +15,13 @@
 | Répartition Sécurisée | DemandesSécuriséesTimeline | LancerOptim | 83 |
 | Feuille de route | FeuilleRouteBouton | FeuilleDeRouteImprimer / FeuilleDeRouteEnvoiMail | 147 / 148 |
 
+Clic droit dans la grille de Répartition (boutons EDIT actifs, vérifié le 27/10/2026) : « Planifier » = batch `PlanifierRepartition` (Func 66), « Confirmer » = batch `ConfirmerRepartition` (Func 63).
+
 ## Tickets en cours
 
 - [[RÉPARTITION] - Indisponibilité non gérer](https://app.clickup.com/t/868mm4xre) : dans la timeline de l'onglet Répartition, un transport peut être assigné à un transporteur sur une plage « Indisponible ». Décision : bloquer. Le transporteur se choisit dans le formulaire Transport, onglet Opération, champ `Operation_NomDuTransporteur` (Search = Func 48). Le gabarit Transport n'a ni bouton ni batch (Enregistrer = bouton natif, sans fonction). Correction dans Func 48 (27/10/2026) : un transporteur dont une indisponibilité « Actif » chevauche le transport s'affiche « ⛔ … indisponible » et le choisir vide le champ. Collée en base et validée par l'utilisateur le 27/10/2026 (le filtre `BETWEEN` type DATE sur `Transporteur_Indisponibilites_Date` fonctionne). Ensuite (à recoller et tester) : la suggestion ⛔ affiche les infos du transporteur dans des clés factices (`dummykey_*`) et elle est grisée et non cliquable par CSS (`.chakra-popover__content h2.chakra-heading` → parent du parent = la suggestion) ; le `console.log` temporaire est retiré. L'horaire (`Horaire_<Jour>`) n'est pas vérifié (décision à prendre).
+  - Autre chemin d'assignation : clic droit dans la grille de Répartition → « Planifier » (popup EDIT avec `Operation_NomDuTransporteur`, puis Func 66 ; un autre batch lance Func 124) et « Confirmer » (Func 63). Ajouté le 27/10/2026 (à recoller) : Func 63 et 66 refusent un transporteur indisponible avant leur popup de confirmation ; Func 48 lit les dates du transport sélectionné (`context.store.pageContentStore.active[0]`) quand `docData` n'en a pas. Vérifié dans la console : dans le popup EDIT de la grille, `docData` ne contient que le champ du popup (`{Operation_NomDuTransporteur: 'jer'}`). Copies d'avant dans le scratchpad de la session.
+  - Remarque : Func 63 et 66 n'enregistrent que `Operation_NomDuTransporteur`, pas `Transport_IDTransporteur` (à confirmer si voulu).
 
 ## Gabarits (FormLayoutID, lus dans le code)
 
