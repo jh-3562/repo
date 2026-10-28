@@ -928,21 +928,24 @@ const createDemandeAndTransport = async () => {
     let payloadAller = null;
     let payloadRetour = null;
 
-    if (type === "Aller") {
+    // Hors délai : les transports sont créés à l'approbation (Func 102).
+    const typeTransportACreer = isHorsDelai ? "" : type;
+
+    if (typeTransportACreer === "Aller") {
       payloadAller = buildTransportPayload(localDocData, "Aller");
       const resAller = await createDocument(
         TRANSPORT_TEMPLATE_ID,
         payloadAller,
       );
       idTransportAller = resAller.id;
-    } else if (type === "Retour") {
+    } else if (typeTransportACreer === "Retour") {
       payloadRetour = buildTransportPayload(localDocData, "Retour");
       const resRetour = await createDocument(
         TRANSPORT_TEMPLATE_ID,
         payloadRetour,
       );
       idTransportRetour = resRetour.id;
-    } else if (type === "Aller/Retour") {
+    } else if (typeTransportACreer === "Aller/Retour") {
       payloadAller = buildTransportPayload(localDocData, "Aller");
       const resAller = await createDocument(
         TRANSPORT_TEMPLATE_ID,
