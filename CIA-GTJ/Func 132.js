@@ -681,7 +681,7 @@ const main = async () => {
   try {
     showPopupLoading('Génération des occurrences…');
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toLocaleDateString('en-CA');
     const dateWindow = [today, today];
 
     const totalCreated = await generateOccurrencesForDateWindow(dateWindow);

@@ -665,9 +665,29 @@ const createDemandeAndTransport = async () => {
         .toLowerCase() === "true";
 
     if (avecRecurrence) {
+      const heuresParType = {
+        Aller: ["DemandeAllerD_Heure", "DemandeAllerA_Heure"],
+        Retour: ["DemandeRetourD_Heure", "DemandeRetourA_Heure"],
+        "Aller/Retour": [
+          "DemandeAllerD_Heure",
+          "DemandeAllerA_Heure",
+          "DemandeRetourD_Heure",
+          "DemandeRetourA_Heure",
+        ],
+      };
+
+      const heuresAVerifier =
+        heuresParType[String(docData?.Transport_TypeTransport || "").trim()];
+
+      if (!heuresAVerifier) {
+        hidePopupLoading();
+        showErrorBanner("Type de transport invalide.");
+        return;
+      }
+
       if (
-        [docData.DemandeAllerD_Heure, docData.DemandeAllerA_Heure].some(
-          (v) => v === undefined || v === "",
+        heuresAVerifier.some(
+          (key) => docData?.[key] === undefined || docData?.[key] === "",
         )
       ) {
         hidePopupLoading();
@@ -865,10 +885,8 @@ const createDemandeAndTransport = async () => {
       );
 
       hidePopupLoading();
-      showSuccessBanner(
-        "Demande créée (récurrence) : aucun transport n'a été créé.",
-      );
       console.log("[Récurrence] Fin du mode récurrence — succès");
+      window.location.href = "/demandes/Demandes_DonneesPrincipales";
       return;
     }
 
