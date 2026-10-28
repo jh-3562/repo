@@ -209,71 +209,31 @@ const buildSuggestions = (documents) => {
     return [];
   }
 
-  return documents.map((doc) => {
-    // console.log("Document:", doc);
-    const data = doc.data;
-
-    const fields = [
-      /*{
-        key: "Categorie_Nom",
-        value: data.Categorie_Nom || "",
-        name: "Nom de la catégorie",
-      },*/
-      {
-        key: "Categorie_Number",
-        value: doc.number || "",
-        name: "Numéro de la catégorie",
-      },
-      /*{
-        key: "Date de début",
-        value: data.Categorie_DateDebut || "",
-        name: "Date de début",
-      },
-      {
-        key: "Date de fin",
-        value: data.Categorie_DateFin || "",
-        name: "Date de fin",
-      },*/
-      {
-        key: "Categorie_Priorite",
-        value: data.Categorie_Priorite || "",
-        name: "Niveau de priorité",
-      },
-    ];
-    return {
-      title:
-        //data[tpmr ? "Categorie_StatMissionTPMR" : "Categorie_StatMission"] ||
-        data["Categorie_Nom"], // Categorie_StatMission
-      fields,
-    };
-  });
+  return documents.map((doc) => ({
+    title: doc.data?.Categorie_Nom || "",
+    fields: [],
+  }));
 };
 
-const sortSuggestionsByPriority = (suggestions) => {
-  const priorityOrder = ["0", "1", "2", "3", "4", "5"];
-  const priorityIndex = new Map(
-    priorityOrder.map((priority, index) => [priority, index]),
-  );
+const sortCategoriesByPriority = (categoryDocuments) => {
+  const getPriority = (doc) => {
+    const priority = Number(doc?.data?.Categorie_Priorite);
+    return Number.isFinite(priority) ? priority : 0;
+  };
 
-  return [...suggestions].sort((a, b) => {
-    const aPriority = String(
-      a?.fields?.find((field) => field.key === "Categorie_Priorite")?.value ??
-        "",
-    );
-    const bPriority = String(
-      b?.fields?.find((field) => field.key === "Categorie_Priorite")?.value ??
-        "",
-    );
+  return [...categoryDocuments].sort((a, b) => getPriority(b) - getPriority(a));
+};
 
-    const aRank = priorityIndex.has(aPriority)
-      ? priorityIndex.get(aPriority)
-      : Number.MAX_SAFE_INTEGER;
-    const bRank = priorityIndex.has(bPriority)
-      ? priorityIndex.get(bPriority)
-      : Number.MAX_SAFE_INTEGER;
+const getCategoryName = (doc) => (doc?.data?.Categorie_Nom || "").toLowerCase();
 
-    return bRank - aRank;
-  });
+const findExactCategory = (categoryDocuments, input) => {
+  const search = input.trim().toLowerCase();
+  return categoryDocuments.find((doc) => getCategoryName(doc) === search);
+};
+
+const filterCategoriesByInput = (categoryDocuments, input) => {
+  const search = input.trim().toLowerCase();
+  return categoryDocuments.filter((doc) => getCategoryName(doc).includes(search));
 };
 
 async function main() {
@@ -289,12 +249,6 @@ async function main() {
       key: "FORMLAYOUTNAME",
       operator: "EQUALS",
       value: "Catégorie",
-      type: "TEXT",
-    },
-    {
-      key: "Categorie_Nom",
-      operator: "CONTAINS",
-      value: input,
       type: "TEXT",
     },
     {
@@ -317,10 +271,16 @@ async function main() {
     },
   ];
 
-  const documents = await getDocuments(filter);
-  const suggestions = sortSuggestionsByPriority(buildSuggestions(documents));
+  const validCategories = sortCategoriesByPriority(await getDocuments(filter));
+  const exactCategory = findExactCategory(validCategories, input);
+  const matchingCategories = filterCategoriesByInput(validCategories, input);
+  // Une catégorie déjà choisie garde toute la liste ouverte, comme un menu déroulant
+  const suggestions = buildSuggestions(
+    exactCategory ? validCategories : matchingCategories,
+  );
 
-  const selectedCategory = suggestions?.[0]?.title || "";
+  const selectedCategory =
+    (exactCategory || matchingCategories[0])?.data?.Categorie_Nom || "";
   const tarifFilters = buildTarifFilters(
     selectedCategory || input,
     debutValidite,
