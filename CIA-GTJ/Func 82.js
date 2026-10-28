@@ -359,19 +359,16 @@ const sendEmail = async (
   messageText = "",
 ) => {
   try {
-    const res = await fetch(
-      N8N_SENDEMAIL,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: email,
-          subjectLine: subjectLine,
-          messageHTML: messageHTML,
-          messageText: messageText,
-        }),
-      },
-    );
+    const res = await fetch(N8N_SENDEMAIL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: email,
+        subjectLine: subjectLine,
+        messageHTML: messageHTML,
+        messageText: messageText,
+      }),
+    });
     return res;
   } catch (e) {
     console.log("Error :", e);
@@ -390,7 +387,10 @@ const main = async () => {
           name: "Date",
           type: "date",
           required: true,
-          defaultValue: store.pageStore.filterData.Demande_DateHeureDebut,
+          defaultValue: (
+            store.pageStore.filterData.Demande_DateHeureDebut ||
+            store.pageStore.filterData.DemandeAllerD_Date
+          )?.split("|")[0],
         },
       ],
       buttons: [

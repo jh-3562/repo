@@ -390,7 +390,7 @@ const main = async () => {
           name: "Date",
           type: "date",
           required: true,
-          defaultValue: store.pageStore.filterData.Demande_DateHeureDebut,
+          defaultValue: (store.pageStore.filterData.Demande_DateHeureDebut || store.pageStore.filterData.DemandeAllerD_Date)?.split("|")[0],
         },
       ],
       buttons: [
