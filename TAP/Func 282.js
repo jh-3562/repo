@@ -1,0 +1,1 @@
+return { 'date_Deces': docData['Raison_suppression'] === 'Décès' ? true : null };

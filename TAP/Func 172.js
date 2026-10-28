@@ -1,0 +1,1 @@
+return { 'NombreAccompagnant': docData['Accompagné'] === 'Oui' ? true : null};

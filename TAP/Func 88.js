@@ -1,0 +1,1 @@
+return { 'Depart_Ascenceur': docData['TypeLieuDépart'] === 'Maison de repos' || docData['TypeLieuDépart'] === 'Hôpital' ? null : true };

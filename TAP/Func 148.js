@@ -1,0 +1,1 @@
+return { 'ManuallySpecifyTime': docData['FixeRdvTime'] === 'true' ? null : true};

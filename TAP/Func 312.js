@@ -1,0 +1,1 @@
+if (docData['STATUS'] === 'OPTIMISATION TERMINÉE') { return { icon: 'vert soumise',color: 'white',backgroundColor: '#2E9939', }; } else if (docData['STATUS'] === 'OPTIMISATION EN COURS') { return { icon: 'bleu en charge',color: 'white',backgroundColor: '#3580CB', }; }

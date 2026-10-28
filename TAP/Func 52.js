@@ -1,0 +1,1 @@
+return { 'Transport_Pathologie': docData['TypeVecteur'] === 'Médicalisée' || docData['TypeVecteur'] === 'Para-médicalisée' ? true : null };

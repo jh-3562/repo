@@ -1,0 +1,1 @@
+return { 'Hide category 1|Categorie 1': docData['When value is 7'] === '7' ? null : true };

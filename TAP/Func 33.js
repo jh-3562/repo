@@ -1,0 +1,1 @@
+return { 'Etablissement_DureeDebarq': docData['DétailTransport_Retour'] === 'Aucun' ? null : true };

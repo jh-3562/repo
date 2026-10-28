@@ -1,0 +1,1 @@
+return {'Adresses_Destinations' : docData["EtablissementDest_Adresse"]||'' + '\n' + docData["AdresseDestination2"]||''};

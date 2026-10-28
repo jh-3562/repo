@@ -1,0 +1,1 @@
+return { 'EtablissementDest_HeureRDV': docData['FixeRdvTime'] === 'true' ? null : true};

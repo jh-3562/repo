@@ -1,0 +1,1 @@
+return { 'DureeDesinfection': docData['Dates_Contamination'] === 'Non' ? null : true };

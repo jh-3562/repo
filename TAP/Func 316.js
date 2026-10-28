@@ -1,0 +1,1 @@
+if (docData['Stop_Type'] === 'Arrêt') { return { backgroundColor: '#f5c4da', }; } else if (docData['Stop_Type'] === 'Départ') { return { backgroundColor: '#ffdebb', }; }

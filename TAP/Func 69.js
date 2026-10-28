@@ -1,0 +1,1 @@
+return { 'Dispatch_JustificationLumieresbleuHopital': docData['Disptach_LumieresBleuesversHopital'] === 'true' ? true : null };

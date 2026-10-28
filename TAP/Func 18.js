@@ -1,0 +1,1 @@
+return { 'Dates_Multidates': docData['Dates_TypeRéc'] === 'Dates spécifiques' ? true : null };

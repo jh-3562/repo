@@ -1,0 +1,1 @@
+if (docData['CheckboxDeplacer'] === 'true') { return {'STATUS': 'SOUMIS','Dates_DateTransport' : '','Contrainte|1|Chauffeur':''} }

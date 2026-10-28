@@ -1,0 +1,1 @@
+return { 'Dest_Ascenceur': docData['Destination_Domicile_Cocher'] === 'true' ? true : null };

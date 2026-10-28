@@ -1,0 +1,1 @@
+return docData['Contrainte|2|NomClient'] ||'';

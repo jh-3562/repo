@@ -1,0 +1,1 @@
+return { 'ClientMembre': docData['Domicile_Ville'] != 'Fort-Coulonge'&&docData['Domicile_Ville'] != 'Mansfield-et-Pontefract' ? null : true };

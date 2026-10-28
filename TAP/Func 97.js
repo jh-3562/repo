@@ -1,0 +1,1 @@
+return docData['TypeVecteur'] === 'Ambulance' ? { 'Etablissement_DureePEC': '18',  'EtablissementDest_DureeDebarq': '19'}  : undefined;

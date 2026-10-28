@@ -1,0 +1,1 @@
+return {'AdresseCollec': docData['Adapte_check']==='Oui' ? true:null}

@@ -1,0 +1,1 @@
+return docData['Popup when value is 1'] === '1' ? { 'PopupInputsTest': true } : undefined;

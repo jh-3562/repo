@@ -1,0 +1,1 @@
+return { 'RaisonAjustement': docData['Ajustement'] === undefined ? null : true };

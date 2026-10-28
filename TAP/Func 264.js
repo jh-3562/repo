@@ -1,0 +1,1 @@
+return {'Factu_TotalDistance':['COMPLÉTÉ','FACTURÉ','CLOTURÉ'].includes(docData['STATUS'])?null:true}

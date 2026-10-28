@@ -1,0 +1,1 @@
+return { 'Dates_TypeRéc': docData['TACheckbox'] === 'true' ? true : null };

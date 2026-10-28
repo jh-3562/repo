@@ -1,0 +1,1 @@
+return {'Contrainte|1|Chauffeur': docData['CheckboxDeplacer'] === 'true' ? true : null};

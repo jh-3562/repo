@@ -1,0 +1,1 @@
+return { 'PeriodeFacture': docData['GenererFactureCB'] === 'true' ? true : null };

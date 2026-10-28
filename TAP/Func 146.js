@@ -1,0 +1,1 @@
+return { 'ManuallySpecifyTime': docData['TypeLieuDestination'] === 'Domicile' ? null : true};

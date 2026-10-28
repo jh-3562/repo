@@ -1,0 +1,1 @@
+return docData['Destination_Domicile_Cocher'] === 'true' ? { 'EtablissementDest_Adresse':docData['Domicile_Adresse'] , 'EtablissementDest_Ville':docData['Domicile_Ville'] , 'EtablissementDest_CodePostal':docData['Domicile_CodePostal'], 'EtablissementDest_Pays':docData['Domicile_Pays']  } : undefined;

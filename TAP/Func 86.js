@@ -1,0 +1,1 @@
+return { 'EtablissementDest_Route': docData['TypeLieuDépart'] === 'Domicile' ? null : true };

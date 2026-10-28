@@ -1,0 +1,1 @@
+if (docData['STATUS'] === 'ACTIF') { return { backgroundColor: '#94D694' }; } else if (docData['STATUS'] === 'COMPLÉTÉE') { return { backgroundColor: '#B1D8F2' }; } else { return { backgroundColor: '#F7C98B' }; }

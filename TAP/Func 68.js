@@ -1,0 +1,1 @@
+return { 'Dispatch_JustificationLumieresVersPatient': docData['Dispatch_LumieresBleuesVersPatient'] === 'true' ? true : null };

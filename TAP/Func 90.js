@@ -1,0 +1,1 @@
+return { 'Depart_HeurePEC': docData['TypeLieuDestination'] === 'Domicile' ? true : null };

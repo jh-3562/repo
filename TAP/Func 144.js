@@ -1,0 +1,1 @@
+return { 'FixeRdvTime': docData['TypeLieuDestination'] === 'Domicile' ? null : true};

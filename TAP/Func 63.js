@@ -1,0 +1,1 @@
+return { 'Appelant_Lien3': docData['Appelant_Ajouter2'] === 'true' ? true : null };

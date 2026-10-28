@@ -1,0 +1,1 @@
+return { 'FormPatient_Domicile': docData['Appelant_Ajouter1'] === 'X' ? null : null };

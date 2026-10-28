@@ -1,0 +1,1 @@
+return { 'Etablissement_Type': docData['Depart_Domicile_Cocher'] === 'true' ? null : true };

@@ -1,0 +1,1 @@
+return docData['TypeLieuDestination'] === 'Domicile' ? { 'EtablissementDest_Adresse': docData['Domicile_Adresse']}  : undefined;

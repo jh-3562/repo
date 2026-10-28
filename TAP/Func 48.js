@@ -1,0 +1,1 @@
+return { 'Etablissement_Chambre': docData['Depart_Domicile_Cocher'] === 'true' ? null : true };

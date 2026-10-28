@@ -1,0 +1,1 @@
+return { 'EtablissementDest_Route': docData['Destination_Domicile_Cocher'] === 'true' ? null : true };

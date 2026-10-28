@@ -1,0 +1,1 @@
+return docData['Service'] === 'CISSSO' ? { 'Description_service': 'Centre de jour CISSSO' } : undefined;

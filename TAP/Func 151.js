@@ -1,0 +1,1 @@
+return docData['Dates_Contamination'] === 'Maladie contagieuse Aérienne' ? { 'Remarques_Notes_Ambulancier': 'Aération complète pendant 15 min ensuite désinfection des points  de contact.', 'LieuDesinfection': 'Sur place', 'DureeDesinfection': '30'}  : undefined;

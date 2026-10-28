@@ -1,0 +1,1 @@
+return docData['TypeAppelant'] === 'Particulier' ? { 'Appelant_Nom': docData['Patient_Nom'],  'Appelant_Prenom': docData['Patient_Prenom'],  'Appelant_Telephone': docData['Patient_Telephone']  }  : undefined;

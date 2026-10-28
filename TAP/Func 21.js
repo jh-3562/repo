@@ -1,0 +1,1 @@
+return { 'Transport_ChaiseRoulante': docData['Transport_Mobilite'] === 'Chaise roulante' ? true : null };

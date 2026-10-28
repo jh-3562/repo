@@ -1,0 +1,1 @@
+return docData['Facturation_IdemAppelant'] === 'true' ? { 'Facturation_Nom':docData['Appelant_Nom'] , 'Facturation_Prenom':docData['Appelant_Prenom'] , 'Facturation_Telephone':docData['Appelant_Telephone'], 'Facturation_Email':docData['Appelant_Email']  } : undefined;

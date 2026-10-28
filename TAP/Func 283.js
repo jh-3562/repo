@@ -1,0 +1,1 @@
+return { 'Commentaire_suppression': docData['Raison_suppression'] === 'Autre' ? true : null };

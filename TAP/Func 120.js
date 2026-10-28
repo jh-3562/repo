@@ -1,0 +1,1 @@
+return docData['STATUS'] === 'Draft' ? { 'AllerOuRetour': 'ALLER'}  : undefined;

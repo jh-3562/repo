@@ -1,0 +1,1 @@
+return { 'Date retour': docData['TypeTransport'] === 'Aller retour fixe' || docData['TypeTransport'] === 'Aller retour sur appel' ? true : null };

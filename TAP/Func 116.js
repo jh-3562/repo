@@ -1,0 +1,1 @@
+if (docData['STATUS'] === 'Draft') {return  { 'Etablissement_DureePEC': '10'}  }

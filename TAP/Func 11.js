@@ -1,0 +1,1 @@
+return { 'Show/Hide categories A/B/C|Categorie A': docData['When value is A/B/C'] === 'A' ? true : null };

@@ -1,0 +1,1 @@
+return docData['Dates_Contamination'] === 'Maladie contagieuse de contact'  || docData['Dates_Contamination'] === 'Selles'  ? { 'Remarques_Notes_Ambulancier': 'Contact en spray ou lingette au points de contact + civière. Déchet + linge : Sac jaune', 'LieuDesinfection': 'Sur place', 'DureeDesinfection': '15'}  : undefined;

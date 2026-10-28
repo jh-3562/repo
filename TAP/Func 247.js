@@ -1,0 +1,1 @@
+return { 'ServiceFacture': docData['GenererFactureCB'] === 'true' ? true : null };

@@ -1,0 +1,1 @@
+if (docData['TypeTransport'] === 'ALLER/RETOUR') {return {'TypeAllerRetour': 'ALLER/RETOUR'} ;} else {return { 'TypeAllerRetour': 'Aller'};}

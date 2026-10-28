@@ -1,0 +1,1 @@
+return docData['Depart_Domicile_Cocher'] === 'true' ? { 'Etablissement_Adresse':docData['Domicile_Adresse'] , 'Etablissement_Ville':docData['Domicile_Ville'] , 'Etablissement_CodePostal':docData['Domicile_CodePostal'], 'Etablissement_Pays':docData['Domicile_Pays']  } : undefined;

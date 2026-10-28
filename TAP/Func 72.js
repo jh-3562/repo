@@ -1,0 +1,1 @@
+return { 'Dispo_HeureFin': docData['EtablissementDest_HeureRDV']|| '' }

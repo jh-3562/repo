@@ -1,0 +1,1 @@
+return { 'I will be hidden when 1=1 or 4=4': docData['When value is 1'] === '1' || docData['When value is 4'] === '4' ? false : true };

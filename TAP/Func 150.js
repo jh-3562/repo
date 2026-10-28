@@ -1,0 +1,1 @@
+return docData['STATUS'] === 'Draft' ? { 'Dates_Contamination': 'Non' } : undefined;

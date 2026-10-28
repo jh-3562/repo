@@ -1,0 +1,1 @@
+return { 'LieuDesinfection': docData['Dates_Contamination'] === 'Non' ? null : true };

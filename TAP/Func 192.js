@@ -1,0 +1,1 @@
+if (docData['TACheckbox'] === 'true') { return {'STATUS': 'ACTIF'} }

@@ -1,0 +1,1 @@
+return docData['When value is 3'] === '4' ? { 'Empty init': docData['My value will be 2'] } : undefined;

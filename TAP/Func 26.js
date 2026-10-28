@@ -1,0 +1,1 @@
+return { 'Dates_Fréquence': docData['Dates_TypeRéc'] === 'Fréquence' ? true : null };

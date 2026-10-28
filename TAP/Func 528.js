@@ -1,0 +1,1 @@
+if (docData['STATUS'] === 'EXPORTÉ(E)') { return { backgroundColor: '#94D694' }; } else { return { backgroundColor: '#FCFCA4' }; }

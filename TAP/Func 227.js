@@ -1,0 +1,1 @@
+return {'ClientID':docData['AjoutClient']==='true'?null:true}

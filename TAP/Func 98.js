@@ -1,0 +1,1 @@
+return docData['TypeVecteur'] === 'Para-médicalisée' ? { 'Etablissement_DureePEC': '22',  'EtablissementDest_DureeDebarq': '30'}  : undefined;

@@ -1,0 +1,1 @@
+return { 'ModeleTA': docData['TACheckbox'] === 'true' ? true : null};

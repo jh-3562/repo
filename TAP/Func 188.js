@@ -1,0 +1,1 @@
+return {'STATUS': docData['CheckboxDeplacer'] === 'true' ? true : null};

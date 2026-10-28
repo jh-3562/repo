@@ -1,0 +1,1 @@
+return { 'CalculateDuration': docData['STATUS'] === 'Draft' ? null : true };

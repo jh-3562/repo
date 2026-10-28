@@ -1,0 +1,1 @@
+if (docData['TypeLieuDestination'] === 'Domicile') {return { 'EtablissementDest_NomLieu': docData['EtablissementDest_Ville']}}
