@@ -59,7 +59,7 @@ const showWarningPopup = (message) => {
   });
 };
 
-const REDIRECT_DEMANDES_URL = "https://web.cat-gtm-test.fastercom.io/demandes";
+const REDIRECT_DEMANDES_URL = "/demandes";
 
 const main = async () => {
   console.log("docData :", docData);
@@ -179,3 +179,4 @@ const main = async () => {
 };
 
 return main();
+

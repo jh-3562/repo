@@ -28,7 +28,7 @@ async function main() {
         status: STATUS_CONFIRMEE,
         active: true,
         template: { templateId: TRANSPORT_TEMPLATE_ID }
-      }
+      },
       preventNotify: "FULL"
       
     });
@@ -65,7 +65,7 @@ async function main() {
     hidePopupLoading();
     showSuccessBanner("Transport confirmed successfully.");
     setTimeout(() => {
-     window.location.href = "https://web.cat-gtm-test.fastercom.io/repartition";
+     window.location.href = "/repartition";
      }, 1000);
 
   } catch (e) {
@@ -75,3 +75,4 @@ async function main() {
 }
 
 main();
+

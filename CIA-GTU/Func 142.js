@@ -64,7 +64,7 @@ async function main(values) {
     hidePopupLoading();
     showSuccessBanner("Status updated successfully.");
     setTimeout(() => {
-     window.location.href = "https://web.cat-gtm-test.fastercom.io/repartition";
+     window.location.href = "/repartition";
      }, 1000);
 
   } catch (e) {
@@ -89,3 +89,4 @@ showCustomPopup({
     { name: "Confirmer", preset: "action", onClick: (values) => main(values) }
   ]
 });
+

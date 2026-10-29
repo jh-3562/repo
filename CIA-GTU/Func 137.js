@@ -502,7 +502,7 @@ async function function137(values) {
     showSuccessBanner("Transport planifié avec succès .");
     setTimeout(() => {
       window.location.href =
-        "https://web.cat-gtm-test.fastercom.io/repartition";
+        "/repartition";
     }, 1000);
   } catch (e) {
     hidePopupLoading();
@@ -587,3 +587,4 @@ showCustomPopup({
     },
   ],
 });
+

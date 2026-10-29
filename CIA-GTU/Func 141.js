@@ -449,7 +449,7 @@ async function main(values) {
 
     setTimeout(() => {
       window.location.replace(
-        "https://web.cat-gtm-test.fastercom.io/repartition",
+        "/repartition",
       );
     }, 800);
   } catch (e) {
@@ -489,3 +489,4 @@ showCustomPopup({
     },
   ],
 });
+

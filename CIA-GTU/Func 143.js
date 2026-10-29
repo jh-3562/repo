@@ -61,7 +61,7 @@ async function main() {
     hidePopupLoading();
     showSuccessBanner("Status updated successfully.");
     setTimeout(() => {
-     window.location.href = "https://web.cat-gtm-test.fastercom.io/repartition";
+     window.location.href = "/repartition";
      }, 1000);
 
   } catch (e) {
@@ -71,3 +71,4 @@ async function main() {
 }
 
 main();
+
