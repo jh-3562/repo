@@ -5,7 +5,7 @@ console.log("Function 85", context);
 // ======================================================
 
 const CONFIG = {
-  REDIRECT_DEMANDES_URL: "https://web.cat-gtm-test.fastercom.io/demandes",
+  REDIRECT_DEMANDES_URL: "/demandes",
 
   TEMPLATE_ID_CLIENT: "7e0a41c7-b3f3-4c91-aaad-461caf36cb2e",
   TEMPLATE_ID_DEMANDE: "dadaf75a-cd49-4cba-8060-2ac15155478f",
