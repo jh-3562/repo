@@ -1,0 +1,35 @@
+if (docData['Kit']) {
+    const mapping = [
+        { from: 'IDProduit', to: 'Kit|1|Produit' }
+    ];
+    const filters = [
+    ];
+    const collection = docData['Kit'];     //Key de la collection
+    const currentRow = collection[indexItemChange];    //A ne pas toucher
+    const searchField = 'Kit|2|codeFournisseur';             //Key du champs address dans la collection
+    const searchValue = currentRow[searchField];    //Ne pas toucher
+    if (searchValue) {
+        api({ local: true })
+            .post(
+                `suggestion?fieldID=${'8EF43B82-8879-4D81-814D-BD58DA4BC6C0'}&fieldValue=${searchValue}`, { filters })
+            .then(res => {
+                if (res?.data?.suggestions?.length > 0) {
+                    callback({
+                        suggestions: {
+                            [searchField]: res.data?.suggestions.map(s => ({
+                                title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                                    ...a,
+                                    value: a.value || '',
+                                    key: mapping.find(m => m.from === a.key).to,
+                                }))
+                            }))
+                        }
+                    })
+                }
+                else { callback({ suggestions:{ [searchField]:[] }}) }
+            })
+    }
+    else {
+        callback({ suggestions:{ [searchField]:[] }});
+    }
+    }

@@ -1,0 +1,126 @@
+const collection = docData['Seq'];
+
+const currentRow = collection[indexItemChange];
+
+if (currentRow['Seq|6|SousCategorie']) {
+
+    if (currentRow['Seq|6|SousCategorie'] === 'Régulier - ÉTÉ' || currentRow['Seq|6|SousCategorie'] === 'Régulier - Supplémentaire') {
+
+        currentRow['Seq|7|Delai'] = '4 jours'
+
+    }
+
+    else if (currentRow['Seq|6|SousCategorie'] === 'Régulier - HIVER' || currentRow['Seq|6|SousCategorie'] === 'Régulier' || currentRow['Seq|6|SousCategorie'] === 'Accès pub' || currentRow['Seq|6|SousCategorie'] === 'Déglaçage' || currentRow['Seq|6|SousCategorie'] === 'Mécanique') {
+
+console.log('test')
+
+        currentRow['Seq|7|Delai'] = '72h'
+
+    }
+
+    else if (currentRow['Seq|6|SousCategorie'] === 'Numérique' || currentRow['Seq|6|SousCategorie'] === 'Affichage') {
+
+        currentRow['Seq|7|Delai'] = '48h'
+
+    }
+
+    else if (currentRow['Seq|6|SousCategorie'] === 'Herbes/Émondage' || currentRow['Seq|6|SousCategorie'] === 'Pression' || currentRow['Seq|6|SousCategorie'] === 'Diffuseur'||currentRow['Seq|6|SousCategorie']==='Numéro') {
+
+        currentRow['Seq|7|Delai'] = '3 mois'
+    }
+
+    else if (currentRow['Seq|6|SousCategorie'] === 'Poubelle' || currentRow['Seq|6|SousCategorie'] === 'Collant' || currentRow['Seq|6|SousCategorie'] === 'Graffiti' || currentRow['Seq|6|SousCategorie'] === 'Plainte' || currentRow['Seq|6|SousCategorie'] === 'Banc' || currentRow['Seq|6|SousCategorie'] === 'Velcro' || currentRow['Seq|6|SousCategorie'] === 'Vandalisme' || currentRow['Seq|6|SousCategorie'] === 'Riveter Velcro' || currentRow['Seq|6|SousCategorie'] === 'Diffuseur anomalie' || currentRow['Seq|6|SousCategorie'] === 'Abribus absent' || currentRow['Seq|6|SousCategorie'] === 'Inaccessible' || currentRow['Seq|6|SousCategorie'] === 'Vis coincée') {
+
+        currentRow['Seq|7|Delai'] = '24h'
+    }
+
+    else if (currentRow['Seq|6|SousCategorie'] === 'Drive' ||currentRow['Seq|6|SousCategorie'] === 'Dalle' ||currentRow['Seq|6|SousCategorie'] === 'Vérification' ||currentRow['Seq|6|SousCategorie'] === 'Inox' ||currentRow['Seq|6|SousCategorie'] === 'Braquette' ||currentRow['Seq|6|SousCategorie'] === 'Structure' ||currentRow['Seq|6|SousCategorie'] === 'Vis' ||currentRow['Seq|6|SousCategorie'] === 'Toit' ||currentRow['Seq|6|SousCategorie'] === 'Réinstallation') {
+
+        currentRow['Seq|7|Delai'] = '7 jours'
+    }
+
+    else if (currentRow['Seq|6|SousCategorie'] === 'Plainte') {
+
+        currentRow['Seq|7|Delai'] = '12h'
+
+    }
+
+    else if (currentRow['Seq|5|Type']==='Polissage'&&currentRow['Seq|6|SousCategorie']==='Verre') {
+
+        currentRow['Seq|7|Delai'] = '7 jours'
+
+    }
+
+    else if (currentRow['Seq|5|Type']==='Réparation'&&currentRow['Seq|6|SousCategorie']==='Verre') {
+
+        currentRow['Seq|7|Delai'] = '72h'
+    }
+
+	else if (currentRow['Seq|5|Type']==='Réparation'&&currentRow['Seq|6|SousCategorie']==='Verre Pub'||currentRow['Seq|5|Type']==='Signalement'&&currentRow['Seq|6|SousCategorie']==='Verre Pub') {
+
+        currentRow['Seq|7|Delai'] = '24h'
+    }
+
+    else if (currentRow['Seq|5|Type']==='Réparation'&&currentRow['Seq|6|SousCategorie']==='Diffuseur'||currentRow['Seq|5|Type']==='Réparation'&&currentRow['Seq|6|SousCategorie']==='Autre') {
+
+        currentRow['Seq|7|Delai'] = '7 jours'
+
+    }
+
+    else if (currentRow['Seq|5|Type']==='URGENCE'&&(currentRow['Seq|6|SousCategorie'] === 'Désinstallation' ||currentRow['Seq|6|SousCategorie'] === 'Débranchement' ||currentRow['Seq|6|SousCategorie'] === 'Sécurisation')) {
+
+        currentRow['Seq|7|Delai'] = '4h'
+
+    }
+
+    else if (currentRow['Seq|6|SousCategorie'] === 'Conversion' ||currentRow['Seq|6|SousCategorie'] === 'Nouveau Site' ||currentRow['Seq|6|SousCategorie'] === 'Numérique' ||currentRow['Seq|6|SousCategorie'] === 'Rebranchement') {
+
+        currentRow['Seq|7|Delai'] = '1 mois'
+
+    }
+
+    else if (currentRow['Seq|5|Type']==='Déploiement'&&currentRow['Seq|6|SousCategorie']==='Dalle'||currentRow['Seq|5|Type']==='Déploiement'&&currentRow['Seq|6|SousCategorie']==='Débranchement'||currentRow['Seq|5|Type']==='Déploiement'&&currentRow['Seq|6|SousCategorie']==='Autre'||currentRow['Seq|5|Type']==='Déploiement'&&currentRow['Seq|6|SousCategorie']==='Installation'||currentRow['Seq|5|Type']==='Déploiement'&&currentRow['Seq|6|SousCategorie']==='Désinstallation') {
+
+        currentRow['Seq|7|Delai'] = '1 mois'
+
+    }
+
+    else if (currentRow['Seq|5|Type']==='Travaux'&&currentRow['Seq|6|SousCategorie']==='Désinstallation'||currentRow['Seq|5|Type']==='Travaux'&&currentRow['Seq|6|SousCategorie']==='Dalle'||currentRow['Seq|5|Type']==='Travaux'&&currentRow['Seq|6|SousCategorie']==='Débranchement'||currentRow['Seq|5|Type']==='Travaux'&&currentRow['Seq|6|SousCategorie']==='Rebranchement') {
+
+        currentRow['Seq|7|Delai'] = '7 jours'
+
+    }
+
+    else if (currentRow['Seq|5|Type']==='Numérique'&&currentRow['Seq|6|SousCategorie']==='Numérique') {
+
+        currentRow['Seq|7|Delai'] = '7 jours'
+
+    }
+
+    else if (currentRow['Seq|5|Type']==='Signalement'&&currentRow['Seq|6|SousCategorie']==='Verre'||currentRow['Seq|5|Type']==='Signalement'&&currentRow['Seq|6|SousCategorie']==='Structure'||currentRow['Seq|5|Type']==='Numérique'&&currentRow['Seq|6|SousCategorie']==='Dépannage'||currentRow['Seq|6|SousCategorie']==='Tâches désinstallation'||currentRow['Seq|6|SousCategorie']==='Tâches installation') {
+
+        currentRow['Seq|7|Delai'] = '24h'
+
+    }
+
+    else if (currentRow['Seq|5|Type']==='Signalement'&&currentRow['Seq|6|SousCategorie']==='Autre') {
+
+        currentRow['Seq|7|Delai'] = ''
+
+    }
+
+    else if (currentRow['Seq|5|Type']==='NO POST'&&currentRow['Seq|6|SousCategorie']==='Autre') {
+
+        currentRow['Seq|7|Delai'] = '24h'
+    }
+
+else if (currentRow['Seq|6|SousCategorie']==='Herbes') {
+
+        currentRow['Seq|7|Delai'] = '1 mois'
+    }
+
+    else { undefined }
+
+}
+
+else { undefined }

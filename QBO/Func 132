@@ -1,0 +1,2 @@
+return docData['RaisonNonComplétion'] === 'Abribus absent'||docData['RaisonNonComplétion'] === 'Non accessible'||docData['RaisonNonComplétion'] === 'Autre'?
+{'InterventionFacturable': 'Non facturable'}: {'InterventionFacturable': 'Facturable'};

@@ -1,0 +1,2 @@
+return docData['TypeIntervention'] === 'Déploiement'&&docData['SousCatégorie1'] === 'Autre'||docData['TypeIntervention'] === 'Travaux'&&docData['SousCatégorie1'] === 'Autre' ?    
+{'Photo_Intervention': true    }: {'Photo_Intervention': null    };

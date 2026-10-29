@@ -1,0 +1,832 @@
+// Function #124 - Fetch submitted planning and create interventions for matching bus shelters
+// Retrieves planning document with status "Soumise", filters bus shelters based on criteria,
+// and calculates due dates based on SLA
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const PLANNING_TEMPLATE_ID = "6a2ee73e-dabc-4bc4-9ceb-d2b38383fb52";
+const PLANNING_TEMPLATE_NAME = "PLANIFICATION";
+const PLANNING_STATUS = "Soumise";
+const FINAL_PLANNING_STATUS = 'À planifier';
+
+const BUS_SHELTER_TEMPLATE_NAME = "ABRIBUS";
+const BUS_SHELTER_STATUS = "Actif";
+
+const INTERVENTION_TEMPLATE_ID = "F7B9A59A-E708-45C4-B786-2A5130CFEE2B";
+const INTERVENTION_STATUS = "Non-assignée";
+
+const PLANNING_KEYS = {
+    // Filtre
+    TEAM: "EquipeFiltre",
+    DISTRICT: "ArrondissementFiltre",
+    PARTNER: "PartenaireFiltre",
+    MODEL: "ModeleFiltre",
+    SPECIAL: "Abribus_Special",
+
+    OPTIM_DATE: "DateOptim",
+    SLA_DELAY: "DélaiSLA",
+    DUE_DATE: "DateDue",
+    INTERVENTION_TYPE: "TypeIntervention",
+    SUB_CATEGORY: "SousCatégorie1",
+};
+
+const BUS_SHELTER_KEYS = {
+    // Filtre
+    TEAM: "EquipeAbribus",
+    DISTRICT: "Arrondissement",
+    PARTNER: "Partenaire",
+    MODEL: "Abribus_Modele",
+    SPECIAL: "Abribus_Special",
+};
+
+const SLA_DELAYS = {
+    "4h": { unit: "hours", value: 4 },
+    "12h": { unit: "hours", value: 12 },
+    "24h": { unit: "days", value: 1 },
+    "48h": { unit: "days", value: 2 },
+    "72h": { unit: "days", value: 3 },
+    "4 jours": { unit: "days", value: 4 },
+    "7 jours": { unit: "days", value: 7 },
+    "1 mois": { unit: "months", value: 1 },
+    "3 mois": { unit: "months", value: 3 },
+};
+
+const DEFAULT_SLA_DELAY = { unit: "days", value: 1 };
+
+// ============================================================================
+// UTILITIES - BANNERS
+// ============================================================================
+
+const createOrUpdateElement = (id, tag, style, innerHTML = "") => {
+    let element = document.getElementById(id);
+    if (!element) {
+        element = document.createElement(tag);
+        element.id = id;
+        document.body.appendChild(element);
+    }
+    element.style = style;
+    element.innerHTML = innerHTML;
+    return element;
+};
+
+const showErrorBanner = (errorMessage) => {
+    const errorBanner = createOrUpdateElement(
+        "errorBanner",
+        "div",
+        `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      min-width: 300px;
+      height: 50px;
+      background-color: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      border-radius: 5px;
+      padding: 0 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    `,
+        `
+<div style="margin-right: 10px; color: red;">&#x26A0;</div><div>${errorMessage}</div>
+<div id="errorBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: red; height: 5px; width: 0%;"></div>
+    `
+    );
+    let progressElement = document.getElementById("errorBannerProgress");
+    let width = 0;
+    let interval = setInterval(() => {
+        if (width >= 100) {
+            clearInterval(interval);
+            errorBanner.style.display = "none";
+        } else {
+            width++;
+            progressElement.style.width = width + "%";
+        }
+    }, 55); // La barre progresse sur 5 secondes
+};
+
+const showSuccessBanner = (successMessage) => {
+    const successBanner = createOrUpdateElement(
+        "successBanner",
+        "div",
+        `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      min-width: 300px;
+      height: 50px;
+      background-color: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      border-radius: 5px;
+      padding: 0 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    `,
+        `
+<div style="margin-right: 10px; color: green;">&#10003;</div><div>${successMessage}</div>
+<div id="successBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: green; height: 5px; width: 0%;"></div>
+    `
+    );
+    let progressElement = document.getElementById("successBannerProgress");
+    let width = 0;
+    let interval = setInterval(() => {
+        if (width >= 100) {
+            clearInterval(interval);
+            successBanner.style.display = "none";
+        } else {
+            width++;
+            progressElement.style.width = width + "%";
+        }
+    }, 55); // La barre progresse sur 5 secondes
+};
+
+// ============================================================================
+// POPUPS (LOADING + CUSTOM + CONFIRMATION)
+// ============================================================================
+
+const showPopupLoading = (loadingMessage) => {
+    createOrUpdateElement(
+        "loadingPopup",
+        "div",
+        `
+      position: fixed; 
+      left: 0; 
+      top: 0; 
+      width: 100%; 
+      height: 100%; 
+      background-color: rgba(0,0,0,0.5); 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      z-index: 9999;
+    `,
+        `
+      <div style="background-color: white; padding: 20px; border-radius: 5px; display: flex; flex-direction: column; align-items: center;">
+        <div>${loadingMessage}</div>
+        <div class="loader" style="border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 40px; height: 40px; margin-top: 20px; animation: spin 1s linear infinite;"></div>
+      </div>
+    `
+    );
+    if (!document.getElementById("spinnerStyle")) {
+        let style = document.createElement("style");
+        style.id = "spinnerStyle";
+        style.innerHTML = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+        document.head.appendChild(style);
+    }
+};
+
+const hidePopupLoading = () => {
+    const loadingPopup = document.getElementById("loadingPopup");
+    if (loadingPopup) loadingPopup.style.display = "none";
+};
+
+const showCustomPopup = ({ title, commentHTML, fields, buttons }) => {
+    function getInput({
+        key,
+        name,
+        type,
+        options,
+        mask,
+        style,
+        defaultValue,
+        min,
+        max,
+        required,
+    }) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "popup-input";
+
+        const label = document.createElement("label");
+        label.textContent = name || key;
+        label.htmlFor = key;
+
+        let input;
+
+        switch (type.toLowerCase()) {
+            case "select":
+                input = document.createElement("select");
+                input.name = key;
+                if (style) input.style = style;
+                input.id = key;
+                (options || []).forEach(({ value, label }) => {
+                    const opt = document.createElement("option");
+                    opt.value = value;
+                    opt.textContent = label;
+                    input.appendChild(opt);
+                });
+                wrapper.append(label, input);
+                break;
+
+            case "checkbox":
+                input = document.createElement("input");
+                input.type = "checkbox";
+                input.name = key;
+                if (style) input.style = style;
+                input.id = key;
+                wrapper.classList.add("popup-input-row");
+                wrapper.append(input, label);
+                break;
+
+            case "number":
+                input = document.createElement("input");
+                input.type = "number";
+                input.name = key;
+                if (style) input.style = style;
+                if (defaultValue !== undefined) input.value = defaultValue;
+                if (min !== undefined) input.min = min;
+                if (max !== undefined) input.max = max;
+                if (required) input.required = true;
+                input.step = 1;
+                input.id = key;
+                input.addEventListener("input", () => {
+                    input.value = input.value.replace(/[^\d]/g, "");
+                });
+                wrapper.append(label, input);
+                break;
+
+            case "label":
+                const span = document.createElement("span");
+                span.innerHTML = name || "";
+                if (style) span.style = style;
+                wrapper.appendChild(span);
+                break;
+
+            default:
+                input = document.createElement("input");
+                input.type = type.toLowerCase();
+                input.name = key;
+                if (style) input.style = style;
+                input.id = key;
+                if (mask instanceof RegExp && typeof applyRegexMask === "function") {
+                    applyRegexMask(input, mask);
+                }
+                wrapper.append(label, input);
+                break;
+        }
+
+        return wrapper;
+    }
+
+    const overlay = document.createElement("div");
+    overlay.className = "popup-overlay";
+
+    const popup = document.createElement("div");
+    popup.className = "popup-box";
+
+    const style = document.createElement("style");
+    style.textContent = `
+  .popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeInOverlay 0.15s ease-out;
+  }
+
+  @keyframes fadeInOverlay {
+    from {
+      background: rgba(0, 0, 0, 0);
+    }
+    to {
+      background: rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  .popup-box {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    background: white;
+    border-radius: 0.375rem;
+    padding: 15px 25px;
+    width: 500px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    animation: fadeInScale 0.15s ease-out;
+  }
+
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+      background: rgba(0, 0, 0, 0);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .popup-box h1,
+  .popup-box h2,
+  .popup-box h3,
+  .popup-box p,
+  .popup-box span {
+    color: #202127;
+  }
+
+  .popup-box h2 {
+    margin: 0 0 20px;
+    font-size: 1.25rem;
+  }
+
+  .popup-box p,
+  .popup-box span {
+    font-size: 1rem;
+  }
+
+  .popup-comment {
+    margin-bottom: 20px;
+  }
+
+  .popup-input {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+
+  .popup-input-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .popup-input label {
+    margin-bottom: 5px;
+    font-size: 12px;
+  }
+
+  .popup-input input,
+  .popup-input select {
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+  }
+
+  .popup-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .popup-buttons button {
+    border: none;
+    padding: 3px 30px;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 768px) {
+    .popup-input input,
+    .popup-input select {
+        width: 100%;
+    }
+  }
+`;
+
+    popup.appendChild(style);
+
+    if (title) {
+        const titleElem = document.createElement("h2");
+        titleElem.textContent = title;
+        titleElem.style.fontWeight = "bold";
+        popup.appendChild(titleElem);
+    }
+
+    if (commentHTML) {
+        const comment = document.createElement("div");
+        comment.className = "popup-comment";
+        comment.innerHTML = commentHTML;
+        popup.appendChild(comment);
+    }
+
+    if (fields) {
+        for (const field of fields) {
+            popup.appendChild(getInput(field));
+        }
+    }
+
+    const buttonRow = document.createElement("div");
+    buttonRow.className = "popup-buttons";
+
+    if (buttons) {
+        for (const { name, onClick, backgroundColor, color, preset } of buttons) {
+            const btn = document.createElement("button");
+            btn.textContent = name;
+
+            switch (preset) {
+                case "action":
+                    btn.style.backgroundColor = "#3182ce";
+                    btn.style.color = "#f2f7fb";
+                    break;
+                case "cancel":
+                    btn.style.backgroundColor = "#f5f5f6";
+                    btn.style.color = "#2c2d32";
+                    break;
+                default:
+                    btn.style.backgroundColor = "#3182ce";
+                    btn.style.color = "#f2f7fb";
+                    break;
+            }
+
+            if (backgroundColor) btn.style.backgroundColor = backgroundColor;
+            if (color) btn.style.color = color;
+
+            btn.onclick = () => {
+                const values = {};
+                const inputs = popup.querySelectorAll("input, select");
+                for (const el of inputs) {
+                    values[el.name] = el.type === "checkbox" ? el.checked : el.value;
+                }
+                onClick(values);
+                document.body.removeChild(overlay);
+            };
+
+            buttonRow.appendChild(btn);
+        }
+    }
+
+    popup.appendChild(buttonRow);
+    overlay.appendChild(popup);
+    document.body.appendChild(overlay);
+};
+
+const showPopupConfirmation = (titleInput, message, yesText = "Oui", noText = "Non") => {
+    return new Promise((resolve) => {
+        showCustomPopup({
+            title: titleInput,
+            commentHTML: message,
+            buttons: [
+                {
+                    name: noText,
+                    backgroundColor: "#ffc9c9",
+                    color: "#1e1e1e",
+                    preset: "cancel",
+                    onClick: () => resolve(false),
+                },
+                {
+                    name: yesText,
+                    backgroundColor: "#b2f2bb",
+                    color: "#1e1e1e",
+                    preset: "action",
+                    onClick: () => resolve(true),
+                },
+            ],
+        });
+    });
+};
+
+// ============================================================================
+// API HELPERS
+// ============================================================================
+
+const getDocumentsIDsByFilters = async (apiFilters) => {
+    try {
+        const response = await api({ local: true }).post("document/id/filter", {
+            filters: apiFilters,
+        });
+
+        return response?.data?.ids || [];
+    } catch (error) {
+        console.error("Failed to fetch document IDs:", error);
+        return [];
+    }
+};
+
+const getDocumentsByIDs = async (documentIDs) => {
+    try {
+        const response = await api({ local: true }).post("document/id", {
+            ids: documentIDs,
+        });
+        return response?.data?.documents || [];
+    } catch (error) {
+        console.error("Failed to fetch documents:", error);
+        return [];
+    }
+};
+
+const createDocuments = async (documentsToCreate) => {
+    try {
+        const response = await api({ local: true }).post("document/many", {
+            documents: documentsToCreate,
+        });
+
+        return response?.data?.docs || [];
+    } catch (error) {
+        console.error("Failed to create documents:", error);
+        return [];
+    }
+};
+
+const updateDocument = async (documentToUpdate) => {
+    try {
+        const response = await api({ local: true }).put("document", {
+            document: documentToUpdate,
+        });
+
+        return response?.data?.document || null;
+    } catch (error) {
+        console.error("Failed to update document:", error);
+        return null;
+    }
+};
+
+// ============================================================================
+// DATE CALCULATION
+// ============================================================================
+
+const calculateDueDate = (startDate, slaDelay) => {
+    if (!startDate) {
+        return "";
+    }
+
+    const dueDate = new Date(startDate);
+    const delay = SLA_DELAYS[slaDelay] || DEFAULT_SLA_DELAY;
+
+    switch (delay.unit) {
+        case "hours":
+            dueDate.setHours(dueDate.getHours() + delay.value);
+            break;
+        case "days":
+            dueDate.setDate(dueDate.getDate() + delay.value);
+            break;
+        case "months":
+            dueDate.setMonth(dueDate.getMonth() + delay.value);
+            break;
+    }
+
+    return dueDate.toISOString().substring(0, 19);
+};
+
+// ============================================================================
+// BUSINESS LOGIC - PLANNING
+// ============================================================================
+
+const getPlanningID = async () => {
+    const apiFilters = [
+        {
+            key: "FORMLAYOUTNAME",
+            operator: "EQUALS",
+            value: PLANNING_TEMPLATE_NAME,
+            type: "TEXT",
+        },
+        {
+            key: "STATUS",
+            operator: "EQUALS",
+            value: PLANNING_STATUS,
+            type: "TEXT",
+        },
+    ];
+
+    const ids = await getDocumentsIDsByFilters(apiFilters);
+    return ids[0] || null;
+};
+
+const getPlanningData = async (planningID) => {
+    const documents = await getDocumentsByIDs([planningID]);
+    return documents[0] || null;
+};
+
+const extractPlanningData = (planningData) => {
+    const data = JSON.parse(planningData.data);
+
+    const optimDate = data[PLANNING_KEYS.OPTIM_DATE] || null;
+    const slaDelay = data[PLANNING_KEYS.SLA_DELAY] || null;
+    const dueDate = calculateDueDate(optimDate, slaDelay);
+
+    return {
+        ...data,
+        [PLANNING_KEYS.DUE_DATE]: dueDate,
+        number: planningData.number
+    };
+};
+
+const updatePlanningStatus = async (planningID) => {
+    const documentToUpdate = {
+        status: FINAL_PLANNING_STATUS,
+        active: true,
+        template: { templateId: PLANNING_TEMPLATE_ID },
+        documentID: planningID,
+    };
+
+    await updateDocument(documentToUpdate);
+};
+
+// ============================================================================
+// BUSINESS LOGIC - BUS SHELTERS
+// ============================================================================
+
+const buildBusShelterFilters = (planning) => {
+    const filters = [
+        {
+            key: "FORMLAYOUTNAME",
+            operator: "EQUALS",
+            value: BUS_SHELTER_TEMPLATE_NAME,
+            type: "TEXT",
+        },
+        {
+            key: "STATUS",
+            operator: "EQUALS",
+            value: BUS_SHELTER_STATUS,
+            type: "TEXT",
+        },
+    ];
+
+    const teams = planning[PLANNING_KEYS.TEAM];
+    if (teams) {
+        filters.push({
+            key: BUS_SHELTER_KEYS.TEAM,
+            operator: "IN",
+            value: teams,
+            type: "TEXT",
+        });
+    }
+
+    const districts = planning[PLANNING_KEYS.DISTRICT];
+    if (districts) {
+        filters.push({
+            key: BUS_SHELTER_KEYS.DISTRICT,
+            operator: "IN",
+            value: districts,
+            type: "TEXT",
+        });
+    }
+
+    const partners = planning[PLANNING_KEYS.PARTNER];
+    if (partners) {
+        filters.push({
+            key: BUS_SHELTER_KEYS.PARTNER,
+            operator: "IN",
+            value: partners,
+            type: "TEXT",
+        });
+    }
+
+    const models = planning[PLANNING_KEYS.MODEL];
+    if (models) {
+        filters.push({
+            key: BUS_SHELTER_KEYS.MODEL,
+            operator: "IN",
+            value: models,
+            type: "TEXT",
+        });
+    }
+
+    const special = planning[PLANNING_KEYS.SPECIAL];
+    if (special) {
+        filters.push({
+            key: BUS_SHELTER_KEYS.SPECIAL,
+            operator: "CONTAINS",
+            value: special,
+            type: "TEXT",
+        });
+    }
+
+    return filters;
+};
+
+const getBusShelterIDs = async (planning) => {
+    const filters = buildBusShelterFilters(planning);
+    console.log("Filters applied:", filters);
+    return await getDocumentsIDsByFilters(filters);
+};
+
+const getBusShelters = async (busShelterIDs) => {
+    if (busShelterIDs.length === 0) {
+        return [];
+    }
+    return await getDocumentsByIDs(busShelterIDs);
+};
+
+// ============================================================================
+// BUSINESS LOGIC - INTERVENTIONS
+// ============================================================================
+
+const prepareInterventionData = (busShelter, planning) => {
+    const busShelterData = JSON.parse(busShelter.data);
+
+    const interventionData = {
+        ...busShelterData,
+        CommandDate: planning[PLANNING_KEYS.OPTIM_DATE],
+        TypeIntervention: planning[PLANNING_KEYS.INTERVENTION_TYPE],
+        SousCatégorie1: planning[PLANNING_KEYS.SUB_CATEGORY],
+        DélaiSLA: planning[PLANNING_KEYS.SLA_DELAY],
+        DateDue: planning[PLANNING_KEYS.DUE_DATE],
+        NumPlanification: planning.number,
+    };
+
+    return {
+        data: JSON.stringify(interventionData),
+        status: INTERVENTION_STATUS,
+        active: true,
+        template: { templateId: INTERVENTION_TEMPLATE_ID }
+    };
+};
+
+const createInterventions = async (busShelters, planning) => {
+    if (busShelters.length === 0) {
+        return [];
+    }
+
+    const interventionsToCreate = busShelters.map(shelter =>
+        prepareInterventionData(shelter, planning)
+    );
+
+    const createdInterventions = await createDocuments(interventionsToCreate);
+
+    return createdInterventions;
+};
+
+// ============================================================================
+// EXECUTION
+// ============================================================================
+
+const main = async () => {
+    try {
+        // Confirmation avant de lancer
+        const confirmed = await showPopupConfirmation(
+            "Génération des interventions",
+            "<p>Voulez-vous générer les interventions pour la dernière planification <strong>Soumise</strong> ?</p>",
+            "Oui, continuer",
+            "Annuler"
+        );
+
+        if (!confirmed) {
+            showErrorBanner("Opération annulée.");
+            return;
+        }
+
+        showPopupLoading("Traitement en cours...");
+
+        const planningID = await getPlanningID();
+
+        if (!planningID) {
+            hidePopupLoading();
+            console.log("No planning document found");
+            showErrorBanner("Aucune planification au statut \"Soumise\" n'a été trouvée.");
+            return;
+        }
+
+        console.log(`planningID`, planningID);
+
+        const planningData = await getPlanningData(planningID);
+
+        if (!planningData) {
+            hidePopupLoading();
+            console.log("Failed to retrieve planning data");
+            showErrorBanner("Impossible de récupérer les données de la planification.");
+            return;
+        }
+
+        const planning = extractPlanningData(planningData);
+
+        console.log(`planning`, planning);
+
+        const busShelterIDs = await getBusShelterIDs(planning);
+        console.log(`Found ${busShelterIDs.length} matching bus shelters`);
+
+        if (busShelterIDs.length === 0) {
+            hidePopupLoading();
+            console.log("No matching bus shelters found for the criteria");
+            showErrorBanner("Aucun abribus ne correspond aux critères de la planification.");
+            return;
+        }
+
+        const busShelters = await getBusShelters(busShelterIDs);
+
+        const createdInterventions = await createInterventions(busShelters, planning);
+        console.log(`Successfully created ${createdInterventions.length} interventions`);
+
+        await updatePlanningStatus(planningID);
+
+        hidePopupLoading();
+        showSuccessBanner(`Opération réussie : ${createdInterventions.length} interventions créées.`);
+
+    } catch (error) {
+        console.error("Error occurred:", error.message);
+        hidePopupLoading();
+        showErrorBanner("Une erreur est survenue.");
+    }
+};
+
+main();
+

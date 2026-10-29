@@ -1,0 +1,60 @@
+console.log("253", context);
+
+const apiFilters = [
+  {
+    key: "FORMLAYOUTNAME",
+
+    operator: "EQUALS",
+
+    value: "ABRIBUS",
+
+    type: "TEXT",
+  },
+
+  {
+    key: "NumAbribus",
+
+    operator: "EQUALS",
+
+    value: docData.NumAbribus,
+
+    type: "TEXT",
+  },
+];
+
+console.log("apiFilters", apiFilters);
+
+const getIds = async (filters) => {
+  const res = await api({ local: true }).post("document/id/filter", {
+    filters,
+  });
+
+  return res?.data?.ids || [];
+};
+
+const getForms = async (ids) => {
+  const res = await api({ local: true }).post("document/id", { ids });
+
+  return res?.data?.documents || [];
+};
+
+// Main
+
+const main = async () => {
+  const ids = await getIds(apiFilters);
+
+  console.log("ids", ids);
+
+  if (ids[0]) {
+    const url = new URL(window.location.href);
+
+    const segments = url.pathname.split("/").filter(Boolean);
+
+    const newPath = `/${segments[0]}/${ids[0]}`;
+
+    window.open(`${url.origin}${newPath}`, "_blank");
+  }
+};
+
+main();
+

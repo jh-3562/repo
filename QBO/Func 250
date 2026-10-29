@@ -1,0 +1,10 @@
+console.log("250");
+const dateCreation = docData?.CommandDate;
+console.log('???', dateCreation && typeof isFutureDate2 === "function");
+return {
+  InterventionDateCreationValide:
+    dateCreation && typeof isFutureDate === "function"
+      ? isFutureDate(dateCreation)
+      : "Non",
+};
+

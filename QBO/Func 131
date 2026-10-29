@@ -1,0 +1,18 @@
+if (docData["TypeIntervention"]==='Travaux saisonniers'&&docData["SousCatégorie1"]==='Diffuseur') {
+
+    if (docData["Abribus_Modele"]==='COLONNE NUM'||docData["Abribus_Modele"]==='INOX NUM') {
+        return {'Photo_INTPorteOuverteEntiere':true,'Photo_INTBarreNoirBas':true,'Photo_INTAfficheReplacee':true,'Photo_INTTubeFluo':null,'Photo_EXTPorteOuverteEntiere':null,'Photo_EXTBarreNoirBas':null,'Photo_EXTTubeFluo':null,'Photo_EXTAfficheReplacee':null,'Photo_VisGraissees':null}
+    }
+
+    else if ((docData["Abribus_Modele"]==='CLASSIQUE PUB'||docData["Abribus_Modele"]==='INOX PUB'||docData["Abribus_Modele"]==='MARQUISE PUB')&&(docData["Partenaire"]==='RTL Longueuil')) {
+        return {'Photo_INTPorteOuverteEntiere':true,'Photo_INTBarreNoirBas':null,'Photo_INTAfficheReplacee':true,'Photo_INTTubeFluo':true,'Photo_EXTPorteOuverteEntiere':true,'Photo_EXTBarreNoirBas':null,'Photo_EXTTubeFluo':true,'Photo_EXTAfficheReplacee':true,'Photo_VisGraissees':true}
+    }
+
+    else {
+        return {'Photo_INTPorteOuverteEntiere':true,'Photo_INTBarreNoirBas':true,'Photo_INTAfficheReplacee':true,'Photo_INTTubeFluo':null,'Photo_EXTPorteOuverteEntiere':true,'Photo_EXTBarreNoirBas':true,'Photo_EXTTubeFluo':null,'Photo_EXTAfficheReplacee':true,'Photo_VisGraissees':null}
+    }
+}
+
+else {
+    return {'Photo_INTPorteOuverteEntiere':null,'Photo_INTBarreNoirBas':null,'Photo_INTAfficheReplacee':null,'Photo_INTTubeFluo':null,'Photo_EXTPorteOuverteEntiere':null,'Photo_EXTBarreNoirBas':null,'Photo_EXTTubeFluo':null,'Photo_EXTAfficheReplacee':null,'Photo_VisGraissees':null}
+}

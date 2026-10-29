@@ -1,0 +1,33 @@
+const mapping = [
+    { from: 'NumArret', to: 'Collection_Inspection|2|Arret' },{ from: 'Arrondissement', to: 'Collection_Inspection|3|Adresse' }
+];
+const filters = [
+];
+const collection = docData['Collection_Inspection'];     //Key de la collection
+const currentRow = collection[indexItemChange];    //A ne pas toucher
+const searchField = 'Collection_Inspection|1|Abribus';             //Key du champs address dans la collection
+const searchValue = currentRow[searchField];    //Ne pas toucher
+if (searchValue) {
+    api({ local: true })
+        .post(
+            `suggestion?fieldID=${'27ED1FCB-0544-4B98-B54E-14EA91136EF6'}&fieldValue=${searchValue}`, { filters })
+        .then(res => {
+            if (res?.data?.suggestions?.length > 0) {
+                callback({
+                    suggestions: {
+                        [searchField]: res.data?.suggestions.map(s => ({
+                            title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                                ...a,
+                                value: a.value || '',
+                                key: mapping.find(m => m.from === a.key).to,
+                            }))
+                        }))
+                    }
+                })
+            }
+            else { callback({ suggestions:{ [searchField]:[] }}) }
+        })
+}
+else {
+    callback({ suggestions:{ [searchField]:[] }});
+}

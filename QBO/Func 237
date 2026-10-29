@@ -1,0 +1,105 @@
+console.log('237', context);
+
+async function mettreAJourProblematiqueEtNotifier(api, docData, templateId, webhookUrl) {
+  const DataCollection = (key, array) => {
+    let result = {};
+    let itemCount = array?.length || 0;
+    (array || []).forEach((obj, index) => {
+      Object.keys(obj || {}).forEach((k) => {
+        result[`${k}|${index + 1}`] = obj[k];
+      });
+    });
+    result[key] = itemCount.toString();
+    return result;
+  };
+
+  const excludeKeys = (obj, keys) =>
+    Object.keys(obj).reduce((result, k) => {
+      if (!keys.includes(k)) result[k] = obj[k];
+      return result;
+    }, {});
+
+  const formatDataAPI = (data) => {
+    Object.keys(data).forEach((k) => {
+      if (Array.isArray(data[k])) data = { ...data, ...DataCollection(k, data[k]) };
+    });
+    return JSON.stringify(excludeKeys(data, ["FORMID", "NUMBER"]));
+  };
+
+  const formId = String(docData?.FORMID || '').trim();
+  const number = Number(docData?.NUMBER);
+  if (!formId) throw new Error('FORMID manquant — mise à jour impossible');
+  if (number === 0) throw new Error('NUMBER=0 — ce flow ne fait pas de création');
+
+  const edits = store?.pageContentStore?.processData?.[0]?.edits || {};
+
+  const raison = String(edits.RaisonNonComplétion || '').trim();
+  if (!raison) throw new Error('Raison de non complétion obligatoire');
+
+  let data = {
+    ...docData,
+    InterventionFacturable: edits.InterventionFacturable ?? '',
+    Intervention_Notes_Solution: edits.Intervention_Notes_Solution ?? '',
+    RaisonNonComplétion: raison,
+  };
+
+  data = { ...data, ...DataCollection("Photos", edits.Photos || []) };
+
+  const payloadUpdate = {
+    data: formatDataAPI(data),
+    status: 'Problématique',
+    active: true,
+    template: { templateId },
+    documentID: formId,
+  };
+
+  await api({ local: true }).put('document', { document: payloadUpdate });
+
+  await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ids: [formId] }),
+  });
+
+  return { formId, mode: 'update-problematique' };
+}
+
+const redirectToViewGroup = () => {
+	const lastCustomPage = localStorage.getItem("lastCustomPage");
+	if (lastCustomPage && lastCustomPage.startsWith("/")) {
+	window.location.replace(lastCustomPage);
+	return;
+	}
+	
+	// fallback
+	const pathname = window.location.pathname; // ex: "/repartition/ff1cb5c3-..."
+	const segments = pathname.split("/").filter(Boolean); // ["repartition", "ff1cb5c3-..."]
+	const basePath = segments.length > 0 ? `/${segments[0]}` : "/"; // "/repartition" ou "/"
+	window.location.replace(basePath);
+};
+
+(async function mainProblematique () {
+  try {
+    const templateId = 'f7b9a59a-e708-45c4-b786-2a5130cfee2b';
+    const webhookUrl = URLS.N8N.NOTIF_EMAIL;
+
+	// Mettre à jour InterventionDateCreationValide
+    const updateDocData = {
+      ...docData,
+      InterventionDateCreationValide:
+        docData?.CommandDate && typeof isFutureDate === "function"
+          ? isFutureDate(docData?.CommandDate)
+          : "Non",
+    };
+    docData = updateDocData;
+
+    await mettreAJourProblematiqueEtNotifier(api, docData, templateId, webhookUrl);
+
+    redirectToViewGroup();
+  } catch (e) {
+    const msg = e?.message || 'Erreur';
+    if (typeof showErrorBanner === 'function') showErrorBanner(msg);
+    else alert(msg);
+  }
+})();
+

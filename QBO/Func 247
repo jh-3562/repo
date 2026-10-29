@@ -1,0 +1,16 @@
+const fields = [
+  'DateRetraitFace1',
+  'DateRetraitFace2',
+  'DateRetraitFace3',
+  'DateRetraitFace4'
+];
+
+let result = {};
+
+fields.forEach(key => {
+  if ((docData[key] || '').includes('9999')) {
+    result[key] = null;
+  }
+});
+
+return result;

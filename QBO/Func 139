@@ -1,0 +1,12 @@
+return {
+  Desinstallation_Tache1:
+    docData['SousCatégorie1'] === 'Tâches désinstallation' ? true : null,
+  Desinstallation_Tache2:
+    docData['SousCatégorie1'] === 'Tâches désinstallation' ? true : null,
+  Desinstallation_Tache3:
+    docData['SousCatégorie1'] === 'Tâches désinstallation' ? true : null,
+  installationPlanned:
+    docData['SousCatégorie1'] === 'Avis d’entrave' ? true : null,
+  takedownValidation:
+    docData['SousCatégorie1'] === 'Avis d’entrave' ? true : null
+}

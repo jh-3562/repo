@@ -1,0 +1,2 @@
+return docData['TypeIntervention']==='Entretien'&&docData['EquipeAbribus']==='GAUTHIER_04'?{'Photo_obligatoire3':true}:{'Photo_obligatoire3':null};
+

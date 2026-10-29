@@ -1,0 +1,227 @@
+//console.log("Fonction #150", context);
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const ABRIBUS_TEMPLATE_ID = "87cbdb19-0ad7-45ce-80d1-34d3a00dc174";
+
+const DEFAULT_TEAM_VALUE = "Sans équipe";
+
+const ALL_ABRIBUS_API_FILTER = [
+    {
+        key: "FORMLAYOUTNAME",
+        operator: "EQUALS",
+        value: "ABRIBUS",
+        type: "TEXT",
+    }
+];
+
+const ABRIBUS_WITH_TEAM_API_FILTER = [
+    {
+        key: "FORMLAYOUTNAME",
+        operator: "EQUALS",
+        value: "ABRIBUS",
+        type: "TEXT",
+    },
+    {
+        key: "EquipeAbribus",
+        operator: "EXISTS",
+        type: "TEXT"
+    },
+];
+
+// ============================================================================
+// UTILITIES
+// ============================================================================
+
+const createOrUpdateElement = (id, tag, style, innerHTML = "") => {
+    let element = document.getElementById(id);
+    if (!element) {
+        element = document.createElement(tag);
+        element.id = id;
+        document.body.appendChild(element);
+    }
+    element.style = style;
+    element.innerHTML = innerHTML;
+    return element;
+};
+
+const showErrorBanner = (errorMessage) => {
+    const errorBanner = createOrUpdateElement(
+        "errorBanner",
+        "div",
+        `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      min-width: 300px;
+      height: 50px;
+      background-color: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      border-radius: 5px;
+      padding: 0 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    `,
+        `
+<div style="margin-right: 10px; color: red;">&#x26A0;</div><div>${errorMessage}</div>
+<div id="errorBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: red; height: 5px; width: 0%;"></div>
+    `
+    );
+    let progressElement = document.getElementById("errorBannerProgress");
+    let width = 0;
+    let interval = setInterval(() => {
+        if (width >= 100) {
+            clearInterval(interval);
+            errorBanner.style.display = "none";
+        } else {
+            width++;
+            progressElement.style.width = width + "%";
+        }
+    }, 55); // La barre progresse sur 5 secondes
+};
+
+const showSuccessBanner = (successMessage) => {
+    const successBanner = createOrUpdateElement(
+        "successBanner",
+        "div",
+        `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      min-width: 300px;
+      height: 50px;
+      background-color: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      border-radius: 5px;
+      padding: 0 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    `,
+        `
+<div style="margin-right: 10px; color: green;">&#10003;</div><div>${successMessage}</div>
+<div id="successBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: green; height: 5px; width: 0%;"></div>
+    `
+    );
+    let progressElement = document.getElementById("successBannerProgress");
+    let width = 0;
+    let interval = setInterval(() => {
+        if (width >= 100) {
+            clearInterval(interval);
+            successBanner.style.display = "none";
+        } else {
+            width++;
+            progressElement.style.width = width + "%";
+        }
+    }, 55); // La barre progresse sur 5 secondes
+};
+
+const getDocumentIDs = async (apiFilters) => {
+    try {
+        const response = await api({ local: true }).post("document/id/filter", {
+            filters: apiFilters,
+        });
+
+        return response?.data?.ids || [];
+    } catch (error) {
+        console.error("Failed to fetch document IDs:", error);
+        return [];
+    }
+};
+
+const getDocuments = async (documentIDs) => {
+    try {
+        const response = await api({ local: true }).post("document/id", {
+            ids: documentIDs,
+        });
+
+        return response?.data?.documents || [];
+    } catch (error) {
+        console.error("Failed to fetch documents:", error);
+        return [];
+    }
+};
+
+const updateDocuments = async (documentsToUpdate) => {
+    try {
+        const response = await api({ local: true }).put("document/Many", {
+            documents: documentsToUpdate,
+        });
+
+        return response?.data?.documents || [];
+    } catch (error) {
+        console.error("Failed to update documents:", error);
+        return [];
+    }
+};
+
+// ============================================================================
+// BUSINESS LOGIC
+// ============================================================================
+
+const identifyAbribusWithoutTeam = (allIDs, withTeamIDs) => {
+    const withTeamSet = new Set(withTeamIDs);
+    return allIDs.filter(id => !withTeamSet.has(id));
+};
+
+const hasAbribusToUpdate  = (abribusWithoutTeamIDs) => {
+    if (abribusWithoutTeamIDs.length === 0) {
+        showSuccessBanner("Aucun abribus à modifier");
+        return false;
+    }
+    return true;
+};
+
+const prepareTeamAssignment = (document) => {
+    return {
+        data: JSON.stringify({ "EquipeAbribus": DEFAULT_TEAM_VALUE }),
+        status: document.status,
+        active: true,
+        template: { templateId: ABRIBUS_TEMPLATE_ID },
+        documentID: document.documentID
+    };
+}
+
+const assignDefaultTeam = async (abribusWithoutTeamData) => {
+    const documentsToUpdate = abribusWithoutTeamData.map(data => prepareTeamAssignment(data));
+
+    await updateDocuments(documentsToUpdate);
+}
+
+const main = async () => {
+    try {
+        showSuccessBanner("Traitement en cours...");
+
+        const [allAbribusIDs, abribusWithTeamIDs] = await Promise.all([
+            getDocumentIDs(ALL_ABRIBUS_API_FILTER),
+            getDocumentIDs(ABRIBUS_WITH_TEAM_API_FILTER)
+        ]);
+
+        const abribusWithoutTeamIDs = identifyAbribusWithoutTeam(allAbribusIDs, abribusWithTeamIDs);
+
+        if (!hasAbribusToUpdate (abribusWithoutTeamIDs)) return;
+        
+        const abribusWithoutTeamData = await getDocuments(abribusWithoutTeamIDs);
+
+        await assignDefaultTeam(abribusWithoutTeamData);
+
+        showSuccessBanner(`${abribusWithoutTeamIDs.length} abribus ${abribusWithoutTeamIDs.length > 1 ? 'ont été modifiés' : 'a été modifié'}`);
+
+    } catch (error) {
+        console.log("Erreur", "Une erreur est survenue : " + error.message);
+        showErrorBanner("Une erreur est survenue.");
+    }
+}
+
+main()

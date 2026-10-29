@@ -1,0 +1,1024 @@
+console.log("FUNCTION 235", context);
+
+const test = true;
+
+let isProcessingComplete = false;
+
+const showPopupConfirmation = (title, message) => {
+  return new Promise((resolve) => {
+    createOrUpdateElement(
+      "popupConfirmOverlay",
+      "div",
+      `
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0,0,0,0.4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      `,
+      `
+        <div style="
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          min-width: 320px;
+          text-align: center;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+          font-family: Arial, sans-serif;
+        ">
+          <h3 style="margin:0 0 12px 0;">${title}</h3>
+          <div style="margin:0 0 16px 0; color:#333;">${message}</div>
+
+          <div style="display:flex; justify-content:center; gap:10px;">
+            <button id="popupConfirmYes" style="
+              padding:8px 16px;
+              background:#2f6fe4;
+              color:white;
+              border:none;
+              border-radius:6px;
+              cursor:pointer;
+              font-weight:600;
+            ">Oui</button>
+
+            <button id="popupConfirmNo" style="
+              padding:8px 16px;
+              background:#e9ecef;
+              color:#1e1e1e;
+              border:none;
+              border-radius:6px;
+              cursor:pointer;
+              font-weight:600;
+            ">Non</button>
+          </div>
+        </div>
+      `,
+    );
+
+    const overlay = document.getElementById("popupConfirmOverlay");
+
+    const close = (val) => {
+      try {
+        overlay?.remove();
+      } catch {}
+      resolve(val);
+    };
+
+    const btnYes = document.getElementById("popupConfirmYes");
+    const btnNo = document.getElementById("popupConfirmNo");
+
+    if (btnYes) btnYes.onclick = () => close(true);
+    if (btnNo) btnNo.onclick = () => close(false);
+
+    if (overlay) {
+      overlay.onclick = (e) => {
+        if (e.target === overlay) close(false);
+      };
+    }
+  });
+};
+
+const showPopupLoading = (message = "En attente d'exécution...") => {
+  createOrUpdateElement(
+    "popupLoadingOverlay",
+    "div",
+    `
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0,0,0,0.45);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      pointer-events: all;
+    `,
+    `
+      <div style="
+        background: white;
+        padding: 24px 32px;
+        border-radius: 10px;
+        min-width: 320px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        font-family: Arial, sans-serif;
+      ">
+        <div style="
+          width: 38px;
+          height: 38px;
+          margin: 0 auto 14px auto;
+          border: 4px solid #e9ecef;
+          border-top: 4px solid #2f6fe4;
+          border-radius: 50%;
+          animation: popupLoadingSpin 0.8s linear infinite;
+        "></div>
+
+        <div style="
+          color:#1e1e1e;
+          font-size:14px;
+          font-weight:600;
+        ">${message}</div>
+      </div>
+
+      <style>
+        @keyframes popupLoadingSpin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    `,
+  );
+};
+
+const hidePopupLoading = () => {
+  try {
+    document.getElementById("popupLoadingOverlay")?.remove();
+  } catch {}
+};
+
+const pad2 = (n) => String(n).padStart(2, "0");
+
+const nowLocalISO = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+};
+
+const DataCollection = (key, arr = []) => {
+  const out = { [key]: String(arr.length) };
+  arr.forEach((obj, i) => {
+    Object.keys(obj || {}).forEach((k) => {
+      out[`${k}|${i + 1}`] = obj?.[k];
+    });
+  });
+  return out;
+};
+
+const formatDataAPI = (data) => {
+  let flat = { ...(data || {}) };
+  for (const k of Object.keys(flat)) {
+    if (Array.isArray(flat[k]))
+      flat = { ...flat, ...DataCollection(k, flat[k]) };
+  }
+  delete flat.FORMID;
+  delete flat.NUMBER;
+  return JSON.stringify(flat);
+};
+
+const postJSON = async (url, body) => {
+  try {
+    const rep = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    let repBody;
+    try {
+      repBody = await rep.json();
+    } catch {
+      repBody = true;
+    }
+
+    return { ok: rep.ok, status: rep.status, body: repBody };
+  } catch (e) {
+    return { ok: false, status: 0, body: String(e?.message || e) };
+  }
+};
+
+const WEBHOOK_LABELS = {
+  NOTIF_EMAIL: "la notification courriel",
+  NOTIF_INSTALL_UNINSTALL: "la notification d'installation ou desinstallation",
+};
+
+const getWebhookError = (label, response) => {
+  const target = WEBHOOK_LABELS[label] || "le traitement";
+
+  if (!response) {
+    return `Impossible de lancer ${target}.`;
+  }
+
+  if (!response.ok) {
+    if (response.status === 0) {
+      return `Impossible de joindre le service pour ${target}.`;
+    }
+
+    if (response.status >= 500) {
+      return `Le service a rencontre une erreur pendant ${target}.`;
+    }
+
+    if (response.status >= 400) {
+      return `La demande a ete refusee pendant ${target}.`;
+    }
+
+    return `Une erreur est survenue pendant ${target}.`;
+  }
+
+  const body = response.body;
+
+  if (body === false || body === null) {
+    return `${target.charAt(0).toUpperCase() + target.slice(1)} n'a pas pu etre confirmee.`;
+  }
+
+  if (typeof body === "object") {
+    if (body.success === false) {
+      return `Le traitement de ${target} a echoue.`;
+    }
+
+    if (body.ok === false) {
+      return `Le traitement de ${target} n'a pas pu etre termine.`;
+    }
+
+    if (body.activated === false) {
+      return `${target.charAt(0).toUpperCase() + target.slice(1)} n'est pas activee.`;
+    }
+
+    if (body.executed === false) {
+      return `${target.charAt(0).toUpperCase() + target.slice(1)} ne s'est pas executee.`;
+    }
+
+    if (body.error) {
+      return `Une erreur est survenue pendant ${target}.`;
+    }
+  }
+
+  return null;
+};
+
+const getDateCompletionAndYear = (dateHeureComplete) => {
+  const v = String(dateHeureComplete || "").trim();
+  if (!v) return { DateCompletion: "", AnneeCompletion: "" };
+  const datePart = v.split("T")[0].split(" ")[0];
+  const m = datePart.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return { DateCompletion: "", AnneeCompletion: "" };
+  return {
+    DateCompletion: `${m[1]}-${m[2]}-${m[3]}`,
+    AnneeCompletion: m[1],
+  };
+};
+
+const mainSequencing2 = async (API, docData) => {
+  const sequencingPad2 = (value) => String(value).padStart(2, "0");
+
+  const sequencingNowLocalISO = () => {
+    const date = new Date();
+    return `${date.getFullYear()}-${sequencingPad2(
+      date.getMonth() + 1,
+    )}-${sequencingPad2(date.getDate())}T${sequencingPad2(
+      date.getHours(),
+    )}:${sequencingPad2(date.getMinutes())}:${sequencingPad2(
+      date.getSeconds(),
+    )}`;
+  };
+
+  const sequencingIsFutureDate = (dateString) => {
+    if (!dateString) return "";
+
+    const parts = String(dateString).split("-").map(Number);
+    if (parts.length !== 3 || parts.some(Number.isNaN)) return "";
+
+    const [year, month, day] = parts;
+    const inputDate = new Date(year, month - 1, day);
+    if (Number.isNaN(inputDate.getTime())) return "";
+
+    const now = new Date();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (now.getHours() >= 22) {
+      today.setDate(today.getDate() + 1);
+    }
+
+    return inputDate <= today ? "Non" : "Oui";
+  };
+
+  const getNumAbribusFilterValue = (data) => {
+    const rawValue = data?.NumAbribus;
+    const values = Array.isArray(rawValue)
+      ? rawValue
+      : String(rawValue || "").split("|");
+    const uniqueValues = [
+      ...new Set(values.map((value) => String(value).trim()).filter(Boolean)),
+    ];
+
+    if (!uniqueValues.length) {
+      throw new Error("NumAbribus manquant pour le sequencage");
+    }
+
+    return uniqueValues.join("|");
+  };
+
+  const getLocalISOInDays = (days) => {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    return `${date.getFullYear()}-${sequencingPad2(
+      date.getMonth() + 1,
+    )}-${sequencingPad2(date.getDate())}T${sequencingPad2(
+      date.getHours(),
+    )}:${sequencingPad2(date.getMinutes())}:${sequencingPad2(
+      date.getSeconds(),
+    )}`;
+  };
+
+  const getDocumentIdsByFilters = async (
+    filters,
+    errorMessage,
+    requestOptions = {},
+  ) => {
+    const response = await API({ local: true }).post("document/id/filter", {
+      filters,
+      ...requestOptions,
+    });
+
+    if (response?.status !== 200) {
+      throw new Error(errorMessage);
+    }
+
+    return Array.isArray(response?.data?.ids) ? response.data.ids : [];
+  };
+
+  const getDocumentsByIds = async (ids) => {
+    if (!ids.length) return [];
+
+    const response = await API({ local: true }).post("document/id", { ids });
+
+    if (response?.status !== 200) {
+      throw new Error("Probleme pendant la recuperation des donnees abribus");
+    }
+
+    return Array.isArray(response?.data?.documents)
+      ? response.data.documents
+      : [];
+  };
+
+  const INTERVENTION_TEMPLATE_ID = "f7b9a59a-e708-45c4-b786-2a5130cfee2b";
+  const STATUS_KEY = "À faire";
+  const TYPE_INTERVENTION = "Entretien";
+
+  const norm = (value) => String(value ?? "").trim();
+
+  const toDate = (value) => {
+    if (!value) return null;
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  };
+
+  const toLocalYMD = (value) => {
+    const stringValue = norm(value);
+    const match = stringValue.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) return null;
+
+    const date = new Date(
+      Number(match[1]),
+      Number(match[2]) - 1,
+      Number(match[3]),
+    );
+    return Number.isNaN(date.getTime()) ? null : date;
+  };
+
+  const addDays = (date, days) =>
+    new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate() + days,
+      date.getHours(),
+      date.getMinutes(),
+      date.getSeconds(),
+    );
+
+  const addHours = (date, hours) =>
+    new Date(date.getTime() + hours * 60 * 60 * 1000);
+
+  const addMonths = (date, months) =>
+    new Date(
+      date.getFullYear(),
+      date.getMonth() + months,
+      date.getDate(),
+      date.getHours(),
+      date.getMinutes(),
+      date.getSeconds(),
+    );
+
+  const midnight = (date) =>
+    new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+  const isoDate = (date) =>
+    `${date.getFullYear()}-${sequencingPad2(
+      date.getMonth() + 1,
+    )}-${sequencingPad2(date.getDate())}`;
+
+  const isoDateTime = (date) =>
+    `${isoDate(date)}T${sequencingPad2(date.getHours())}:${sequencingPad2(
+      date.getMinutes(),
+    )}:${sequencingPad2(date.getSeconds())}`;
+
+  const applySLAFromLast = (date, slaLabel) => {
+    const normalizedSla = norm(slaLabel).toLowerCase();
+    if (normalizedSla === "4h") return addHours(date, 4);
+    if (normalizedSla === "12h") return addHours(date, 12);
+    if (normalizedSla === "24h") return addDays(date, 1);
+    if (normalizedSla === "48h") return addDays(date, 2);
+    if (normalizedSla === "72h") return addDays(date, 3);
+    if (normalizedSla === "4 jours") return addDays(date, 4);
+    if (normalizedSla === "7 jours") return addDays(date, 7);
+    if (normalizedSla === "1 mois") return addMonths(date, 1);
+    if (normalizedSla === "3 mois") return addMonths(date, 3);
+    return addDays(date, 1);
+  };
+
+  const parseApiDoc = (doc) => {
+    const rawData = doc?.data ?? doc;
+    let dataObj = {};
+
+    if (typeof rawData === "string") {
+      try {
+        dataObj = JSON.parse(rawData || "{}");
+      } catch {
+        dataObj = {};
+      }
+    } else if (rawData && typeof rawData === "object") {
+      dataObj = rawData;
+    }
+
+    const metadata = doc?.metaData || {};
+    const formLayoutId =
+      metadata.FORMLAYOUTID ||
+      doc?.template?.templateId ||
+      INTERVENTION_TEMPLATE_ID;
+
+    return { dataObj, formLayoutId };
+  };
+
+  const excludeKeys = new Set([
+    "Photo_NumSerieFABCO",
+    "IDplainte",
+    "Photo_4BoulonsSecuriteToit",
+    "Photo_AbribusApresIntervention",
+    "Photo_AbribusAvantIntervention",
+    "Photo_AbribusCompletCoteReparation",
+    "Photo_AbribusCompletDeneige",
+    "Photo_AbribusCompletDeneigeCoteOppose",
+    "Photo_AbribusCompletLave",
+    "Photo_AbribusCompletLaveCoteOppose",
+    "Photo_BraquetteInstallee",
+    "Intervention_commentaires",
+    "Photo_DalleCoulee",
+    "CommandDate",
+    "DateDue",
+    "DateHeureComplete",
+    "DateCompletion",
+    "AnneeCompletion",
+    "DélaiSLA",
+    "DocumentsSupp",
+    "EquipeAbribus",
+    "Photo_GrosPlanFaceExt",
+    "Photo_GrosPlanFaceInt",
+    "Photo_Intervention",
+    "Intervention_Notes_Solution",
+    "Intervention_Notes_Probleme",
+    "Photo_NumSerie",
+    "Photo_NumeroDeSerie",
+    "Photo_PanneauArret",
+    "Photos",
+    "Photo_PlanEloigneAbribusCompletFaceExt",
+    "Photo_PlanEloigneAbribusCompletFaceInt",
+    "Photo_PlanRaproccheReparation",
+    "PositionTournee",
+    "Photo_ProblemeAReparer",
+    "RaisonNonComplétion",
+    "Photo_SiteApresSecurisation",
+    "Photo_SiteEnArrivant",
+    "Photo_SiteSansAbribus",
+    "SousCatégorie1",
+    "SPVM",
+    "Photo_VerreApresPolissage",
+    "Photo_VerreAvant",
+    "Photo_VerreBrise",
+    "Abribus_Deneigement",
+    "Abribus_Deneigement_Notes",
+    "Poubelle",
+    "Positionnement",
+    "Notifications_Assignation",
+    "Notifications_Completion",
+    "Notifications_AssignationManuel",
+    "Notifications_CompletionManuel",
+    "Photo_obligatoire3",
+  ]);
+
+  const excludePrefixes = [
+    "DocumentsSupp|",
+    "Photos|",
+    "Notifications_Assignation|",
+    "Notifications_Completion|",
+    "Notifications_AssignationManuel|",
+    "Notifications_CompletionManuel|",
+  ];
+
+  const scrubClone = (source) => {
+    const output = {};
+    for (const [key, value] of Object.entries(source || {})) {
+      if (excludeKeys.has(key)) continue;
+      if (excludePrefixes.some((prefix) => key.startsWith(prefix))) continue;
+      output[key] = value;
+    }
+    return output;
+  };
+
+  const numAbribus = getNumAbribusFilterValue(docData);
+  const currentFormId = norm(docData?.FORMID).toLowerCase();
+  const dateNow = sequencingNowLocalISO();
+  const dateIn60Days = getLocalISOInDays(60);
+
+  // 1. Retrieve abribus data and future interventions.
+
+  const abribusIds = await getDocumentIdsByFilters(
+    [
+      {
+        key: "FORMLAYOUTNAME",
+        operator: "EQUALS",
+        value: "ABRIBUS",
+        type: "TEXT",
+      },
+      {
+        key: "STATUS",
+        operator: "EQUALS",
+        value: "Actif",
+        type: "TEXT",
+      },
+      {
+        key: "NumAbribus",
+        operator: "IN",
+        value: numAbribus,
+        type: "TEXT",
+      },
+    ],
+    "Probleme pendant la recherche des formulaires abribus",
+  );
+
+  // Abribus inactif (ou introuvable) : aucune regle de sequencement,
+  // on ne cree pas d'intervention future et on laisse completer l'actuelle.
+  if (!abribusIds.length) {
+    console.log("[seq] Aucun abribus actif pour", numAbribus, "- sequencage ignore");
+    return {
+      abribusIds,
+      abribusDocuments: [],
+      futureInterventionIds: [],
+      futureInterventionDocuments: [],
+      document: null,
+      createdDocument: null,
+      hasExistingFuture: false,
+      hasMatchingSequence: false,
+      skippedInactiveAbribus: true,
+    };
+  }
+
+  const abribusDocuments = await getDocumentsByIds(abribusIds);
+
+  const matchingFutureInterventionIds = await getDocumentIdsByFilters(
+    [
+      {
+        key: "FORMLAYOUTNAME",
+        operator: "EQUALS",
+        value: "INTERVENTION",
+        type: "TEXT",
+      },
+      {
+        key: "STATUS",
+        operator: "IN",
+        value: "Problématique|À faire|Non-Assignée|Non-assignée",
+        type: "TEXT",
+      },
+      {
+        key: "TypeIntervention",
+        operator: "EQUALS",
+        value: "Entretien",
+        type: "TEXT",
+      },
+      {
+        key: "DateDue",
+        operator: "BETWEEN",
+        value: `${dateNow}|${dateIn60Days}`,
+        type: "DATETIME",
+      },
+      {
+        key: "NumAbribus",
+        operator: "IN",
+        value: numAbribus,
+        type: "TEXT",
+      },
+    ],
+    "Probleme pendant la recherche des interventions futures",
+    {
+      sort: [{ key: "DateDue", direction: "ASC" }],
+      limit: 1000,
+    },
+  );
+
+  console.log(
+    "[seq] currentFormId:",
+    currentFormId,
+    "ids:",
+    matchingFutureInterventionIds,
+  );
+
+  const futureInterventionIds = matchingFutureInterventionIds.filter(
+    (id) => !currentFormId || norm(id).toLowerCase() !== currentFormId,
+  );
+
+  const futureInterventionDocuments = await getDocumentsByIds(
+    futureInterventionIds,
+  );
+
+  // 2. Process the data and select the next intervention.
+  const interCompleted = [docData];
+  const abriDocs = abribusDocuments;
+  const futureDocs = futureInterventionDocuments;
+
+  const lastByNumCat = {};
+  for (const interventionDocument of interCompleted) {
+    const { dataObj, formLayoutId } = parseApiDoc(interventionDocument);
+    if (norm(dataObj.TypeIntervention) !== TYPE_INTERVENTION) continue;
+
+    const number = norm(dataObj.NumAbribus);
+    if (!number) continue;
+
+    const subCategory = norm(dataObj.SousCatégorie1);
+    const category =
+      subCategory === "Régulier - Supplémentaire" ? "suppl" : "reg";
+    const completedAt = toDate(dataObj.DateHeureComplete);
+    if (!completedAt) continue;
+
+    const key = `${number}||${category}`;
+    const current = lastByNumCat[key];
+    if (!current || completedAt > current.DateHeureComplete) {
+      lastByNumCat[key] = {
+        dataObj,
+        formLayoutId,
+        NumAbribus: number,
+        SousCatégorie1: subCategory,
+        DateHeureComplete: completedAt,
+        SLA_Last: dataObj.DélaiSLA || "24h",
+        Position_Last: dataObj.PositionTournee || "",
+      };
+    }
+  }
+
+  const sequencesByNum = {};
+  for (const abribusDocument of abriDocs) {
+    const { dataObj } = parseApiDoc(abribusDocument);
+    const number = norm(dataObj.NumAbribus);
+    if (!number) continue;
+
+    const rows = {};
+    for (const [key, value] of Object.entries(dataObj)) {
+      if (!key.startsWith("Seq|")) continue;
+
+      const parts = key.split("|");
+      if (parts.length !== 4) continue;
+
+      const rowNumber = parts[3];
+      const field = parts[2];
+      rows[rowNumber] = rows[rowNumber] || { rowNumber };
+      rows[rowNumber][field] = value;
+    }
+
+    const sequences = Object.values(rows)
+      .map((row) => ({
+        rowNumber: row.rowNumber,
+        Equipe: norm(row.Equipe),
+        Position: norm(row.Position),
+        Frequence: Number(norm(row.Frequence || "0")),
+        Periode: norm(row.Periode),
+        Type: norm(row.Type),
+        SousCategorie: norm(row.SousCategorie),
+        Delai: norm(row.Delai),
+      }))
+      .filter(
+        (sequence) =>
+          Number.isFinite(sequence.Frequence) && sequence.Frequence > 0,
+      );
+
+    if (sequences.length) sequencesByNum[number] = sequences;
+  }
+
+  const futureMinDueByNumCat = {};
+  for (const futureDocument of futureDocs) {
+    const { dataObj } = parseApiDoc(futureDocument);
+    if (norm(dataObj.TypeIntervention) !== TYPE_INTERVENTION) continue;
+
+    const number = norm(dataObj.NumAbribus);
+    if (!number) continue;
+
+    const subCategory = norm(dataObj.SousCatégorie1);
+    const category =
+      subCategory === "Régulier - Supplémentaire" ? "suppl" : "reg";
+    const dueDate = toDate(dataObj.DateDue);
+    if (!dueDate) continue;
+
+    const key = `${number}||${category}`;
+    if (!futureMinDueByNumCat[key] || dueDate < futureMinDueByNumCat[key]) {
+      futureMinDueByNumCat[key] = dueDate;
+    }
+  }
+
+  let chosen = null;
+  let hasExistingFuture = false;
+  let hasMatchingSequence = false;
+  const today = new Date();
+
+  for (const [key, source] of Object.entries(lastByNumCat)) {
+    const [number, category] = key.split("||");
+    const sourceType = norm(source.dataObj.TypeIntervention);
+    const sequences = (sequencesByNum[number] || []).filter((sequence) => {
+      const isSupplementary =
+        sequence.SousCategorie === "Régulier - Supplémentaire";
+      const matchesCategory =
+        category === "suppl" ? isSupplementary : !isSupplementary;
+      const matchesType = !sequence.Type || sequence.Type === sourceType;
+      return matchesCategory && matchesType;
+    });
+    if (!sequences.length) continue;
+    hasMatchingSequence = true;
+
+    const minimumFutureDue = futureMinDueByNumCat[key];
+    if (minimumFutureDue && source.DateHeureComplete < minimumFutureDue) {
+      hasExistingFuture = true;
+      continue;
+    }
+
+    for (const sequence of sequences) {
+      const newDate = addDays(source.DateHeureComplete, sequence.Frequence);
+      const [startValue, endValue] = (sequence.Periode || "").split("|");
+      const startDate = toLocalYMD(startValue) || toDate(startValue);
+      const endDate = toLocalYMD(endValue) || toDate(endValue);
+
+      if (endDate) endDate.setHours(23, 59, 59, 999);
+      if (startDate && newDate < startDate) continue;
+      if (endDate && newDate > endDate) continue;
+
+      const dueDate = applySLAFromLast(newDate, source.SLA_Last);
+      if (midnight(dueDate) < midnight(today)) continue;
+
+      if (!chosen || dueDate < chosen.DateDue) {
+        chosen = {
+          source,
+          sequence,
+          NewDate: newDate,
+          DateDue: dueDate,
+        };
+      }
+    }
+  }
+
+  let sequencingDocument = null;
+  if (chosen) {
+    const base = scrubClone(chosen.source.dataObj);
+
+    base.CommandDate = isoDate(chosen.NewDate);
+    base.DateDue = isoDateTime(chosen.DateDue);
+    base.DélaiSLA = chosen.sequence.Delai || "24h";
+    base.EquipeAbribus = chosen.sequence.Equipe || "";
+    base.SousCatégorie1 =
+      chosen.sequence.SousCategorie || chosen.source.SousCatégorie1 || "";
+    base.PositionTournee =
+      chosen.sequence.Position || chosen.source.Position_Last || "";
+    base.TypeIntervention = TYPE_INTERVENTION;
+    base.NumAbribus = chosen.source.NumAbribus;
+    base.FrequenceSequence = String(chosen.sequence.Frequence || "");
+    base.Sequence = String(chosen.sequence.rowNumber || "");
+    base.InterventionDateCreationValide = sequencingIsFutureDate(
+      base.CommandDate,
+    );
+
+    sequencingDocument = {
+      data: JSON.stringify(base),
+      status: STATUS_KEY,
+      active: true,
+      template: {
+        templateId: chosen.source.formLayoutId || INTERVENTION_TEMPLATE_ID,
+      },
+    };
+  }
+
+  // 3. Create the sequenced intervention.
+  let createdDocument = null;
+  if (sequencingDocument) {
+    const response = await API({ local: true }).post("document", {
+      document: sequencingDocument,
+    });
+
+    if (!response || response.status < 200 || response.status >= 300) {
+      throw new Error(
+        "Probleme pendant la creation de l'intervention sequencee",
+      );
+    }
+
+    createdDocument = response.data || null;
+  }
+
+  return {
+    abribusIds,
+    abribusDocuments,
+    futureInterventionIds,
+    futureInterventionDocuments,
+    document: sequencingDocument,
+    createdDocument,
+    hasExistingFuture,
+    hasMatchingSequence,
+  };
+};
+
+async function creerOuMettreAJourEnCompleteEtNotifier(
+  api,
+  docData,
+  templateId,
+  webhookUrl,
+  webhookUrl2,
+) {
+  if (isProcessingComplete) {
+    showErrorBanner("Un traitement est deja en cours.");
+    return null;
+  }
+
+  try {
+    const ret = isValidDocument(t, docData);
+    if (ret !== undefined) return null;
+
+    const confirm = await showPopupConfirmation(
+      "Compléter",
+      `Souhaitez-vous ${test ? "TEST " : ""}compléter cette intervention ?`,
+    );
+
+    if (!confirm) return null;
+
+    isProcessingComplete = true;
+    showPopupLoading("En attente d'exécution...");
+
+    const dateHeureComplete =
+      docData?.DateHeureComplete &&
+      String(docData.DateHeureComplete).trim() !== ""
+        ? docData.DateHeureComplete
+        : nowLocalISO();
+
+    const stampedData = {
+      ...docData,
+      DateHeureComplete: dateHeureComplete,
+      ...getDateCompletionAndYear(dateHeureComplete),
+    };
+
+    console.log("[235][complete] Lancement du sequencing avant la completion");
+    const sequencing = await mainSequencing2(api, stampedData);
+    console.log("[235][complete] Sequencing result:", sequencing);
+
+    if (
+      sequencing?.hasMatchingSequence &&
+      !sequencing?.document &&
+      !sequencing?.hasExistingFuture
+    ) {
+      throw new Error(
+        "Aucune nouvelle intervention n'a ete creee par le sequencage",
+      );
+    }
+
+    const number = Number(docData?.NUMBER || 0);
+    let formId = String(docData?.FORMID || "").trim();
+
+    if (number === 0) {
+      const payloadCreate = {
+        data: formatDataAPI(stampedData),
+        status: "Complété",
+        active: true,
+        template: { templateId },
+      };
+
+      const res = await api({ local: true }).post("document", {
+        document: payloadCreate,
+        preventNotify: "FULL",
+      });
+
+      formId =
+        res?.data?.id || res?.headers?.location?.split("/")?.pop() || null;
+    } else {
+      if (!formId) throw new Error("FORMID manquant pour la mise à jour");
+
+      const payloadUpdate = {
+        data: formatDataAPI(stampedData),
+        status: "Complété",
+        active: true,
+        template: { templateId },
+        documentID: formId,
+      };
+
+      await api({ local: true }).put("document", {
+        document: payloadUpdate,
+        preventNotify: "FULL",
+      });
+    }
+
+    if (!formId) throw new Error("Impossible de déterminer l'ID du formulaire");
+
+    const payloadIds = { ids: [formId] };
+
+    console.log("[235][complete] Lancement des notifications", { formId });
+
+    const [webhook1Result, webhook2Result] = await Promise.allSettled([
+      postJSON(webhookUrl, payloadIds),
+      postJSON(webhookUrl2, payloadIds),
+    ]);
+
+    const webhook1 =
+      webhook1Result.status === "fulfilled"
+        ? webhook1Result.value
+        : { ok: false, status: 0, body: "Echec appel webhook" };
+
+    const webhook2 =
+      webhook2Result.status === "fulfilled"
+        ? webhook2Result.value
+        : { ok: false, status: 0, body: "Echec appel webhook" };
+
+    console.log("[235][complete] Resultats des traitements", {
+      webhookEmail: webhook1Result.status,
+      webhookInstallUninstall: webhook2Result.status,
+    });
+
+    const errors = [
+      getWebhookError("NOTIF_EMAIL", webhook1),
+      getWebhookError("NOTIF_INSTALL_UNINSTALL", webhook2),
+    ].filter(Boolean);
+
+    hidePopupLoading();
+
+    if (errors.length) {
+      showErrorBanner(`Complété, mais erreurs: ${errors.join(", ")}`);
+    } else {
+      showSuccessBanner("Intervention complétée et notifications envoyées.");
+    }
+
+    return {
+      formId,
+      webhook1,
+      webhook2,
+      sequencing,
+      hasErrors: errors.length > 0,
+    };
+  } catch (e) {
+    console.error("[235][complete] Erreur", e);
+    hidePopupLoading();
+    showErrorBanner(e?.message || String(e));
+    return null;
+  } finally {
+    isProcessingComplete = false;
+  }
+}
+
+const redirectToViewGroup = () => {
+  const lastCustomPage = localStorage.getItem("lastCustomPage");
+  if (lastCustomPage && lastCustomPage.startsWith("/")) {
+    window.location.replace(lastCustomPage);
+    return;
+  }
+
+  // Fallback
+  const pathname = window.location.pathname; // ex: "/repartition/ff1cb5c3-..."
+  const segments = pathname.split("/").filter(Boolean); // ["repartition", "ff1cb5c3-..."]
+  const basePath = segments.length > 0 ? `/${segments[0]}` : "/"; // "/repartition" ou "/"
+  window.location.replace(basePath);
+};
+
+(async function mainComplete() {
+  try {
+    const templateId = "f7b9a59a-e708-45c4-b786-2a5130cfee2b";
+    const webhookUrl = URLS.N8N.NOTIF_EMAIL;
+    const webhookUrl2 = URLS.N8N.NOTIF_INSTALL_UNINSTALL;
+
+    // Update InterventionDateCreationValide
+    const updateDocData = {
+      ...docData,
+      InterventionDateCreationValide:
+        docData?.CommandDate && typeof isFutureDate === "function"
+          ? isFutureDate(docData?.CommandDate)
+          : "Non",
+    };
+    docData = updateDocData;
+
+    const out = await creerOuMettreAJourEnCompleteEtNotifier(
+      api,
+      docData,
+      templateId,
+      webhookUrl,
+      webhookUrl2,
+    );
+
+    if (!out) return;
+
+    if (out.hasErrors) {
+      return;
+    }
+
+    redirectToViewGroup();
+  } catch (e) {
+    console.error("[235][main] Erreur", e);
+    hidePopupLoading();
+    showErrorBanner(e?.message || String(e));
+  }
+})();
+

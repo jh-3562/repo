@@ -1,0 +1,1 @@
+return { 'SousCatégorie1|Polissage': docData['TypeIntervention'] === 'Polissage' ? true : null };

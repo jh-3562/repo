@@ -1,0 +1,106 @@
+const { CommandDate, DélaiSLA } = docData;
+
+let newDélaiSLA = DélaiSLA;
+
+if (!newDélaiSLA && inputKey === 'CommandDate') {
+  const user1 = store.pageContentStore?.processData[0]?.filters[1]?.value;
+  const user2 = store.pageContentStore?.processData[0]?.filters[2]?.value;
+
+  newDélaiSLA = user2 === 'Régulier - ÉTÉ' || user2 === 'Régulier - Supplémentaire' ? '4 jours' :
+    user2 === 'Régulier - HIVER' ? '72h' :
+    user2 === 'Régulier - NUM' ? '48h' :
+    user2 === 'Herbes/Émondage' ? '3 mois' :
+    user2 === 'Poubelle' ? '24h' :
+    user2 === 'Drive' ? '7 jours' :
+    user2 === 'Collant' ? '24h' :
+    user2 === 'Graffiti' ? '24h' :
+    user2 === 'Pression' ? '3 mois' :
+    (user1 === 'Entretien - Spécial' && user2 === 'Diffuseur') ? '3 mois' :
+    (user1 === 'Entretien - Spécial' && user2 === 'Plainte') ? '24h' :
+    user2 === 'Régulier' ? '72h' :
+    user2 === 'Accès pub' ? '72h' :
+    user2 === 'Déglaçage' ? '72h' :
+    user2 === 'Mécanique' ? '72h' :
+    (user1 === 'Déneigement' && user2 === 'Dalle') ? '7 jours' :
+    (user1 === 'Déneigement' && user2 === 'Plainte') ? '12h' :
+    user2 === 'Vérification' ? '7 jours' :
+    (user1 === 'Polissage' && user2 === 'Verre') ? '7 jours' :
+    user2 === 'Inox' ? '7 jours' :
+    user2 === 'Braquette' ? '7 jours' :
+    (user1 === 'Réparation' && user2 === 'Verre') ? '72h' :
+    (user1 === 'Réparation' && user2 === 'Verre Pub') ? '24h' :
+    (user1 === 'Signalement' && user2 === 'Verre Pub') ? '24h':
+    user2 === 'Banc' ? '24h' :
+    (user1 === 'Réparation' && user2 === 'Structure') ? '7 jours' :
+    user2 === 'Vis' ? '7 jours' :
+    user2 === 'Velcro' ? '24h' :
+    (user1 === 'Réparation' && user2 === 'Diffuseur') ? '7 jours' :
+    user2 === 'Toit' ? '7 jours' :
+    user2 === 'Affichage' ? '48h' :
+    (user1 === 'Réparation' && user2 === 'Autre') ? '7 jours' :
+    (user1 === 'URGENCE' && user2 === 'Désinstallation') ? '4h' :
+    (user1 === 'URGENCE' && user2 === 'Débranchement') ? '4h' :
+    user2 === 'Sécurisation' ? '4h' :
+    user2 === 'Conversion' ? '1 mois' :
+    user2 === 'Nouveau Site' ? '1 mois' :
+    (user1 === 'Déploiement' && user2 === 'Numérique') ? '1 mois' :
+    (user1 === 'Déploiement' && user2 === 'Dalle') ? '1 mois' :
+    (user1 === 'Déploiement' && user2 === 'Débranchement') ? '1 mois' :
+    (user1 === 'Déploiement' && user2 === 'Rebranchement') ? '1 mois' :
+    (user1 === 'Déploiement' && user2 === 'Autre') ? '1 mois' :
+    (user1 === 'Déploiement' && user2 === 'Installation') ? '1 mois' :
+    (user1 === 'Déploiement' && user2 === 'Désinstallation') ? '1 mois' :
+    (user1 === 'Travaux' && user2 === 'Désinstallation') ? '7 jours' :
+    user2 === 'Réinstallation' ? '7 jours' :
+    (user1 === 'Travaux' && user2 === 'Dalle') ? '7 jours' :
+    (user1 === 'Travaux' && user2 === 'Autre') ? '7 jours' :
+    (user1 === 'Travaux' && user2 === 'Débranchement') ? '7 jours' :
+    (user1 === 'Travaux' && user2 === 'Rebranchement') ? '7 jours' :
+    (user1 === 'Numérique' && user2 === 'Numérique') ? '7 jours' :
+    (user1 === 'Signalement' && user2 === 'Verre') ? '24h' :
+    user2 === 'Vandalisme' ? '24h' :
+    (user1 === 'Signalement' && user2 === 'Structure') ? '24h' :
+    (user1 === 'Signalement' && user2 === 'Autre') ? '' :
+    user2 === 'Riveter Velcro' ? '24h' :
+    user2 === 'Diffuseur anomalie' ? '24h' :
+    user2 === 'Abribus absent' ? '24h' :
+    user2 === 'Inaccessible' ? '24h' :
+    user2 === 'Vis coincée' ? '24h' :
+    (user1 === 'NO POST' && user2 === 'Autre') ? '' :
+    user2 === 'Herbes' ? '1 mois' :
+    user2 === 'Numéro' ? '3 mois' :
+    user2 === 'Tâches désinstallation' ? '24h' :
+    user2 === 'Tâches installation' ? '24h' :
+    newDélaiSLA;
+
+}
+
+if (newDélaiSLA && CommandDate) {
+  const dateDue = new Date(CommandDate);
+
+  const delaiSLAMap = {
+    '4h': { type: 'hours', value: 4 },
+    '12h': { type: 'hours', value: 12 },
+    '24h': { type: 'hours', value: 24 },
+    '48h': { type: 'hours', value: 48 },
+    '72h': { type: 'hours', value: 72 },
+    '4 jours': { type: 'hours', value: 96 },
+    '7 jours': { type: 'hours', value: 168 },
+    '1 mois': { type: 'months', value: 1 },
+    '3 mois': { type: 'months', value: 3 },
+  };
+
+  const delaiSLAInfo = delaiSLAMap[newDélaiSLA];
+
+  if (delaiSLAInfo) {
+    if (delaiSLAInfo.type === 'months') {
+      dateDue.setMonth(dateDue.getMonth() + delaiSLAInfo.value);
+    } else {
+      dateDue.setHours(dateDue.getHours() + delaiSLAInfo.value);
+    }
+  } else {
+    dateDue.setDate(dateDue.getDate() + 1);
+  }
+
+  return { 'DélaiSLA': newDélaiSLA, 'DateDue': dateDue.toISOString().substring(0, 19) };
+}

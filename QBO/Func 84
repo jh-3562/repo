@@ -1,0 +1,63 @@
+return docData['Seq|6|SousCategorie'] === 'Régulier - ÉTÉ' || docData['Seq|6|SousCategorie'] === 'Régulier - Supplémentaire' ? {
+    'Seq|7|Delai': '4 jours' } : docData['Seq|6|SousCategorie']==='Régulier - HIVER' ? {
+    'Seq|7|Delai': '72h' } : docData['Seq|6|SousCategorie']==='Numérique' ? {
+    'Seq|7|Delai': '48h' } : docData['Seq|6|SousCategorie']==='Herbes/Émondage' ? {
+    'Seq|7|Delai': '3 mois' } : docData['Seq|6|SousCategorie']==='Poubelle' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Drive' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Collant' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Graffiti' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Pression' ? {
+    'Seq|7|Delai': '3 mois' } : docData['Seq|6|SousCategorie']==='Diffuseur' ? {
+    'Seq|7|Delai': '3 mois' } : docData['Seq|6|SousCategorie']==='Plainte' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Régulier' ? {
+    'Seq|7|Delai': '72h' } : docData['Seq|6|SousCategorie']==='Accès pub' ? {
+    'Seq|7|Delai': '72h' } : docData['Seq|6|SousCategorie']==='Déglaçage' ? {
+    'Seq|7|Delai': '72h' } : docData['Seq|6|SousCategorie']==='Mécanique' ? {
+    'Seq|7|Delai': '72h' } : docData['Seq|6|SousCategorie']==='Dalle' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Plainte' ? {
+    'Seq|7|Delai': '12h' } : docData['Seq|6|SousCategorie']==='Vérification' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Verre'&&docData['Seq|5|Type']==='Polissage' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Inox' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Braquette' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Verre'&&docData['Seq|5|Type']==='Réparations' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Banc' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Structure' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Vis' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Velcro' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Diffuseur'&&docData['Seq|5|Type']==='Réparations' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Toit' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Affichage' ? {
+    'Seq|7|Delai': '48h' } : docData['Seq|6|SousCategorie']==='Autre'&&docData['Seq|5|Type']==='Réparations' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Désinstallation' ? {
+    'Seq|7|Delai': '4h' } : docData['Seq|6|SousCategorie']==='Débranchement' ? {
+    'Seq|7|Delai': '4h' } : docData['Seq|6|SousCategorie']==='Sécurisation' ? {
+    'Seq|7|Delai': '4h' } : docData['Seq|6|SousCategorie']==='Conversion' ? {
+    'Seq|7|Delai': '1 mois' } : docData['Seq|6|SousCategorie']==='Nouveau Site' ? {
+    'Seq|7|Delai': '1 mois' } : docData['Seq|6|SousCategorie']==='Numérique' ? {
+    'Seq|7|Delai': '1 mois' } : docData['Seq|6|SousCategorie']==='Dalle'&&docData['Seq|5|Type']==='Déploiement' ? {
+    'Seq|7|Delai': '1 mois' } : docData['Seq|6|SousCategorie']==='Débranchement'&&docData['Seq|5|Type']==='Déploiement' ? {
+    'Seq|7|Delai': '1 mois' } : docData['Seq|6|SousCategorie']==='Rebranchement' ? {
+    'Seq|7|Delai': '1 mois' } : docData['Seq|6|SousCategorie']==='Autre'&&docData['Seq|5|Type']==='Déploiement' ? {
+    'Seq|7|Delai': '1 mois' } : docData['Seq|6|SousCategorie']==='Désinstallation'&&docData['Seq|5|Type']==='Travaux' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Réinstallation' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Dalle'&&docData['Seq|5|Type']==='Travaux' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Autre'&&docData['Seq|5|Type']==='Travaux' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Débranchement'&&docData['Seq|5|Type']==='Travaux' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Rebranchement'&&docData['Seq|5|Type']==='Travaux' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Numérique'&&docData['Seq|5|Type']==='Numérique' ? {
+    'Seq|7|Delai': '7 jours' } : docData['Seq|6|SousCategorie']==='Verre'&&docData['Seq|5|Type']==='Signalement' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Vandalisme' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Structure'&&docData['Seq|5|Type']==='Signalement' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Autre'&&docData['Seq|5|Type']==='Signalement' ? {
+    'Seq|7|Delai': '' } : docData['Seq|6|SousCategorie']==='Riveter Velcro' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Diffuseur anomalie' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Abribus absent' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Inaccessible' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Vis coincée' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Autre'&&docData['Seq|5|Type']==='NO POST' ? {
+    'Seq|7|Delai': '' } : docData['Seq|6|SousCategorie']==='Herbes' ? {
+    'Seq|7|Delai': '1 mois' } : docData['Seq|6|SousCategorie']==='Numéro' ? {
+    'Seq|7|Delai': '3 mois' } : docData['Seq|6|SousCategorie']==='Tâches désinstallation' ? {
+    'Seq|7|Delai': '24h' } : docData['Seq|6|SousCategorie']==='Tâches installation' ? {
+    'Seq|7|Delai': '24h' }
+   : undefined;

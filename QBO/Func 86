@@ -1,0 +1,89 @@
+const collection = docData['Seq'];
+
+const currentRow = collection[indexItemChange];
+
+if (currentRow['Seq|5|Type']) {
+
+    if (currentRow['Seq|5|Type'] === 'Entretien') {
+
+        currentRow['Seq|6|SousCategorie|NO POST'] = true
+
+    }
+
+    else if (currentRow['Seq|5|Type'] === 'Entretien - Spécial') {
+
+        currentRow['Seq|6|SousCategorie|Entretien - Spécial'] = true
+
+    }
+
+    else if (currentRow['Seq|5|Type'] === 'Déneigement') {
+
+        currentRow['Seq|6|SousCategorie|Déneigement'] = true
+
+    }
+
+    else if (currentRow['Seq|5|Type'] === 'Électricité') {
+
+        currentRow['Seq|6|SousCategorie|Électricité'] = true
+
+    }
+
+    else if (currentRow['Seq|5|Type'] === 'Polissage') {
+
+        currentRow['Seq|6|SousCategorie|Polissage'] = true
+
+    }
+
+    else if (currentRow['Seq|5|Type'] === 'Braquette') {
+
+        currentRow['Seq|6|SousCategorie|Braquette'] = true
+
+    }
+
+    else if (currentRow['Seq|5|Type'] === 'URGENCE') {
+
+        currentRow['Seq|6|SousCategorie|URGENCE'] = true
+
+    }
+
+    else if (currentRow['Seq|5|Type'] === 'Réparation') {
+
+        currentRow['Seq|6|SousCategorie|Réparation'] = true
+
+    }
+
+    else if (currentRow['Seq|5|Type'] === 'Déploiement') {
+
+        currentRow['Seq|6|SousCategorie|Déploiement'] = true
+
+    }
+
+    else if (currentRow['Seq|5|Type'] === 'Travaux') {
+
+        currentRow['Seq|6|SousCategorie|Travaux'] = true
+
+    }
+
+    else if (currentRow['Seq|5|Type'] === 'Numérique') {
+
+        currentRow['Seq|6|SousCategorie|Numérique'] = true
+
+    }
+
+    else if (currentRow['Seq|5|Type'] === 'Signalement') {
+
+        currentRow['Seq|6|SousCategorie|Signalement'] = true
+
+    }
+
+    else if (currentRow['Seq|5|Type'] === 'NO POST') {
+
+        currentRow['Seq|6|SousCategorie|NO POST'] = true
+
+    }
+
+    else { undefined }
+
+}
+
+else { undefined }

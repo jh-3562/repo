@@ -1,0 +1,1301 @@
+// Log the current execution context to help diagnose browser-side script runs.
+console.log("254", context);
+
+// ===== UI Functions =====
+// Create an element when it does not exist, then replace its style and markup.
+const createOrUpdateElement = (id, tag, style, innerHTML = "") => {
+  let element = document.getElementById(id);
+  if (!element) {
+    element = document.createElement(tag);
+    element.id = id;
+    document.body.appendChild(element);
+  }
+  element.style = style;
+  element.innerHTML = innerHTML;
+  return element;
+};
+
+// Show a full-screen loading overlay and install the spinner animation once.
+const showPopupLoading = (loadingMessage) => {
+  createOrUpdateElement(
+    "loadingPopup",
+    "div",
+    `
+      position: fixed; 
+      left: 0; 
+      top: 0; 
+      width: 100%; 
+      height: 100%; 
+      background-color: rgba(0,0,0,0.5); 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      z-index: 9999;
+    `,
+    `
+      <div style="background-color: white; padding: 20px; border-radius: 5px; display: flex; flex-direction: column; align-items: center;">
+        <div>${loadingMessage}</div>
+        <div class="loader" style="border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 40px; height: 40px; margin-top: 20px; animation: spin 1s linear infinite;"></div>
+      </div>
+    `,
+  );
+  if (!document.getElementById("spinnerStyle")) {
+    let style = document.createElement("style");
+    style.id = "spinnerStyle";
+    style.innerHTML = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+};
+
+// Hide the loading overlay without removing it from the page.
+const hidePopupLoading = () => {
+  const loadingPopup = document.getElementById("loadingPopup");
+  if (loadingPopup) loadingPopup.style.display = "none";
+};
+
+// Show a confirmation dialog and call the matching callback when answered.
+const showPopupConfirm = (title, message, onConfirm, onCancel) => {
+  const popup = createOrUpdateElement(
+    "confirmPopup",
+    "div",
+    `
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    `,
+    `
+      <div style="background-color: white; padding: 30px; border-radius: 8px; max-width: 500px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+        <div style="font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #333;">${title}</div>
+        <div style="font-size: 14px; margin-bottom: 25px; color: #666;">${message}</div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button id="confirmPopupCancel" style="padding: 8px 16px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 14px;">Annuler</button>
+          <button id="confirmPopupOk" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">OK</button>
+        </div>
+      </div>
+    `,
+  );
+
+  const okButton = document.getElementById("confirmPopupOk");
+  const cancelButton = document.getElementById("confirmPopupCancel");
+
+  okButton.onclick = () => {
+    popup.style.display = "none";
+    if (onConfirm) onConfirm();
+  };
+
+  cancelButton.onclick = () => {
+    popup.style.display = "none";
+    if (onCancel) onCancel();
+  };
+};
+
+// Display a timed error banner and render its dynamic message as plain text.
+const showErrorBanner = (errorMessage) => {
+  const errorBanner = createOrUpdateElement(
+    "errorBanner",
+    "div",
+    `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 760px;
+      max-width: calc(100vw - 32px);
+      min-width: 0;
+      min-height: 50px;
+      max-height: 80vh;
+      overflow-y: auto;
+      background-color: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      border-radius: 5px;
+      box-sizing: border-box;
+      padding: 14px 20px 18px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    `,
+    `
+      <div style="margin-right: 10px; color: red; flex-shrink: 0;">&#x26A0;</div><div id="errorBannerMessage" style="white-space: pre-wrap; overflow-wrap: anywhere;"></div>
+      <div id="errorBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: red; height: 5px; width: 0%;"></div>
+    `,
+  );
+  const messageElement = document.getElementById("errorBannerMessage");
+  if (messageElement) messageElement.textContent = String(errorMessage ?? "");
+  if (errorBanner.hideInterval) clearInterval(errorBanner.hideInterval);
+
+  let progressElement = document.getElementById("errorBannerProgress");
+  let width = 0;
+  let interval = setInterval(() => {
+    if (width >= 100) {
+      clearInterval(interval);
+      errorBanner.style.display = "none";
+    } else {
+      width++;
+      progressElement.style.width = width + "%";
+    }
+  }, 55);
+  errorBanner.hideInterval = interval;
+};
+
+// Add a title to an error message before displaying the shared banner.
+const showPopupError = (title, message) => {
+  showErrorBanner(`${title}: ${message}`);
+};
+
+// Extract a readable message from native errors, HTTP responses, or API errors.
+const getErrorMessage = (error) => {
+  if (typeof error === "string") return error;
+
+  const responseData = error?.response?.data;
+  const responseMessage =
+    typeof responseData === "string"
+      ? responseData
+      : (responseData?.message ?? responseData?.error ?? responseData?.detail);
+  const message = responseMessage || error?.message || error?.error;
+
+  if (typeof message === "string" && message.trim()) return message;
+  if (message != null) {
+    try {
+      return JSON.stringify(message);
+    } catch {
+      return String(message);
+    }
+  }
+
+  return "Erreur inconnue.";
+};
+
+// ===== End UI Functions =====
+
+// These template IDs identify the route and intervention document layouts.
+const trajetTemplateID = "04017559-b91d-4bc3-b6e8-23592358e699";
+const interventionTemplateID = "f7b9a59a-e708-45c4-b786-2a5130cfee2b";
+
+// Resolve the role-specific grid and fields, plus the active team and filters.
+const user = store?.moduleStore?.user || {};
+// Select the Driver configuration when the user has the DRIVER role; otherwise use Dispatcher.
+const mappingRole = (user.roles || []).some(
+  (role) =>
+    String(role ?? "")
+      .trim()
+      .toUpperCase() === "DRIVER",
+)
+  ? "DRIVER"
+  : "DISPATCHER";
+const interventionGridKey =
+  mappingRole === "DRIVER" ? "TableTrajetOptim" : "TableTrajetOptimDispatcher";
+const interventionTripFields =
+  mappingRole === "DRIVER"
+    ? {
+        formId: "Intervention_FormIDTranjet",
+        position: "Intervention_PositionTrajet",
+      }
+    : {
+        formId: "Intervention_FormIDTranjet_Dispatcher",
+        position: "Intervention_PositionTrajet_Dispatcher",
+      };
+const equipeRole = user?.filters?.find(
+  (item) => item.key === "EquipeAbribus",
+)?.value;
+const equipeFiltre = store?.pageStore?.filterData?.EquipeAbribus;
+const equipe = equipeRole || equipeFiltre;
+
+const arrondissement = store?.pageStore?.filterData?.Arrondissement;
+// Split, trim, de-duplicate, and consistently sort arrondissement filter values.
+const normalizeArrondissements = (value) => {
+  const values = Array.isArray(value) ? value : [value];
+  const parsedValues = values.flatMap((item) =>
+    String(item ?? "").split(/[|;,]/),
+  );
+
+  return [
+    ...new Set(parsedValues.map((item) => item.trim()).filter(Boolean)),
+  ].sort((left, right) =>
+    left.localeCompare(right, "fr", { sensitivity: "base" }),
+  );
+};
+const arrondissementFilterValues = normalizeArrondissements(arrondissement);
+console.log("equipe", equipe);
+console.log("mappingRole", mappingRole);
+
+const edits = store?.pageContentStore?.processData[0].edits;
+console.log("edits", edits);
+
+// Read interventions from the table selected for the current role.
+const forms = store?.moduleStore?.tableDatas?.[interventionGridKey]?.rows || [];
+console.log("Optimisation intervention source", {
+  role: mappingRole,
+  grid: interventionGridKey,
+  availableGrids: Object.keys(store?.moduleStore?.tableDatas || {}),
+  formCount: forms.length,
+});
+
+// Add a text equality filter only when its value is not empty.
+const pushOptionalTextFilter = (key, value) => {
+  if (value == null || String(value).trim() === "") return;
+
+  apiFilters.push({
+    key,
+    operator: "EQUALS",
+    value,
+    type: "TEXT",
+  });
+};
+
+pushOptionalTextFilter("Notifs_Modele", edits.Notifs_Modele);
+pushOptionalTextFilter("Notifs_Secteur", edits.Notifs_Secteur);
+pushOptionalTextFilter("Partenaire", edits.Partenaire);
+
+// Keep collection field indexes stable for the backend's flattened data format.
+const collectionFieldIndexes = {
+  Mapping: {
+    Role: 1,
+    Arrondissement: 2,
+    GeocodeKey: 3,
+  },
+  Geocode: {
+    GeocodeKey: 1,
+    GeoJson: 2,
+    Adresse: 3,
+    Latitude: 4,
+    Longitude: 5,
+  },
+};
+
+// Flatten an array collection into indexed key/value fields for API documents.
+const DataCollection = (key, array) => {
+  let result = {};
+  let itemCount = array?.length;
+  array.forEach((obj, index) => {
+    Object.keys(obj).forEach((fieldKey) => {
+      const fieldIndex =
+        collectionFieldIndexes[key]?.[fieldKey] ??
+        Object.keys(obj).indexOf(fieldKey) + 1;
+      let newKey = `${key}|${fieldIndex}|${fieldKey}|${index + 1}`;
+      result[newKey] = obj[fieldKey];
+    });
+  });
+  result[key] = String(itemCount ?? 0);
+  return result;
+};
+
+// Copy an object while omitting fields managed separately by the API.
+const excludeKeys = (obj, keys) =>
+  Object.keys(obj).reduce((result, key) => {
+    if (!keys.includes(key)) {
+      result[key] = obj[key];
+    }
+    return result;
+  }, {});
+
+// Serialize arrays using the collection format and omit managed document fields.
+const formatDataAPI = (data) => {
+  Object.keys(data).forEach((key) => {
+    if (Array.isArray(data[key])) {
+      data = { ...data, ...DataCollection(key, data[key]) };
+    }
+  });
+  return JSON.stringify(excludeKeys(data, ["FORMID", "NUMBER"]));
+};
+
+// Restore a collection from either native arrays or flattened API fields.
+const parseDataCollection = (data, collectionKey) => {
+  if (Array.isArray(data?.[collectionKey])) {
+    return data[collectionKey].map((row) => ({ ...row }));
+  }
+
+  const rowCount = Number.parseInt(data?.[collectionKey], 10);
+  if (!Number.isInteger(rowCount) || rowCount <= 0) {
+    return [];
+  }
+
+  return Array.from({ length: rowCount }, (_, index) => {
+    const rowNumber = index + 1;
+    const prefix = `${collectionKey}|`;
+    return Object.entries(data || {}).reduce((row, [key, value]) => {
+      if (!key.startsWith(prefix)) {
+        return row;
+      }
+
+      const parts = key.slice(prefix.length).split("|");
+      if (parts.length === 3 && Number(parts[2]) === rowNumber) {
+        row[parts[1]] = value;
+      } else if (parts.length === 2 && Number(parts[0]) === rowNumber) {
+        row[parts[1]] = value;
+      }
+      return row;
+    }, {});
+  }).filter((row) => Object.keys(row).length > 0);
+};
+
+// Generate a geocode key that does not collide with existing records.
+const createUniqueGeocodeKey = (existingGeocodes) => {
+  const existingKeys = new Set(
+    existingGeocodes.map((row) => String(row?.GeocodeKey ?? "")),
+  );
+  const cryptoApi =
+    typeof globalThis !== "undefined" ? globalThis.crypto : undefined;
+  let geocodeKey;
+
+  do {
+    geocodeKey =
+      cryptoApi?.randomUUID?.() ||
+      `geocode_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  } while (existingKeys.has(geocodeKey));
+
+  return geocodeKey;
+};
+
+// Build a normalized identity so role/arrondissement mappings can be replaced safely.
+const getMappingIdentity = (mapping) =>
+  JSON.stringify([
+    String(mapping?.Role ?? "")
+      .trim()
+      .toUpperCase(),
+    String(mapping?.Arrondissement ?? "")
+      .trim()
+      .toLocaleLowerCase("fr"),
+  ]);
+
+// Replace mappings for the selected identities and retain only referenced geocodes.
+const buildUpdatedMappingAndGeocode = (
+  existingData,
+  role,
+  arrondissements,
+  geoJson,
+  address,
+  latitude,
+  longitude,
+) => {
+  const existingMapping = parseDataCollection(existingData, "Mapping").map(
+    (row) => excludeKeys(row, ["Arrondissement_Liée"]),
+  );
+  const existingGeocodes = parseDataCollection(existingData, "Geocode");
+
+  if (arrondissements.length === 0) {
+    return { mapping: existingMapping, geocode: existingGeocodes };
+  }
+
+  const geocodeKey = createUniqueGeocodeKey(existingGeocodes);
+  const mappingToAdd = arrondissements.map((currentArrondissement) => ({
+    Role: role,
+    Arrondissement: currentArrondissement,
+    GeocodeKey: geocodeKey,
+  }));
+  const replacedIdentities = new Set(mappingToAdd.map(getMappingIdentity));
+  const mapping = [
+    ...existingMapping.filter(
+      (row) => !replacedIdentities.has(getMappingIdentity(row)),
+    ),
+    ...mappingToAdd,
+  ];
+  const referencedGeocodeKeys = new Set(
+    mapping.map((row) => String(row?.GeocodeKey ?? "")).filter(Boolean),
+  );
+  const geocodeByKey = new Map();
+
+  existingGeocodes.forEach((row) => {
+    const key = String(row?.GeocodeKey ?? "");
+    if (referencedGeocodeKeys.has(key)) {
+      geocodeByKey.set(key, row);
+    }
+  });
+
+  geocodeByKey.set(geocodeKey, {
+    GeocodeKey: geocodeKey,
+    GeoJson: JSON.stringify(geoJson),
+    Adresse: address,
+    Latitude: latitude,
+    Longitude: longitude,
+  });
+
+  return { mapping, geocode: [...geocodeByKey.values()] };
+};
+
+// Create one document and log API failures without rethrowing them.
+const createDocument = async (doc) => {
+  try {
+    const response = await api({ local: true }).post("document", {
+      document: doc,
+    });
+
+    console.log("update", response?.data);
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du formulaire :", error);
+  }
+};
+
+// Create multiple documents and rethrow failures for the main workflow to report.
+const createManyDocument = async (docs) => {
+  try {
+    const response = await api({ local: true }).post("document/Many", {
+      documents: docs,
+    });
+
+    console.log("update", response?.data);
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du formulaire :", error);
+    throw error;
+  }
+};
+
+// Update one document and return null when the API call fails.
+const updateDocument = async (document) => {
+  try {
+    const response = await api({ local: true }).put("document", {
+      document: document,
+    });
+
+    return response?.data?.document || null;
+  } catch (error) {
+    console.error("Failed to update document:", error);
+    return null;
+  }
+};
+
+// Update multiple documents and propagate failures to the stage-aware error handler.
+const updateManyDocument = async (documents) => {
+  try {
+    const response = await api({ local: true }).put("document/Many", {
+      documents: documents,
+    });
+
+    return response?.data?.document || null;
+  } catch (error) {
+    console.error("Failed to update document:", error);
+    throw error;
+  }
+};
+
+// Return document IDs matching the supplied filter list.
+const getIds = async (filters) => {
+  const res = await api({ local: true }).post("document/id/filter", {
+    filters,
+  });
+
+  return res?.data?.ids || [];
+};
+
+// Fetch full documents for a list of IDs.
+const getForms = async (ids) => {
+  const res = await api({ local: true }).post("document/id", { ids });
+
+  return res?.data?.documents || [];
+};
+
+// Routing and optimization limits shared by the payload and OSRM helpers.
+const DEFAULT_TASK_DURATION_MIN = 0;
+const FIXED_AVAILABILITY = ["2025-01-01T00:00:00", "2025-01-07T23:59:59"];
+const MAX_OPTIMIZABLE_INTERVENTIONS = 600;
+const OSRM_BASE_URL = "http://54.39.186.33:5000";
+const OSRM_PROFILE = "driving";
+const OPTIM_WEBHOOK_URL =
+  "https://solve.optim-test.fastercom.io/api_optim?config=QBO";
+
+// Normalize a date-like value to YYYY-MM-DD, defaulting to today when empty.
+const toDateKey = (value) => {
+  if (!value) {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  return String(value).slice(0, 10);
+};
+
+// Return the configured availability interval for the resource and its tasks.
+const buildFullDayAvailability = () => FIXED_AVAILABILITY;
+
+// Accept parsed data or JSON text and return an empty object if parsing fails.
+const parseFormData = (value) => {
+  if (!value) {
+    return {};
+  }
+
+  if (typeof value === "object") {
+    return value;
+  }
+
+  try {
+    return JSON.parse(value);
+  } catch (error) {
+    console.error("Impossible de parser form.data", error);
+    return {};
+  }
+};
+
+// Return a [latitude, longitude] pair only when both coordinates are present.
+const toLocation = (latitude, longitude) => {
+  if (
+    latitude == null ||
+    longitude == null ||
+    latitude === "" ||
+    longitude === ""
+  ) {
+    return null;
+  }
+
+  return [String(latitude), String(longitude)];
+};
+
+// Normalize a team name into an identifier accepted by the optimizer.
+const sanitizeResourceId = (value) =>
+  String(value || "resource_default")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, "_");
+
+// Resolve the depot address to the [latitude, longitude] format used internally.
+const geocodeAddress = (address) =>
+  new Promise((resolve, reject) => {
+    if (!address || String(address).trim() === "") {
+      reject(new Error("AdresseDepart est vide."));
+      return;
+    }
+
+    if (typeof google === "undefined" || !google?.maps?.Geocoder) {
+      reject(new Error("Google Maps Geocoder n'est pas disponible."));
+      return;
+    }
+
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address: String(address).trim() }, (results, status) => {
+      if (status !== "OK" || !Array.isArray(results) || results.length === 0) {
+        reject(
+          new Error(
+            `Geocoding impossible pour AdresseDepart (status: ${status}).`,
+          ),
+        );
+        return;
+      }
+
+      const location = results[0]?.geometry?.location;
+      if (
+        !location ||
+        typeof location.lat !== "function" ||
+        typeof location.lng !== "function"
+      ) {
+        reject(new Error("Coordonnées absentes dans la réponse de géocodage."));
+        return;
+      }
+
+      resolve([String(location.lat()), String(location.lng())]);
+    });
+  });
+
+// Request OSRM travel durations, converting coordinates to OSRM's lon,lat order.
+const buildOsrmTimeMatrix = async (locations) => {
+  if (!Array.isArray(locations) || locations.length === 0) {
+    throw new Error(
+      "Au moins une localisation est requise pour la matrice OSRM.",
+    );
+  }
+
+  const coordinates = locations
+    .map((location, index) => {
+      if (!Array.isArray(location) || location.length < 2) {
+        throw new Error(`Localisation invalide à l'index ${index}.`);
+      }
+
+      const latitude = Number(location[0]);
+      const longitude = Number(location[1]);
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        throw new Error(`Coordonnées invalides à l'index ${index}.`);
+      }
+
+      return `${longitude},${latitude}`;
+    })
+    .join(";");
+
+  const query = new URLSearchParams({
+    annotations: "duration",
+    approaches: locations.map(() => "curb").join(";"),
+  });
+  const endpoint = `${OSRM_BASE_URL.replace(/\/+$/, "")}/table/v1/${OSRM_PROFILE}/${coordinates}?${query}`;
+  console.log("[OSRM Table] Request", {
+    endpoint,
+    locationCount: locations.length,
+    locations,
+  });
+  const response = await api({ local: true }).post(
+    "external",
+    {
+      Method: "GET",
+      Url: endpoint,
+    },
+    { validErrors: [400] },
+  );
+  console.log("[OSRM Table] Response", {
+    status: response?.status,
+    data: response?.data,
+  });
+  const result = response?.data;
+  if (
+    result?.code !== "Ok" ||
+    !Array.isArray(result?.durations) ||
+    result.durations.length !== locations.length
+  ) {
+    throw new Error(
+      `Matrice OSRM invalide: ${result?.code || "réponse inconnue"}.`,
+    );
+  }
+
+  return result.durations.map((row, rowIndex) => {
+    if (!Array.isArray(row) || row.length !== locations.length) {
+      throw new Error(
+        `Ligne invalide dans la matrice OSRM à l'index ${rowIndex}.`,
+      );
+    }
+
+    return row.map((value, columnIndex) => {
+      const duration = Number(value);
+      if (!Number.isFinite(duration)) {
+        throw new Error(
+          `Durée OSRM indisponible pour la cellule ${rowIndex},${columnIndex}.`,
+        );
+      }
+
+      return Math.round(duration);
+    });
+  });
+};
+
+// Convert eligible forms into tasks, add the depot, request the OSRM matrix, and build the optimizer payload.
+const buildOptimPayloadFromForms = async (
+  inputForms,
+  {
+    depotLocation,
+    resourceId = sanitizeResourceId(equipe || "resource_default"),
+  } = {},
+) => {
+  if (!Array.isArray(depotLocation) || depotLocation.length < 2) {
+    throw new Error(
+      "depotLocation est requis pour construire le payload d'optimisation.",
+    );
+  }
+
+  const availabilities = [buildFullDayAvailability()];
+  const skippedInterventions = [];
+
+  const tasks = inputForms
+    .map((form, index) => {
+      const data = parseFormData(form?.data);
+      const location = toLocation(data?.LatitudeLieu, data?.LongitudeLieu);
+
+      if (!location) {
+        skippedInterventions.push({
+          index,
+          formID: form?.metaData?.FORMID || form?.rowID || null,
+          arrondissement: data?.Arrondissement ?? null,
+          latitude: data?.LatitudeLieu ?? null,
+          longitude: data?.LongitudeLieu ?? null,
+          dataFields: Object.keys(data),
+        });
+        return null;
+      }
+
+      // Prefix each task ID with its arrondissement so it can be matched to a form later.
+      // Use "global" when the form has no arrondissement value.
+      const formArrondissement = data?.Arrondissement || "global";
+      return {
+        TaskID: `${formArrondissement}_${form?.metaData?.FORMID || form?.rowID}`,
+        Priority: 0,
+        location,
+        Availabilities: availabilities,
+        Duration: DEFAULT_TASK_DURATION_MIN,
+        Quantities: [],
+        AllowedResourceIDs: [resourceId],
+        EndLocation: null,
+        Lateness: null,
+        SuggestedAppointment: null,
+      };
+    })
+    .filter(Boolean);
+
+  console.log(
+    "[Optimisation] Interventions ignorées avant OSRM",
+    skippedInterventions,
+  );
+  console.log("Optimisation OSRM input counts", {
+    formCount: inputForms.length,
+    taskCount: tasks.length,
+    skippedWithoutCoordinates: inputForms.length - tasks.length,
+  });
+  if (tasks.length === 0) {
+    throw new Error(
+      "Aucune intervention avec des coordonnées valides (LatitudeLieu/LongitudeLieu) n'a été trouvée.",
+    );
+  }
+
+  const locations = [...tasks.map((task) => task.location), depotLocation];
+  console.log("[Optimisation] Coordonnées préparées pour OSRM", [
+    ...tasks.map((task) => ({
+      source: "intervention",
+      taskID: task.TaskID,
+      latitude: task.location[0],
+      longitude: task.location[1],
+      osrmCoordinate: `${task.location[1]},${task.location[0]}`,
+    })),
+    {
+      source: "dépôt",
+      latitude: depotLocation[0],
+      longitude: depotLocation[1],
+      osrmCoordinate: `${depotLocation[1]},${depotLocation[0]}`,
+    },
+  ]);
+  const endLocationIndex = locations.length - 1;
+  const osrmTimeMatrix = await buildOsrmTimeMatrix(locations);
+  const timeMatrix = osrmTimeMatrix.map((row) =>
+    row.map((duration, columnIndex) =>
+      columnIndex === endLocationIndex ? 0 : duration,
+    ),
+  );
+
+  const payload = {
+    Resources: [
+      {
+        ResourceID: resourceId,
+        StartLocation: endLocationIndex,
+        EndLocation: endLocationIndex,
+        Availability: buildFullDayAvailability(),
+        Capacities: [],
+        HourlyTravelCost: 10,
+        ReturnLateness: null,
+        HourlyRate: null,
+        AssignmentCost: null,
+      },
+    ],
+    Tasks: tasks.map(({ location, ...task }, index) => ({
+      ...task,
+      StartLocation: index,
+    })),
+    TravelMatrices: {
+      TimeMatrix: timeMatrix,
+    },
+    Links: [],
+  };
+
+  return { payload, locations };
+};
+
+// Extract intervention IDs and stop positions from every optimized route schedule.
+const buildTrajetResultsFromOptim = (optimResponse) => {
+  const routes = optimResponse?.routes || {};
+
+  // Process every route because the optimizer may return one route per arrondissement.
+  const allResults = [];
+  let globalPosition = 1;
+
+  Object.values(routes).forEach((route) => {
+    const schedule = route?.schedule || [];
+
+    schedule.forEach((entry) => {
+      const taskDescription = String(entry?.description || "");
+      if (taskDescription.includes("_")) {
+        // Remove the arrondissement prefix from "arrondissement_FORMID".
+        const parts = taskDescription.split("_");
+        const formID = parts.slice(1).join("_"); // Preserve underscores that belong to the FORMID.
+        allResults.push({
+          "Trajet_ArretCollec|1|FORMID": formID,
+          Intervention_Position: String(globalPosition),
+        });
+        globalPosition++;
+      }
+    });
+  });
+
+  return allResults;
+};
+
+// Return a valid empty GeoJSON line when no usable route geometry is available.
+const emptyTrajetGeoJson = () => ({
+  type: "FeatureCollection",
+  features: [
+    {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "LineString",
+        coordinates: [],
+      },
+    },
+  ],
+});
+
+// Convert scheduled location indexes into OSRM route geometry, falling back to direct segments.
+const buildTrajetGeoJsonFromOptim = async (optimResponse, locations) => {
+  const routes = optimResponse?.routes || {};
+  const firstRoute = Object.values(routes)?.[0] || {};
+  const schedule = firstRoute?.schedule || [];
+
+  if (!Array.isArray(schedule) || schedule.length < 2) {
+    return emptyTrajetGeoJson();
+  }
+
+  if (!Array.isArray(locations) || locations.length === 0) {
+    console.warn("Les localisations indexées sont absentes du résultat.");
+    return emptyTrajetGeoJson();
+  }
+
+  const scheduleWithoutReturn = schedule.slice(0, -1);
+  const routePoints = scheduleWithoutReturn
+    .map((entry) => {
+      const locationIndex = Number(entry?.location);
+      if (
+        !Number.isInteger(locationIndex) ||
+        locationIndex < 0 ||
+        locationIndex >= locations.length
+      ) {
+        console.warn(
+          `Index de localisation invalide dans le planning: ${entry?.location}`,
+        );
+        return null;
+      }
+
+      const location = locations[locationIndex];
+      const latitude = Number(location?.[0]);
+      const longitude = Number(location?.[1]);
+      if (
+        !Number.isFinite(latitude) ||
+        !Number.isFinite(longitude) ||
+        latitude < -90 ||
+        latitude > 90 ||
+        longitude < -180 ||
+        longitude > 180
+      ) {
+        console.warn(
+          `Coordonnées invalides pour l'index de localisation ${locationIndex}.`,
+        );
+        return null;
+      }
+
+      return [latitude, longitude];
+    })
+    .filter(Boolean);
+
+  if (routePoints.length < 2) {
+    return emptyTrajetGeoJson();
+  }
+
+  const MAX_ROUTE_LOCATIONS = 200;
+  const chunks = [];
+  let start = 0;
+
+  while (start < routePoints.length - 1) {
+    const end = Math.min(start + MAX_ROUTE_LOCATIONS, routePoints.length);
+    chunks.push(routePoints.slice(start, end));
+    start = end - 1;
+  }
+
+  // Request detailed route geometry for one chunk to stay within OSRM URL limits.
+  const getCoordinatesChunk = async (chunk) => {
+    const coordinates = chunk
+      .map(([latitude, longitude]) => `${longitude},${latitude}`)
+      .join(";");
+    const query = new URLSearchParams({
+      approaches: chunk.map(() => "curb").join(";"),
+      geometries: "geojson",
+      overview: "full",
+      steps: "false",
+    });
+    const endpoint = `${OSRM_BASE_URL.replace(/\/+$/, "")}/route/v1/${OSRM_PROFILE}/${coordinates}?${query}`;
+    console.log("[OSRM Route] Request", {
+      endpoint,
+      locationCount: chunk.length,
+      locations: chunk,
+    });
+    const response = await api({ local: true }).post(
+      "external",
+      {
+        Method: "GET",
+        Url: endpoint,
+      },
+      { validErrors: [400] },
+    );
+    console.log("[OSRM Route] Response", {
+      status: response?.status,
+      data: response?.data,
+    });
+    const result = response?.data;
+    const routeCoordinates = result?.routes?.[0]?.geometry?.coordinates;
+    if (
+      result?.code !== "Ok" ||
+      !Array.isArray(routeCoordinates) ||
+      routeCoordinates.length === 0
+    ) {
+      throw new Error(
+        `Géométrie OSRM invalide: ${result?.code || "réponse inconnue"}.`,
+      );
+    }
+
+    return routeCoordinates.filter(
+      (coordinate) =>
+        Array.isArray(coordinate) &&
+        coordinate.length >= 2 &&
+        Number.isFinite(Number(coordinate[0])) &&
+        Number.isFinite(Number(coordinate[1])),
+    );
+  };
+
+  const allCoordinates = [];
+  const routeGeometryErrors = [];
+  for (const chunk of chunks) {
+    try {
+      const coordinates = await getCoordinatesChunk(chunk);
+      coordinates.forEach((coordinate) => {
+        const previous = allCoordinates[allCoordinates.length - 1];
+        if (
+          !previous ||
+          previous[0] !== coordinate[0] ||
+          previous[1] !== coordinate[1]
+        ) {
+          allCoordinates.push(coordinate);
+        }
+      });
+    } catch (error) {
+      console.warn("Échec du calcul de la géométrie OSRM.", error);
+      routeGeometryErrors.push(getErrorMessage(error));
+      chunk.forEach(([latitude, longitude]) => {
+        const coordinate = [longitude, latitude];
+        const previous = allCoordinates[allCoordinates.length - 1];
+        if (
+          !previous ||
+          previous[0] !== coordinate[0] ||
+          previous[1] !== coordinate[1]
+        ) {
+          allCoordinates.push(coordinate);
+        }
+      });
+    }
+  }
+
+  if (routeGeometryErrors.length > 0) {
+    showPopupError(
+      "Avertissement de trajet",
+      `OSRM n'a pas pu calculer ${routeGeometryErrors.length} segment(s). Un tracé direct entre les arrêts sera utilisé. Détail : ${routeGeometryErrors[0]}`,
+    );
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        properties: {},
+        geometry: {
+          type: "LineString",
+          coordinates: allCoordinates,
+        },
+      },
+    ],
+  };
+};
+
+// Submit the optimization payload to the webhook and parse its response body.
+const apiOptim = async (body) => {
+  try {
+    // Wait for the webhook response and consume its complete body before returning.
+    const response = await fetch(OPTIM_WEBHOOK_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    const responseText = await response.text();
+    let data;
+    try {
+      data = responseText ? JSON.parse(responseText) : null;
+    } catch {
+      data = responseText;
+    }
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${getErrorMessage(data)}`);
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Erreur lors de l’appel à l’API :", error);
+    throw error;
+  }
+};
+
+// Run validation, geocoding, OSRM routing, optimization, and document updates in order.
+const main = async () => {
+  let currentStage = "Initialisation";
+  try {
+    currentStage = "Validation des paramètres";
+    // Stop before making external requests when no team is selected.
+    if (!equipe || String(equipe).trim() === "") {
+      showPopupError("Erreur", "Aucune équipe n'est sélectionnée.");
+      return;
+    }
+
+    // Enforce the optimizer's maximum supported number of interventions.
+    if (forms.length > MAX_OPTIMIZABLE_INTERVENTIONS) {
+      showPopupError(
+        "Erreur",
+        `Le nombre d'interventions (${forms.length}) dépasse la limite de ${MAX_OPTIMIZABLE_INTERVENTIONS}. L'optimisation ne peut pas être effectuée.`,
+      );
+      return;
+    }
+
+    currentStage = "Géocodage de l'adresse de départ";
+    const adresseDepart = edits?.AdresseDepart;
+    const depotLocation = await geocodeAddress(adresseDepart);
+    console.log("depotLocation (geocode)", depotLocation);
+
+    console.log("arrondissement filter", arrondissement);
+
+    // Ask before continuing when the user has not selected an arrondissement.
+    currentStage = "Confirmation du filtre d'arrondissement";
+    const hasFilterArrondissement = arrondissementFilterValues.length > 0;
+    if (!hasFilterArrondissement) {
+      const confirmed = await new Promise((resolve) => {
+        showPopupConfirm(
+          "Attention",
+          "Aucun arrondissement n'a été sélectionné dans le filtre. L'optimisation va se faire sans filtre arrondissement. Voulez-vous continuer?",
+          () => resolve(true),
+          () => resolve(false),
+        );
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
+      console.log("Optimisation sans filtre arrondissement confirmée");
+    }
+
+    showPopupLoading("Optimisation en cours");
+
+    // Build one payload and one travel matrix for all eligible interventions.
+    currentStage = "Construction de la matrice OSRM";
+    const { payload: optimPayload, locations } =
+      await buildOptimPayloadFromForms(forms, {
+        depotLocation,
+      });
+    console.log("optimPayload", optimPayload);
+
+    // Submit the combined payload once, rather than optimizing each arrondissement separately.
+    currentStage = "Appel de l'API d'optimisation";
+    const { success, data } = await apiOptim(optimPayload);
+    console.log("data :", data);
+
+    if (!success) {
+      const optimizationError =
+        typeof data === "string"
+          ? data
+          : data?.message || data?.error || data?.details;
+      throw new Error(
+        optimizationError
+          ? `L'API d'optimisation a échoué : ${getErrorMessage(optimizationError)}`
+          : "L'API d'optimisation a répondu success=false.",
+      );
+    }
+
+    // Convert the optimizer schedule into form IDs and stop positions.
+    currentStage = "Lecture des résultats d'optimisation";
+    const allResults = buildTrajetResultsFromOptim(data);
+    if (allResults.length === 0) {
+      throw new Error(
+        "L'API d'optimisation n'a retourné aucun arrêt dans son planning.",
+      );
+    }
+
+    currentStage = "Calcul de la géométrie du trajet";
+    const trajetGeoJson = await buildTrajetGeoJsonFromOptim(data, locations);
+    console.log("allResults", allResults);
+    console.log("trajetGeoJson", trajetGeoJson);
+
+    // Find the team's existing route document, if one has already been created.
+    const trajetFilters = [
+      {
+        key: "FORMLAYOUTNAME",
+        operator: "EQUALS",
+        value: "TRAJET",
+        type: "TEXT",
+      },
+      {
+        key: "EquipeAbribus",
+        operator: "EQUALS",
+        value: equipe,
+        type: "TEXT",
+      },
+    ];
+    currentStage = "Recherche du formulaire trajet de l'équipe";
+    const trajetIDs = await getIds(trajetFilters);
+    let trajetID = trajetIDs[0] || null;
+    console.log("trajetIDs pour l'équipe", trajetIDs);
+
+    if (trajetIDs.length > 1) {
+      console.warn(
+        "Plusieurs trajets existent déjà pour cette équipe; le premier sera mis à jour.",
+      );
+    }
+
+    currentStage = "Lecture du formulaire trajet existant";
+    const existingTrajetForms = trajetID ? await getForms([trajetID]) : [];
+    const existingTrajetData = parseFormData(existingTrajetForms[0]?.data);
+    // Preserve mappings outside the selected role/arrondissements while replacing this run's data.
+    const mappingArrondissements =
+      arrondissementFilterValues.length > 0
+        ? arrondissementFilterValues
+        : normalizeArrondissements(
+            allResults.map((result) => {
+              const interventionID = result["Trajet_ArretCollec|1|FORMID"];
+              const form = forms.find((item) => {
+                const formID = item?.metaData?.FORMID || item?.rowID;
+                return (
+                  formID != null && String(formID) === String(interventionID)
+                );
+              });
+              return parseFormData(form?.data)?.Arrondissement;
+            }),
+          );
+    const { mapping, geocode } = buildUpdatedMappingAndGeocode(
+      existingTrajetData,
+      mappingRole,
+      mappingArrondissements,
+      trajetGeoJson,
+      adresseDepart,
+      depotLocation[0],
+      depotLocation[1],
+    );
+
+    const trajetDocument = {
+      data: formatDataAPI({
+        EquipeAbribus: equipe,
+        Mapping: mapping,
+        Geocode: geocode,
+      }),
+      status: "Actif",
+      active: true,
+      template: { templateId: trajetTemplateID },
+    };
+
+    currentStage = "Enregistrement du formulaire trajet";
+    if (trajetID) {
+      await updateManyDocument([
+        {
+          ...trajetDocument,
+          documentID: trajetID,
+        },
+      ]);
+    } else {
+      await createManyDocument([trajetDocument]);
+      currentStage = "Recherche du formulaire trajet créé";
+      const createdTrajetIDs = await getIds(trajetFilters);
+      trajetID = createdTrajetIDs[0] || null;
+    }
+
+    if (!trajetID) {
+      throw new Error(
+        "Impossible de retrouver le formulaire trajet de cette équipe.",
+      );
+    }
+
+    currentStage = "Recherche des interventions liées au trajet";
+    const arrondissementsToReplace =
+      arrondissementFilterValues.length > 0
+        ? arrondissementFilterValues
+        : normalizeArrondissements(
+            forms.map((form) => parseFormData(form?.data)?.Arrondissement),
+          );
+    const oldInterventionIDs = [
+      ...new Set(
+        (
+          await Promise.all(
+            arrondissementsToReplace.map((currentArrondissement) =>
+              getIds([
+                {
+                  key: interventionTripFields.formId,
+                  operator: "EQUALS",
+                  value: trajetID,
+                  type: "TEXT",
+                },
+                {
+                  key: "Arrondissement",
+                  operator: "EQUALS",
+                  value: currentArrondissement,
+                  type: "TEXT",
+                },
+              ]),
+            ),
+          )
+        ).flat(),
+      ),
+    ];
+    console.log("oldInterventionIDs", oldInterventionIDs);
+
+    const allInterventionsToUpdate = [];
+    const newInterventionIDs = [];
+
+    allResults.forEach((result) => {
+      const interventionID = result["Trajet_ArretCollec|1|FORMID"];
+      const globalPosition = result["Intervention_Position"];
+      const form = forms.find(
+        (f) => (f?.metaData?.FORMID || f?.rowID) === interventionID,
+      );
+      if (!form) return;
+
+      newInterventionIDs.push(interventionID);
+      allInterventionsToUpdate.push({
+        documentID: interventionID,
+        data: formatDataAPI({
+          [interventionTripFields.formId]: trajetID,
+          [interventionTripFields.position]: globalPosition,
+        }),
+        status: "À faire",
+        active: true,
+        template: { templateId: interventionTemplateID },
+      });
+    });
+
+    const removedInterventionIDs = oldInterventionIDs.filter(
+      (id) => !newInterventionIDs.includes(id),
+    );
+    removedInterventionIDs.forEach((id) => {
+      allInterventionsToUpdate.push({
+        documentID: id,
+        data: formatDataAPI({
+          [interventionTripFields.formId]: "",
+          [interventionTripFields.position]: "",
+        }),
+        status: "À faire",
+        active: true,
+        template: { templateId: interventionTemplateID },
+      });
+    });
+
+    // Persist the new route link and position on each included intervention.
+    if (allInterventionsToUpdate.length > 0) {
+      currentStage = "Mise à jour des interventions";
+      console.log("Mise à jour des interventions:", allInterventionsToUpdate);
+      await updateManyDocument(allInterventionsToUpdate);
+    }
+  } catch (error) {
+    const errorMessage = getErrorMessage(error);
+    console.error(`[Optimisation] Échec à l'étape "${currentStage}" :`, error);
+    showPopupError("Erreur d'optimisation", `${currentStage}\n${errorMessage}`);
+  } finally {
+    hidePopupLoading();
+  }
+};
+
+main();
+

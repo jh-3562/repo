@@ -1,0 +1,1 @@
+return {'LatitudeLieu': position.coords.latitude };

@@ -1,0 +1,30 @@
+console.log("234", context);
+
+return {
+  // Si c’est un nouveau document (NUMBER = 0)
+  Creation_Intervention:
+    Number(docData.NUMBER) === 0 ? true : null,
+
+  // Si ce n’est pas un nouveau (déjà existant)
+  Enregistrement_InterventionAfaire:
+    Number(docData.NUMBER) !== 0 && docData.STATUS === 'À faire'
+      ? true : null,
+
+  Intervention_ButtonMilieu:
+    Number(docData.NUMBER) !== 0 && docData.STATUS === 'À faire'
+      ? true : null,
+  
+  Intervention_ButtonFin:
+    Number(docData.NUMBER) !== 0 && docData.STATUS === 'À faire'
+      ? true : null,
+  // Si déjà existant ET statut = 'Non-assignée'
+  InterventionNonAssignee:
+    Number(docData.NUMBER) !== 0 && docData.STATUS === 'Non-assignée'
+      ? true : null,
+
+  // Si le document existe ET statut = 'Problématique'
+  InternvetionTraiter:
+    Number(docData.NUMBER) !== 0 && docData.STATUS === 'Problématique'
+      ? true : null,
+};
+

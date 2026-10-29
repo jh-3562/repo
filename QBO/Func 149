@@ -1,0 +1,102 @@
+// Function #149 - Update intervention status
+// Fetches interventions by status and planning number, then updates their new status
+
+//console.log("Fonction #149", context);
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const INTERVENTION_TEMPLATE_ID = "F7B9A59A-E708-45C4-B786-2A5130CFEE2B";
+
+// ============================================================================
+// UTILITIES
+// ============================================================================
+
+const getDocumentsIDsByFilters = async (apiFilters) => {
+    try {
+        const response = await api({ local: true }).post("document/id/filter", {
+            filters: apiFilters,
+        });
+
+        return response?.data?.ids || [];
+    } catch (error) {
+        console.error("Failed to fetch document IDs:", error);
+        return [];
+    }
+};
+
+const updateDocuments = async (documentsToUpdate) => {
+    try {
+        const response = await api({ local: true }).put("document/Many", {
+            documents: documentsToUpdate,
+        });
+
+        return response?.data?.documents || [];
+    } catch (error) {
+        console.error("Failed to update documents:", error);
+        return [];
+    }
+};
+
+// ============================================================================
+// BUSINESS LOGIC
+// ============================================================================
+
+const getInterventionIDs = async (interventionFilter) => {
+    const apiFilters = [
+        {
+            key: "FORMLAYOUTNAME",
+            operator: "EQUALS",
+            value: "INTERVENTION",
+            type: "TEXT",
+        },
+        {
+            key: "STATUS",
+            operator: "EQUALS",
+            value: interventionFilter.status,
+            type: "TEXT",
+        },
+        {
+            key: "NumPlanification",
+            operator: "EQUALS",
+            value: interventionFilter.numPlanification,
+            type: "TEXT",
+        },
+    ];
+
+    return await getDocumentsIDsByFilters(apiFilters);
+}
+
+const updateInterventionStatus = async (interventionIDs, newStatus) => {
+    const documentsToUpdate = interventionIDs.map(id => ({
+        status: newStatus,
+        active: true,
+        template: { templateId: INTERVENTION_TEMPLATE_ID },
+        documentID: id,
+    }))
+
+    await updateDocuments(documentsToUpdate);
+}
+
+const main = async () => {
+    try {
+        const status = store.pageContentStore.processData[0].filters[0].value;
+        const numPlanification = store.pageContentStore.processData[0].filters[1].value;
+        const newStatus = store.pageContentStore.processData[1].edits.STATUS;
+
+        const interventionFilter = {
+            status,
+            numPlanification,
+        }
+
+        const interventionIDs = await getInterventionIDs(interventionFilter);
+
+        await updateInterventionStatus(interventionIDs, newStatus);
+
+    } catch (error) {
+        console.log("Erreur", "Une erreur est survenue : " + error.message);
+    }
+}
+
+main()

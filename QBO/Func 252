@@ -1,0 +1,54 @@
+console.log('252', context);
+
+const ids = store?.pageContentStore?.processData?.[0]?.result?.ids || [];
+const edits = store?.pageContentStore?.processData?.[1]?.edits || {};
+
+console.log('ids', ids);
+console.log('edits', edits);
+
+const getDocumentsFromId = async (ids) => {
+  try {
+    const res = await api({ local: true }).post(`document/id`, { ids });
+    const documents = res?.data?.documents;
+
+    if (!documents) {
+      throw new Error(`Erreur lors de la récupération du document`);
+    }
+
+    return documents.map((doc) => {
+      return {
+          data: JSON.stringify({
+            ...edits,
+            InterventionDateCreationValide: isFutureDate(edits.CommandDate)
+          }),
+          status: doc.metaData["STATUS"],
+          active: true,
+          template: { templateId: doc.metaData["FORMLAYOUTID"] },
+          documentID: doc.metaData["FORMID"],
+      };
+    });
+  } catch (error) {
+    console.error(`Erreur lors de la récupération du document :`, error);
+    throw error;
+  }
+};
+
+const updateDocuments = async (doc) => {
+  try {
+    const response = await api({ local: true }).put('document/Many', {
+      documents: doc,
+    });
+
+    console.log('update', response?.data);
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du formulaire :', error);
+  }
+}
+
+const main = async () => {
+  const documents = await getDocumentsFromId(ids);
+  console.log('documents',documents);
+  await updateDocuments(documents)
+}
+
+main();

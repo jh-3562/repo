@@ -1,0 +1,14 @@
+console.log('Function 71')
+
+return docData['SousCatégorie1'] === 'Conversion' ||
+  docData['SousCatégorie1'] === 'Nouveau Site' ||
+  docData['SousCatégorie1'] === 'Réinstallation' ||
+  (docData['TypeIntervention'] === 'Déploiement' &&
+    docData['SousCatégorie1'] === 'Installation') ||
+  (docData['TypeIntervention'] === 'Déploiement' &&
+    docData['SousCatégorie1'] === 'Finition') ||
+  (docData['TypeIntervention'] === 'Travaux' &&
+    docData['SousCatégorie1'] === 'Finition')
+  ? { Photo_PlanEloigneAbribusCompletFaceInt: true }
+  : { Photo_PlanEloigneAbribusCompletFaceInt: null }
+

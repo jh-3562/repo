@@ -1,0 +1,1 @@
+return { 'SousCatégorie1|Numérique': docData['TypeIntervention'] === 'Numérique' ? true : null };

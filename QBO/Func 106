@@ -1,0 +1,8 @@
+console.log('106',context);
+const user = store.moduleStore?.user?.roles[0];
+
+if (user != 'ADMIN'&&user != 'PARTENAIRE') {
+
+return { 'Intervention_Notification': null};
+
+}

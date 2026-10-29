@@ -1,0 +1,739 @@
+console.log('233', context);
+
+const TEMPLATE_ID = 'f7b9a59a-e708-45c4-b786-2a5130cfee2b';
+const WEBHOOK_URL = URLS.N8N.NOTIF_EMAIL;
+const WEBHOOK_SAUVE_VITRES_URL = URLS.N8N.WINDOW_NOTIFICATION;
+const REDIRECT_URL = URLS.MAIN + '/command';
+const TARGET_STATUS = 'À faire';
+const NOTIFICATION_DISABLED = 'false';
+const EQUIPE_SAUVE_VITRES = 'SAUVE VITRES';
+
+/*  UI HELPERS (POPUPS/BANNERS) */
+const createOrUpdateElement = (id, tag, style, innerHTML = "") => {
+  let element = document.getElementById(id);
+  if (!element) {
+    element = document.createElement(tag);
+    element.id = id;
+    document.body.appendChild(element);
+  }
+  element.style = style;
+  element.innerHTML = innerHTML;
+  return element;
+};
+
+const showErrorBanner = (errorMessage) => {
+  const errorBanner = createOrUpdateElement(
+    "errorBanner",
+    "div",
+    `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      min-width: 300px;
+      height: 50px;
+      background-color: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      border-radius: 5px;
+      padding: 0 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    `,
+    `
+      <div style="margin-right: 10px; color: red;">&#x26A0;</div><div>${errorMessage}</div>
+      <div id="errorBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: red; height: 5px; width: 0%;"></div>
+    `
+  );
+  let progressElement = document.getElementById("errorBannerProgress");
+  let width = 0;
+  let interval = setInterval(() => {
+    if (width >= 100) {
+      clearInterval(interval);
+      errorBanner.style.display = "none";
+    } else {
+      width++;
+      progressElement.style.width = width + "%";
+    }
+  }, 55);
+};
+
+const showSuccessBanner = (successMessage) => {
+  const successBanner = createOrUpdateElement(
+    "successBanner",
+    "div",
+    `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      min-width: 300px;
+      height: 50px;
+      background-color: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      border-radius: 5px;
+      padding: 0 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    `,
+    `
+      <div style="margin-right: 10px; color: green;">&#10003;</div><div>${successMessage}</div>
+      <div id="successBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: green; height: 5px; width: 0%;"></div>
+    `
+  );
+  let progressElement = document.getElementById("successBannerProgress");
+  let width = 0;
+  let interval = setInterval(() => {
+    if (width >= 100) {
+      clearInterval(interval);
+      successBanner.style.display = "none";
+    } else {
+      width++;
+      progressElement.style.width = width + "%";
+    }
+  }, 55);
+};
+
+const showPopupLoading = (loadingMessage) => {
+  createOrUpdateElement(
+    "loadingPopup",
+    "div",
+    `
+      position: fixed; 
+      left: 0; 
+      top: 0; 
+      width: 100%; 
+      height: 100%; 
+      background-color: rgba(0,0,0,0.5); 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      z-index: 9999;
+    `,
+    `
+      <div style="background-color: white; padding: 20px; border-radius: 5px; display: flex; flex-direction: column; align-items: center;">
+        <div>${loadingMessage}</div>
+        <div class="loader" style="border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 40px; height: 40px; margin-top: 20px; animation: spin 1s linear infinite;"></div>
+      </div>
+    `
+  );
+  if (!document.getElementById("spinnerStyle")) {
+    let style = document.createElement("style");
+    style.id = "spinnerStyle";
+    style.innerHTML = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+};
+
+const hidePopupLoading = () => {
+  const loadingPopup = document.getElementById("loadingPopup");
+  if (loadingPopup) loadingPopup.style.display = "none";
+};
+
+// Sécurité: définir applyRegexMask s'il n'existe pas (évite ReferenceError)
+if (typeof window.applyRegexMask !== 'function') {
+  window.applyRegexMask = (inputEl, regex) => {
+    if (!(inputEl instanceof HTMLElement) || !(regex instanceof RegExp)) return;
+    inputEl.addEventListener('input', () => {
+      const m = String(inputEl.value).match(regex);
+      inputEl.value = m ? m[0] : '';
+    });
+  };
+}
+
+/* POPUP  */
+const showCustomPopup = ({ title, commentHTML, fields, buttons }) => {
+  function getInput({
+    key,
+    name,
+    type,
+    options,
+    mask,
+    style,
+    defaultValue,
+    min,
+    max,
+    required,
+  }) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "popup-input";
+
+    const label = document.createElement("label");
+    label.textContent = name || key;
+    label.htmlFor = key;
+
+    let input;
+
+    switch (String(type || '').toLowerCase()) {
+      case "select":
+        input = document.createElement("select");
+        input.name = key;
+        if (style) input.style = style;
+        input.id = key;
+        (options || []).forEach(({ value, label }) => {
+          const opt = document.createElement("option");
+          opt.value = value;
+          opt.textContent = label;
+          input.appendChild(opt);
+        });
+        if (defaultValue !== undefined) input.value = defaultValue;
+        wrapper.append(label, input);
+        break;
+
+      case "checkbox":
+        input = document.createElement("input");
+        input.type = "checkbox";
+        input.name = key;
+        if (style) input.style = style;
+        input.id = key;
+        wrapper.classList.add("popup-input-row");
+        wrapper.append(input, label);
+        break;
+
+      case "number":
+        input = document.createElement("input");
+        input.type = "number";
+        input.name = key;
+        if (style) input.style = style;
+        if (defaultValue !== undefined) input.value = defaultValue;
+        if (min !== undefined) input.min = min;
+        if (max !== undefined) input.max = max;
+        if (required) input.required = true;
+        input.step = 1;
+        input.id = key;
+        input.addEventListener("input", () => {
+          input.value = input.value.replace(/[^\d]/g, "");
+        });
+        wrapper.append(label, input);
+        break;
+
+      case "label":
+        const span = document.createElement("span");
+        span.innerHTML = name || "";
+        if (style) span.style = style;
+        wrapper.appendChild(span);
+        break;
+
+      default:
+        input = document.createElement("input");
+        input.type = String(type || 'text').toLowerCase();
+        input.name = key;
+        if (style) input.style = style;
+        input.id = key;
+        if (defaultValue !== undefined) input.value = defaultValue;
+        if (mask instanceof RegExp) {
+          applyRegexMask(input, mask);
+        }
+        wrapper.append(label, input);
+        break;
+    }
+
+    if (required && input) {
+      label.innerHTML += ' <span style="color: red">*</span>';
+      input.dataset.required = "true";
+    }
+
+    return wrapper;
+  }
+
+  const overlay = document.createElement("div");
+  overlay.className = "popup-overlay";
+
+  const popup = document.createElement("div");
+  popup.className = "popup-box";
+
+  const style = document.createElement("style");
+  style.textContent = `
+  .popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeInOverlay 0.15s ease-out;
+  }
+
+  @keyframes fadeInOverlay {
+    from { background: rgba(0, 0, 0, 0); }
+    to   { background: rgba(0, 0, 0, 0.4); }
+  }
+
+  .popup-box {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    background: white;
+    border-radius: 0.375rem;
+    padding: 15px 25px;
+    width: 500px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    animation: fadeInScale 0.15s ease-out;
+  }
+
+  @keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .popup-box h1,
+  .popup-box h2,
+  .popup-box h3,
+  .popup-box p,
+  .popup-box span { color: #202127; }
+
+  .popup-box h2 { margin: 0 0 20px; font-size: 1.25rem; }
+
+  .popup-box p, .popup-box span { font-size: 1rem; }
+
+  .popup-comment { margin-bottom: 20px; }
+
+  .popup-input { display: flex; flex-direction: column; margin-bottom: 10px; }
+  .popup-input-row { flex-direction: row; align-items: center; gap: 10px; }
+
+  .popup-input label { margin-bottom: 5px; font-size: 12px; }
+
+  .popup-input input,
+  .popup-input select {
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+  }
+
+  .popup-buttons { display: flex; justify-content: flex-end; gap: 10px; }
+
+  .popup-buttons button {
+    border: none;
+    padding: 3px 30px;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 768px) {
+    .popup-input input, .popup-input select { width: 100%; }
+  }`;
+
+  popup.appendChild(style);
+
+  if (title) {
+    const titleElem = document.createElement("h2");
+    titleElem.textContent = title;
+    titleElem.style.fontWeight = "bold";
+    popup.appendChild(titleElem);
+  }
+
+  if (commentHTML) {
+    const comment = document.createElement("div");
+    comment.className = "popup-comment";
+    comment.innerHTML = commentHTML;
+    popup.appendChild(comment);
+  }
+
+  if (fields) {
+    for (const field of fields) popup.appendChild(getInput(field));
+  }
+
+  const buttonRow = document.createElement("div");
+  buttonRow.className = "popup-buttons";
+
+  if (buttons) {
+    for (const { name, onClick, backgroundColor, color, preset } of buttons) {
+      const btn = document.createElement("button");
+      btn.textContent = name;
+
+      switch (preset) {
+        case "action":
+          btn.style.backgroundColor = "#3182ce";
+          btn.style.color = "#f2f7fb";
+          break;
+        case "cancel":
+          btn.style.backgroundColor = "#f5f5f6";
+          btn.style.color = "#2c2d32";
+          break;
+        default:
+          btn.style.backgroundColor = "#3182ce";
+          btn.style.color = "#f2f7fb";
+          break;
+      }
+
+      if (backgroundColor) btn.style.backgroundColor = backgroundColor;
+      if (color) btn.style.color = color;
+
+      btn.onclick = () => {
+        const values = {};
+        const inputs = popup.querySelectorAll("input, select");
+        for (const el of inputs) {
+          values[el.name] = el.type === "checkbox" ? el.checked : el.value;
+        }
+
+       
+        const res = onClick(values);
+        if (res !== false) {
+          document.body.removeChild(overlay);
+        }
+      };
+
+      buttonRow.appendChild(btn);
+    }
+  }
+
+  popup.appendChild(buttonRow);
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+};
+
+const showPopupConfirmation = (titleInput, message, yesText = "Oui", noText = "Non") => {
+  return new Promise((resolve) => {
+    showCustomPopup({
+      title: titleInput,
+      commentHTML: message,
+      buttons: [
+        { name: noText,  backgroundColor: "#ffc9c9", color: "#1e1e1e", onClick: () => resolve(false) },
+        { name: yesText, backgroundColor: "#b2f2bb", color: "#1e1e1e", onClick: () => resolve(true) },
+      ],
+    });
+  });
+};
+
+/*  POPUP CRÉER L'INTERVENTION  */
+const showPopupCreerIntervention = (docData) => {
+  return new Promise((resolve) => {
+    const valeurEquipe = docData?.EquipeAbribus || "";
+    const valeurSousCat = docData?.["SousCatégorie1"] || "";
+
+    showCustomPopup({
+      title: "Créer l'intervention",
+      commentHTML: `
+        <p>Souhaitez-vous créer cette intervention ?</p>
+      `,
+      fields: [
+        {
+          key: "EquipeAbribus",
+          name: "Equipe",
+          type: "text",
+          style: "width: 100%;",
+          defaultValue: valeurEquipe,
+        },
+        {
+          key: "SousCategorie1",
+          name: "Sous catégorie 1 *",
+          type: "text",
+          style: "width: 100%;",
+          defaultValue: valeurSousCat,
+          required: true,
+        },
+      ],
+      buttons: [
+        {
+          name: "Non",
+          preset: "cancel",
+          onClick: () => {
+            resolve(null);
+          },
+        },
+        {
+          name: "Oui",
+          preset: "action",
+          onClick: (values) => {
+            const sousCat = String(values.SousCategorie1 || "").trim();
+
+            if (!sousCat) {
+              showErrorBanner("Le champ 'Sous catégorie 1' est obligatoire.");
+              return false; // garde la popup ouverte
+            }
+
+            resolve({
+              EquipeAbribus: String(values.EquipeAbribus || "").trim(),
+              SousCategorie1: sousCat,
+            });
+
+            return true; // ferme la popup
+          },
+        },
+      ],
+    });
+  });
+};
+
+
+const __displayError = (msg) => {
+  if (typeof showErrorBanner === 'function') return showErrorBanner(msg);
+  if (typeof showCustomPopup === 'function') {
+    return showCustomPopup({
+      title: 'Champs obligatoires manquants',
+      commentHTML: `<div>${msg}</div>`,
+      buttons: [{ name: 'OK', preset: 'action', onClick: () => {} }],
+    });
+  }
+  alert(msg);
+};
+
+/*VALIDATION: CHAMPS OBLIGATOIRES */
+const requireFields = (doc) => {
+  const REQUIRED = ['TypeIntervention', 'SousCatégorie1', 'DélaiSLA', 'NumAbribus'];
+  const missing = [];
+  for (const k of REQUIRED) {
+    const v = doc?.[k];
+    const s = v == null ? '' : String(v).trim();
+    if (!s) missing.push(k);
+  }
+  if (missing.length) {
+    __displayError(`Veuillez compléter les champs obligatoires:\n- ${missing.join('\n- ')}`);
+    throw new Error(`Champs obligatoires manquants: ${missing.join(', ')}`);
+  }
+};
+
+/*  FORMATAGE DONNÉES POUR L'API  */
+const DataCollection = (key, array) => {
+  const result = {};
+  const itemCount = array?.length || 0;
+  array?.forEach((obj, index) => {
+    Object.keys(obj || {}).forEach((k) => {
+      result[`${k}|${index + 1}`] = obj[k];
+    });
+  });
+  result[key] = String(itemCount);
+  return result;
+};
+
+const excludeKeys = (obj, keys) =>
+  Object.keys(obj || {}).reduce((res, k) => {
+    if (!keys.includes(k)) res[k] = obj[k];
+    return res;
+  }, {});
+
+const formatDataAPI = (data) => {
+  let formattedData = { ...data };
+  Object.keys(formattedData || {}).forEach((k) => {
+    if (Array.isArray(formattedData[k])) {
+      formattedData = { ...formattedData, ...DataCollection(k, formattedData[k]) };
+    }
+  });
+  return JSON.stringify(excludeKeys(formattedData, ['FORMID', 'NUMBER']));
+};
+
+/* STATUS / NOTIFS */
+const normalizeStatus = (s) =>
+  String(s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+
+const shouldNotifyStatusChange = (previousStatus) => {
+  const previousStatusNorm = normalizeStatus(previousStatus);
+  const targetStatusNorm = normalizeStatus(TARGET_STATUS);
+  return previousStatusNorm !== targetStatusNorm;
+};
+
+const shouldNotifySauveVitreTeam = (previousTeam, newTeam) =>
+  previousTeam !== newTeam && newTeam === EQUIPE_SAUVE_VITRES;
+
+/*  PAYLOAD */
+const buildDataPayload = (docData) => {
+  return docData;
+};
+
+const fetchCurrentDocumentData = async (api, formId) => {
+  try {
+    const res = await api({ local: true }).post('document/id', { ids: [formId] });
+    const doc = res?.data?.documents?.[0] || {};
+    return doc;
+  } catch (e) {
+    console.warn('[DB] database read failed', e);
+    return { status: null, data: {}, metaData: {} };
+  }
+};
+
+const extractFormId = (response) => {
+  const directId = response?.data?.id;
+  if (directId) return directId;
+  const location = response?.headers?.location;
+  if (typeof location === 'string') {
+    const parts = location.split('/');
+    return parts[parts.length - 1] || null;
+  }
+  return null;
+};
+
+const createDocument = async (api, data, templateId) => {
+  const payload = {
+    data: formatDataAPI(data),
+    status: TARGET_STATUS,
+    active: true,
+    template: { templateId },
+  };
+  const res = await api({ local: true }).post('document', { document: payload });
+  console.log('[CREATE][RAW]', res);
+  return extractFormId(res);
+};
+
+const updateDocument = async (api, data, templateId, formId) => {
+  const payload = {
+    data: formatDataAPI(data),
+    status: TARGET_STATUS,
+    active: true,
+    template: { templateId },
+    documentID: formId,
+  };
+  const res = await api({ local: true }).put('document', { document: payload });
+  console.log('[UPDATE][RAW]', res);
+  return formId;
+};
+
+/*  WEBHOOKS  */
+const callWebhook = async (webhookUrl, formId, webhookName = 'WEBHOOK') => {
+  const response = await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ids: [formId] }),
+  });
+
+  let body;
+  try {
+    body = await response.json();
+  } catch {
+    body = await response.text().catch(() => '');
+  }
+  console.log(`[${webhookName}]`, response.status, body);
+  return { status: response.status, body };
+};
+
+const callMainWebhook = async (shouldCall, formId) => {
+  if (!shouldCall) {
+    
+    return null;
+  }
+  return await callWebhook(WEBHOOK_URL, formId, 'WEBHOOK');
+};
+
+const callSauveVitresWebhook = async (shouldCall, formId) => {
+  if (!shouldCall) {
+   
+    return null;
+  }
+  return await callWebhook(WEBHOOK_SAUVE_VITRES_URL, formId, 'WEBHOOK_SAUVE_VITRES');
+};
+
+/* FLOW */
+const creerOuMettreAJourEtNotifier = async (api, docData, templateId) => {
+  requireFields(docData);
+
+  const isNew = Number(docData?.NUMBER) === 0;
+
+  let formId;
+  let shouldCallWebhook = false;
+  let shouldCallSauveVitresWebhook = false;
+  let data = buildDataPayload(docData);
+
+  if (isNew) {
+    formId = await createDocument(api, data, templateId);
+    shouldCallWebhook = true;
+
+    if (data.EquipeAbribus === EQUIPE_SAUVE_VITRES) {
+      shouldCallSauveVitresWebhook = true;
+    }
+  } else {
+    const formIdCandidate = String(docData?.FORMID || '').trim();
+    if (!formIdCandidate) throw new Error('FORMID manquant pour la mise à jour');
+
+    const current = await fetchCurrentDocumentData(api, formIdCandidate);
+
+    const previousStatus =
+      current?.metaData?.STATUS ?? current?.status ?? current?.STATUS ?? null;
+    const previousTeam = current?.data?.EquipeAbribus;
+
+    const duplicateNotifValue = String(data?.DuppliquerNotif || '').trim().toLowerCase();
+    const shouldForceWebhookByDuplicateNotif = duplicateNotifValue === 'true';
+
+    if (shouldForceWebhookByDuplicateNotif) {
+      shouldCallWebhook = true;
+      shouldCallSauveVitresWebhook = data.EquipeAbribus === EQUIPE_SAUVE_VITRES;
+      data = {
+        ...data,
+        DuppliquerNotif: 'false',
+      };
+    } else {
+      shouldCallWebhook = shouldNotifyStatusChange(previousStatus);
+      shouldCallSauveVitresWebhook = shouldNotifySauveVitreTeam(previousTeam, data.EquipeAbribus);
+    }
+
+    formId = await updateDocument(api, data, templateId, formIdCandidate);
+  }
+
+  
+
+  if (!formId) throw new Error("Impossible de déterminer l'ID du formulaire");
+
+  const webhookResult = await callMainWebhook(shouldCallWebhook, formId);
+  const sauveVitresResult = await callSauveVitresWebhook(shouldCallSauveVitresWebhook, formId);
+
+  return {
+    formId,
+    webhook: webhookResult,
+    webhookSauveVitres: sauveVitresResult,
+    mode: isNew ? 'create' : 'update',
+    webhookCalled: !!shouldCallWebhook,
+    webhookSauveVitresCalled: !!shouldCallSauveVitresWebhook,
+  };
+};
+
+const redirectToViewGroup = () => {
+const lastCustomPage = localStorage.getItem("lastCustomPage");
+if (lastCustomPage && lastCustomPage.startsWith("/")) {
+window.location.replace(lastCustomPage);
+return;
+}
+
+// fallback
+const pathname = window.location.pathname; // ex: "/repartition/ff1cb5c3-..."
+const segments = pathname.split("/").filter(Boolean); // ["repartition", "ff1cb5c3-..."]
+const basePath = segments.length > 0 ? `/${segments[0]}` : "/"; // "/repartition" ou "/"
+window.location.replace(basePath);
+};
+
+
+/* MAIN  */
+(async () => {
+  try {
+    console.log('[MAIN] start – NUMBER:', docData?.NUMBER, 'FORMID:', docData?.FORMID);
+
+    // 1) Popup "Créer l'intervention" avant de créer / mettre à jour
+    const popupResult = await showPopupCreerIntervention(docData);
+
+    if (popupResult === null) {
+      console.log('[MAIN] action annulée par l’utilisateur');
+      return;
+    }
+
+    // 2) Mettre à jour docData avec les valeurs de la popup
+    docData.EquipeAbribus = popupResult.EquipeAbribus;
+    docData["SousCatégorie1"] = popupResult.SousCategorie1;
+    // Mettre à jour InterventionDateCreationValide
+    docData.InterventionDateCreationValide =
+      docData?.CommandDate && typeof isFutureDate === "function"
+        ? isFutureDate(docData?.CommandDate)
+        : "Non";
+
+    // 3) Flow normal (création / maj + webhooks)
+    const out = await creerOuMettreAJourEtNotifier(api, docData, TEMPLATE_ID);
+    console.log('[MAIN] done:', out);
+
+    // Redirection finale
+	redirectToViewGroup();
+
+  } catch (e) {
+    console.error('[MAIN][ERREUR]', e);
+  }
+})();
+

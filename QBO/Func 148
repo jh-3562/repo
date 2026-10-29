@@ -1,0 +1,5 @@
+let qteTotale = parseFloat(docData['QuantiteProduitsNeufs']||0)+parseFloat(docData['QuantiteProduitsUsages']||0)
+let coutUnitaire = parseFloat(docData['CoutProduit']||0);
+let coutTotal = qteTotale*coutUnitaire;
+return  { 'CoutTotalProduit':`${coutTotal.toFixed(2)}` }
+

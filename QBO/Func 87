@@ -1,0 +1,14 @@
+const user = store.moduleStore?.user?.roles[0];
+
+if (user != 'ADMIN') {
+
+	console.log('fonction abribus ok')
+    return{'NumAbribus':true, 'LienGoogleMaps':true, 'NumArret':true,'EquipeAbribus':true,'PositionTournee':true,'Abribus_Adresse':true, 'Abribus_route':true, 'AdresseLieu':true, 'VilleLieu':true, 'Arrondissement':true, 'Abribus_province':true, 'Positionnement':true, 'Abribus_CodePostal':true,'LatitudeLieu':true, 'LongitudeLieu':true, 'Partenaire':true, 'Market':true, 'Abribus_Modele':true, 'DescriptionLieu':true,'Poubelle':true, 'Abribus_Deneigement':true, 'Abribus_Deneigement_Notes':true, 'LienFormIntervention':true,'UDF_Electricite_Statut':true,'UDF_Electricite_TypeAlimentation':true,'UDF_Face_Illumination_Hours':true,'UDF_Numero_Face1':true,'UDF_Electricite_IlluminationFace1':true,'DateRetraitFace1':true,'UDF_Numero_Face2':true,'UDF_Electricite_IlluminationFace2':true,'DateRetraitFace2':true,'UDF_Numero_Face3':true,'UDF_Electricite_IlluminationFace3':true,'DateRetraitFace3':true,'UDF_Numero_Face4':true,'UDF_Electricite_IlluminationFace4':true,'DateRetraitFace4':true,'DateInactif':true,'DateInactifFin':true,'UDF_AdManagerKey':true,'Seq':true,'DateDerInter':true,'FormIDDerInter':true}
+
+}
+
+else 
+
+	console.log('fonction abribus NON',context)
+	return{'NumAbribus':false, 'LienGoogleMaps':false, 'NumArret':false,'EquipeAbribus':false,'PositionTournee':false,'Abribus_Adresse':false, 'Abribus_route':false, 'AdresseLieu':false, 'VilleLieu':false, 'Arrondissement':false, 'Abribus_province':false, 'Positionnement':false, 'Abribus_CodePostal':false,'LatitudeLieu':false, 'LongitudeLieu':false, 'Partenaire':false, 'Market':false, 'Abribus_Modele':false, 'DescriptionLieu':false,'Poubelle':false, 'Abribus_Deneigement':false, 'Abribus_Deneigement_Notes':false, 'LienFormIntervention':false,'UDF_Electricite_Statut':false,'UDF_Electricite_TypeAlimentation':false,'UDF_Face_Illumination_Hours':false,'UDF_Numero_Face1':false,'UDF_Electricite_IlluminationFace1':false,'DateRetraitFace1':false,'UDF_Numero_Face2':false,'UDF_Electricite_IlluminationFace2':false,'DateRetraitFace2':false,'UDF_Numero_Face3':false,'UDF_Electricite_IlluminationFace3':false,'DateRetraitFace3':false,'UDF_Numero_Face4':false,'UDF_Electricite_IlluminationFace4':false,'DateRetraitFace4':false,'DateInactif':false,'DateInactifFin':false,'UDF_AdManagerKey':false,'Seq':false,'DateDerInter':false,'FormIDDerInter':false}
+

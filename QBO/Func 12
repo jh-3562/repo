@@ -1,0 +1,1 @@
+return docData['When value is 3'] === '3'?{'Empty init': 'Fastercom'}: undefined;

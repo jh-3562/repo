@@ -1,0 +1,1 @@
+if (docData['DateDue'] && new Date(docData['DateDue']) > new Date('TODAY')) { return { backgroundColor: '#cff8bd', }; } else if (docData['DateDue'] && new Date(docData['DateDue']) < new Date('TODAY')) { return { backgroundColor: '#f57474', }; }

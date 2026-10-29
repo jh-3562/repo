@@ -1,0 +1,250 @@
+console.log('Function 243', context);
+
+const TEMPLATE_ID = 'f7b9a59a-e708-45c4-b786-2a5130cfee2b';
+const TARGET_STATUS_OPT = 'À optimiser';
+const PREVENT_NOTIFY = "FULL";
+const DATE_FIELD_KEY = "CommandDate";
+
+// -------------------- BANNERS --------------------
+const showSuccessBanner = (msg) => {
+  const el = document.createElement('div');
+  el.style = `
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    background: white; color: black;
+    padding: 12px 18px; border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.35);
+    z-index: 99999; white-space: pre-line;
+  `;
+  el.innerHTML = `<span style="color:green;font-weight:700;">✔</span> ${msg}`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1800);
+};
+
+const showErrorBanner = (msg) => {
+  const el = document.createElement('div');
+  el.style = `
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    background: white; color: black;
+    padding: 12px 18px; border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.35);
+    z-index: 99999; white-space: pre-line;
+  `;
+  el.innerHTML = `<span style="color:red;font-weight:700;">⚠</span> ${msg}`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2200);
+};
+
+// -------------------- LOADING --------------------
+const showPopupLoading = (loadingMessage) => {
+  const el = document.createElement("div");
+  el.id = "loadingPopup";
+  el.style = `
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999;
+  `;
+  el.innerHTML = `
+    <div style="background:white;padding:20px;border-radius:6px;display:flex;flex-direction:column;align-items:center;">
+      <div>${loadingMessage}</div>
+      <div style="border:6px solid #f3f3f3;border-top:6px solid #3498db;border-radius:50%;width:40px;height:40px;margin-top:20px;animation:spin 1s linear infinite;"></div>
+    </div>
+  `;
+  document.body.appendChild(el);
+  if (!document.getElementById("spinnerStyle")) {
+    const style = document.createElement("style");
+    style.id = "spinnerStyle";
+    style.innerHTML = `@keyframes spin {0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}`;
+    document.head.appendChild(style);
+  }
+};
+
+const hidePopupLoading = () => {
+  const el = document.getElementById("loadingPopup");
+  if (el) el.remove();
+};
+
+// -------------------- DATE HELPERS --------------------
+const pad = (n) => String(n).padStart(2,'0');
+const todayYYYYMMDD = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+};
+
+// -------------------- POPUP --------------------
+const showPopupCommande = (defaultValue) => {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.style = `
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.35);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 99998;
+    `;
+
+    const box = document.createElement("div");
+    box.style = `
+      width: 420px; background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      font-family: system-ui;
+    `;
+
+    box.innerHTML = `
+      <h2 style="margin:0 0 10px 0;">Passer à "À optimiser"</h2>
+      <p style="margin:0 0 10px 0;">Date de commande <b>(obligatoire)</b></p>
+      <input id="cmdDate" type="date" value="${defaultValue || todayYYYYMMDD()}"
+        style="width:100%;height:40px;font-size:16px;margin-bottom:15px"/>
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <button id="noBtn">Non</button>
+        <button id="yesBtn" style="background:#1f6feb;color:white;border:none;padding:8px 14px;border-radius:6px;">Oui</button>
+      </div>
+    `;
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    box.querySelector('#noBtn').onclick = () => { overlay.remove(); resolve(null); };
+    box.querySelector('#yesBtn').onclick = () => {
+      const v = String(box.querySelector('#cmdDate').value || '').trim();
+      if (!v) return showErrorBanner("Le champ CommandDate est obligatoire.");
+      overlay.remove();
+      resolve(v);
+    };
+  });
+};
+
+// -------------------- FORMAT DATA --------------------
+const DataCollection = (key, array) => {
+  let result = {};
+  let itemCount = array?.length || 0;
+  array?.forEach((obj, index) => {
+    Object.keys(obj || {}).forEach((k) => {
+      result[`${k}|${index + 1}`] = obj[k];
+    });
+  });
+  result[key] = String(itemCount);
+  return result;
+};
+
+const excludeKeys = (obj, keys) =>
+  Object.keys(obj || {}).reduce((res, k) => {
+    if (!keys.includes(k)) res[k] = obj[k];
+    return res;
+  }, {});
+
+const formatDataAPI = (data) => {
+  let d = { ...(data || {}) };
+  Object.keys(d || {}).forEach((k) => {
+    if (Array.isArray(d[k])) d = { ...d, ...DataCollection(k, d[k]) };
+  });
+  return JSON.stringify(excludeKeys(d, ['FORMID', 'NUMBER']));
+};
+
+// -------------------- CREATE / UPDATE --------------------
+async function creerOuMettreAJour_A_OPTIMISER(api, docData, templateId, commandDate) {
+  const ret = isValidDocument(t, docData);
+  console.log('[DEBUG][isValidDocument][RETURN]', ret, 'type:', typeof ret);
+
+  if (ret !== undefined) {
+    console.log('[STOP] Validation KO (ret != undefined) -> on sort');
+    return null;
+  }
+
+  const number = Number(docData?.NUMBER);
+  let formId = String(docData?.FORMID || '').trim();
+
+  const stampedData = {
+    ...(docData || {}),
+    [DATE_FIELD_KEY]: commandDate,
+  };
+
+  showPopupLoading('Mise à jour "À optimiser" en cours...');
+  try {
+    if (number === 0) {
+      const payloadCreate = {
+        data: formatDataAPI(stampedData),
+        status: TARGET_STATUS_OPT,
+        active: true,
+        template: { templateId },
+      };
+      console.log('[OPT][POST][PAYLOAD]', payloadCreate);
+
+      const res = await api({ local: true }).post('document', {
+        document: payloadCreate,
+        preventNotify: PREVENT_NOTIFY,
+      });
+
+      console.log('[OPT][POST][RAW]', res);
+      formId = res?.data?.id || res?.headers?.location?.split('/').pop() || null;
+    } else {
+      if (!formId) throw new Error('FORMID manquant pour la mise à jour');
+
+      const payloadUpdate = {
+        data: formatDataAPI(stampedData),
+        status: TARGET_STATUS_OPT,
+        active: true,
+        template: { templateId },
+        documentID: formId,
+      };
+      console.log('[OPT][PUT][PAYLOAD]', payloadUpdate);
+
+      const res = await api({ local: true }).put('document', {
+        document: payloadUpdate,
+        preventNotify: PREVENT_NOTIFY,
+      });
+
+      console.log('[OPT][PUT][RAW]', res);
+    }
+  } finally {
+    hidePopupLoading();
+  }
+
+  if (!formId) throw new Error("Impossible de déterminer l'ID du formulaire");
+  return formId;
+}
+
+const redirectToViewGroup = () => {
+	const lastCustomPage = localStorage.getItem("lastCustomPage");
+	if (lastCustomPage && lastCustomPage.startsWith("/")) {
+	window.location.replace(lastCustomPage);
+	return;
+	}
+	
+	// fallback
+	const pathname = window.location.pathname; // ex: "/repartition/ff1cb5c3-..."
+	const segments = pathname.split("/").filter(Boolean); // ["repartition", "ff1cb5c3-..."]
+	const basePath = segments.length > 0 ? `/${segments[0]}` : "/"; // "/repartition" ou "/"
+	window.location.replace(basePath);
+};
+
+// -------------------- RUN --------------------
+(async () => {
+  try {
+    const defaultDate = String(docData?.[DATE_FIELD_KEY] || '').trim() || todayYYYYMMDD();
+    const date = await showPopupCommande(defaultDate);
+    if (!date) return;
+    
+    // Mettre à jour InterventionDateCreationValide
+    const updateDocData = {
+      ...docData,
+      InterventionDateCreationValide:
+        docData?.CommandDate && typeof isFutureDate === "function"
+          ? isFutureDate(docData?.CommandDate)
+          : "Non",
+    };
+    docData = updateDocData;
+
+    const formId = await creerOuMettreAJour_A_OPTIMISER(api, docData, TEMPLATE_ID, date);
+    if (!formId) return;
+
+    showSuccessBanner(`Statut mis à jour : ${TARGET_STATUS_OPT}\nFormID : ${formId}`);
+    setTimeout(() => { redirectToViewGroup(); }, 900);
+
+  } catch (e) {
+    showErrorBanner(String(e?.message || e || 'Erreur inconnue'));
+    console.error('[OPT][ERREUR]', e);
+  }
+})();
+

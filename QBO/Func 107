@@ -1,0 +1,13 @@
+const role = store.moduleStore?.user?.roles[0]
+
+if (role == 'DRIVER') {
+	api()
+	.get(`https://interface.quebecor.fasterlogistic.com/webhook/dd023aaa-2fe9-470d-9a49-c5fe978501de?date=`+store.pageContentStore.processData[0].filters[0].value+`&statut=`+store.pageContentStore.processData[0].filters[1].value+`&arrondissement=`+store.pageContentStore.processData[0].filters[2].value+`&equipe=`+store.moduleStore.user.filters[0].value+`&typewo=`+store.pageContentStore.processData[0].filters[4].value+`&souscategorie=`+store.pageContentStore.processData[0].filters[5].value)
+	.then(console.log('Optimisation lancée - chauffeur') && callback([]));
+}
+
+else {
+	api()
+	.get(`https://interface.quebecor.fasterlogistic.com/webhook/dd023aaa-2fe9-470d-9a49-c5fe978501de?date=`+store.pageContentStore.processData[0].filters[0].value+`&statut=`+store.pageContentStore.processData[0].filters[1].value+`&arrondissement=`+store.pageContentStore.processData[0].filters[2].value+`&equipe=`+store.pageContentStore.processData[0].filters[3].value+`&typewo=`+store.pageContentStore.processData[0].filters[4].value+`&souscategorie=`+store.pageContentStore.processData[0].filters[5].value)
+	.then(console.log('Optimisation lancée - admin') && callback([]));
+}

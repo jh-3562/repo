@@ -1,0 +1,8 @@
+const user = store.moduleStore?.user?.roles[0];
+
+if (user === 'DRIVER'&&docData['STATUS'] != 'Draft') {
+
+		console.log(docData['STATUS'])
+        return{'SousCatégorie1':true, 'DateDue':true, 'NumAbribus':true, 'DélaiSLA':true, 'CommandDate':true, 'NumArret':true, 'Abribus_Adresse':true, 'Abribus_route':true, 'AdresseLieu':true, 'VilleLieu':true, 'Arrondissement':true, 'Abribus_province':true, 'Positionnement':true, 'Abribus_CodePostal':true, 'LatitudeLieu':true, 'LongitudeLieu':true, 'Partenaire':true, 'Market':true, 'Abribus_Modele':true, 'DescriptionLieu':true, 'Poubelle':true, 'Abribus_Deneigement':true, 'Abribus_Deneigement_Notes':true, 'LienGoogleMaps':true, 'UDF_Electricite_Statut':true, 'UDF_Electricite_TypeAlimentation':true, 'UDF_Face_Illumination_Hours':true, 'UDF_Numero_Face4':true, 'UDF_Numero_Face3':true, 'UDF_Numero_Face1':true, 'UDF_Numero_Face2':true, 'UDF_Electricite_IlluminationFace4':true, 'UDF_Electricite_IlluminationFace2':true, 'UDF_Electricite_IlluminationFace1':true, 'UDF_Electricite_IlluminationFace3':true, 'UDF_AdManagerKey':true,'PositionTournee':true}
+
+    }

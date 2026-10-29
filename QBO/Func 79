@@ -1,0 +1,15 @@
+const { TypeIntervention, SousCatégorie1 } = docData;
+
+const isNumerique = SousCatégorie1 === "Numérique";
+const isDeploiementNumerique =
+  isNumerique && TypeIntervention === "Déploiement";
+const isInterventionNumerique = isNumerique && TypeIntervention === "Numérique";
+
+const res = {
+  Photo_NumeroDeSerie:
+    isDeploiementNumerique || isInterventionNumerique ? true : null,
+  Photo_FaceInt: isInterventionNumerique ? true : null,
+  Photo_FaceExt: isInterventionNumerique ? true : null,
+};
+
+return res;

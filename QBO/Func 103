@@ -1,0 +1,2 @@
+return docData['TypeIntervention'] === 'Entretien - Spécial' || (docData['TypeIntervention'] === 'Travaux saisonniers' && docData['SousCatégorie1'] === 'Autre') ?
+{'Photo_AbribusAvantIntervention': true,'Photo_AbribusApresIntervention': true}: {'Photo_AbribusAvantIntervention': null,'Photo_AbribusApresIntervention': null};

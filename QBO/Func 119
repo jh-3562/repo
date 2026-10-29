@@ -1,0 +1,13 @@
+if (docData["Poubelle"]==='Poubelle à faire') {
+
+	if (docData['SousCatégorie1'] === 'Régulier'||docData['TypeIntervention'] === 'Déneigement'&&docData['SousCatégorie1'] === 'Dalle'||docData['TypeIntervention'] === 'Déneigement'&&docData['SousCatégorie1'] === 'Plainte'||docData['SousCatégorie1'] === 'Accès pub'||docData['SousCatégorie1'] === 'Déglaçage'||docData['SousCatégorie1'] === 'Mécanique') {    
+	
+		return {'Photo_DeneigementPoubelles': true}
+		
+		}
+		
+	else return {'Photo_DeneigementPoubelles': null}
+	
+	}
+	
+else return {'Photo_DeneigementPoubelles': null}

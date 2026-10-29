@@ -1,0 +1,4 @@
+console.log('231',context);
+return {
+  'Intervention_SetionCachee': store.moduleStore.user.roles.includes('ADMIN') ? true : null
+}

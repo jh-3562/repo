@@ -1,0 +1,10 @@
+console.log("240", context);
+
+return {
+  // Si c’est un nouveau document (NUMBER = 0)
+  ButtonImportation:
+    Number(docData.NUMBER) === 0 ? true : null,
+
+  
+};
+

@@ -1,0 +1,1 @@
+return { 'RaisonNonComplétionComment': docData['RaisonNonComplétion'] != 'Autre' ? null : true };

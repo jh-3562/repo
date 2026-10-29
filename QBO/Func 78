@@ -1,0 +1,2 @@
+return docData['TypeIntervention'] === 'Déploiement'&&docData['SousCatégorie1'] === 'Numérique' ?    
+{'Photo_GrosPlanFaceExt': true    }: {'Photo_GrosPlanFaceExt': null    };

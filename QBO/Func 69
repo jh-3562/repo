@@ -1,0 +1,2 @@
+return docData['SousCatégorie1'] === 'Sécurisation' ?    
+{'Photo_SiteApresSecurisation': true    }: {'Photo_SiteApresSecurisation': null    };

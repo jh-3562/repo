@@ -1,0 +1,1 @@
+if (docData['Partenaire'] === 'Montréal') { return { color: 'white',backgroundColor: '#0000e6', }; } else if (docData['Partenaire'] === 'Laval') { return { color: 'white',backgroundColor: '#2275BE', }; } else if (docData['Partenaire'] === 'Longueuil') { return { color: 'white',backgroundColor: '#721BC0', }; }

@@ -1,0 +1,101 @@
+console.log('245', context);
+
+const showSuccessBanner = (msg) => {
+  const el = document.createElement('div');
+  el.style = `
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    color: black;
+    padding: 12px 18px;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.35);
+    z-index: 99999;
+  `;
+  el.innerHTML = `<span style="color:green;font-weight:700;">✔</span> ${msg}`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1800);
+};
+
+const showErrorBanner = (msg) => {
+  const el = document.createElement('div');
+  el.style = `
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    color: black;
+    padding: 12px 18px;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.35);
+    z-index: 99999;
+  `;
+  el.innerHTML = `<span style="color:red;font-weight:700;">⚠</span> ${msg}`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2400);
+};
+
+const getToken = () => {
+  const keys = ['token', 'access_token', 'accessToken', 'jwt', 'JWT', 'authToken', 'AUTH_TOKEN'];
+  for (const k of keys) {
+    const v = localStorage.getItem(k) || sessionStorage.getItem(k);
+    if (v && String(v).trim()) return String(v).trim();
+  }
+  return '';
+};
+
+const imprimerInterventionPDF = async (formId) => {
+  const apiUrl = `${window.location.origin}/api/document/download/Intervention/PDF/${encodeURIComponent(formId)}`;
+
+  const token = getToken();
+  if (!token) throw new Error('Token manquant (localStorage/sessionStorage)');
+
+  const res = await fetch(apiUrl, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json, application/pdf'
+    }
+  });
+
+  if (!res.ok) throw new Error(`Erreur PDF (${res.status})`);
+
+  const ct = (res.headers.get('content-type') || '').toLowerCase();
+
+  if (ct.includes('application/pdf')) {
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    window.open(blobUrl, '_blank', 'noopener');
+    setTimeout(() => { try { URL.revokeObjectURL(blobUrl); } catch {} }, 30000);
+    return true;
+  }
+
+  const data = await res.json();
+  const fileUrl = String(data?.fileUrl || '').trim();
+  if (!fileUrl) throw new Error('fileUrl manquant');
+
+  const fullUrl = fileUrl.startsWith('http')
+    ? fileUrl
+    : `${window.location.origin}${fileUrl.startsWith('/') ? '' : '/'}${fileUrl}`;
+
+  window.open(fullUrl, '_blank', 'noopener');
+  return true;
+};
+
+(async () => {
+  try {
+    const formId = String(docData?.FORMID || '').trim();
+    if (!formId) throw new Error('FORMID manquant');
+
+    await imprimerInterventionPDF(formId);
+    showSuccessBanner(`PDF ouvert (FormID : ${formId})`);
+  } catch (e) {
+    showErrorBanner(String(e?.message || e));
+    console.error('[PRINT][ERREUR]', e);
+  }
+})();
+

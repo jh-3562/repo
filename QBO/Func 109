@@ -1,0 +1,147 @@
+console.log('Function 109')
+var date = new Date()
+var dateDue = new Date()
+
+if (
+  (docData['TypeIntervention'] === 'URGENCE' &&
+    docData['SousCatégorie1'] === 'Désinstallation') ||
+  (docData['TypeIntervention'] === 'URGENCE' &&
+    docData['SousCatégorie1'] === 'Débranchement') ||
+  docData['SousCatégorie1'] === 'Sécurisation'
+) {
+  dateDue.setHours(dateDue.getHours() + 4)
+} else if (
+  docData['TypeIntervention'] === 'Déneigement' &&
+  docData['SousCatégorie1'] === 'Plainte'
+) {
+  dateDue.setHours(dateDue.getHours() + 12)
+} else if (
+  docData['SousCatégorie1'] === 'Régulier - HIVER' ||
+  (docData['TypeIntervention'] === 'Réparation' &&
+    docData['SousCatégorie1'] === 'Verre') ||
+  docData['SousCatégorie1'] === 'Régulier' ||
+  docData['SousCatégorie1'] === 'Accès pub' ||
+  docData['SousCatégorie1'] === 'Déglaçage' ||
+  docData['SousCatégorie1'] === 'Mécanique' ||
+  (docData['TypeIntervention'] === 'Travaux' &&
+    docData['SousCatégorie1'] === 'Débranchement Tardif') ||
+  (docData['TypeIntervention'] === 'Travaux' &&
+    docData['SousCatégorie1'] === 'Rebranchement Tardif') ||
+  (docData['TypeIntervention'] === 'Travaux' &&
+    docData['SousCatégorie1'] === 'Finition') ||
+  (docData['TypeIntervention'] === 'Déploiement' &&
+    docData['SousCatégorie1'] === 'Finition') ||
+  (docData['TypeIntervention'] === 'Entretien - Spécial' &&
+    docData['SousCatégorie1'] === 'Après installation')
+) {
+  dateDue.setDate(dateDue.getDate() + 3)
+} else if (
+  docData['SousCatégorie1'] === 'Régulier - NUM' ||
+  docData['SousCatégorie1'] === 'Affichage'
+) {
+  dateDue.setDate(dateDue.getDate() + 2)
+} else if (
+  docData['SousCatégorie1'] === 'Poubelle' ||
+  docData['SousCatégorie1'] === 'Collant' ||
+  docData['SousCatégorie1'] === 'Graffiti' ||
+  (docData['TypeIntervention'] === 'Entretien - Spécial' &&
+    docData['SousCatégorie1'] === 'Plainte') ||
+  (docData['TypeIntervention'] === 'Réparation' &&
+    docData['SousCatégorie1'] === 'Verre Pub') ||
+  (docData['TypeIntervention'] === 'Signalement' &&
+    docData['SousCatégorie1'] === 'Verre Pub') ||
+  docData['SousCatégorie1'] === 'Banc' ||
+  docData['SousCatégorie1'] === 'Velcro' ||
+  (docData['TypeIntervention'] === 'Signalement' &&
+    docData['SousCatégorie1'] === 'Verre') ||
+  docData['SousCatégorie1|Signalement'] === 'Vandalisme' ||
+  (docData['TypeIntervention'] === 'Signalement' &&
+    docData['SousCatégorie1'] === 'Structure') ||
+  docData['SousCatégorie1'] === 'Riveter Velcro' ||
+  docData['SousCatégorie1'] === 'Diffuseur anomalie' ||
+  docData['SousCatégorie1'] === 'Abribus absent' ||
+  docData['SousCatégorie1'] === 'Inaccessible' ||
+  docData['SousCatégorie1'] === 'Vis coincée' ||
+  (docData['TypeIntervention'] === 'Numérique' &&
+    docData['SousCatégorie1'] === 'Dépannage') ||
+  docData['SousCatégorie1'] === 'Tâches désinstallation' ||
+  docData['SousCatégorie1'] === 'Tâches installation'
+) {
+  dateDue.setDate(dateDue.getDate() + 1)
+} else if (
+  docData['SousCatégorie1'] === 'Conversion' ||
+  docData['SousCatégorie1'] === 'Nouveau Site' ||
+  (docData['TypeIntervention'] === 'Déploiement' &&
+    docData['SousCatégorie1'] === 'Numérique') ||
+  (docData['TypeIntervention'] === 'Déploiement' &&
+    docData['SousCatégorie1'] === 'Dalle') ||
+  (docData['TypeIntervention'] === 'Déploiement' &&
+    docData['SousCatégorie1'] === 'Débranchement') ||
+  (docData['TypeIntervention'] === 'Déploiement' &&
+    docData['SousCatégorie1'] === 'Rebranchement') ||
+  (docData['TypeIntervention'] === 'Déploiement' &&
+    docData['SousCatégorie1'] === 'Autre') ||
+  (docData['TypeIntervention'] === 'Déploiement' &&
+    docData['SousCatégorie1'] === 'Installation') ||
+  (docData['TypeIntervention'] === 'Déploiement' &&
+    docData['SousCatégorie1'] === 'Désinstallation') ||
+  docData['SousCatégorie1'] === 'Herbes'
+) {
+  dateDue.setMonth(dateDue.getMonth() + 1)
+} else if (
+  docData['SousCatégorie1'] === 'Herbes/Émondage' ||
+  docData['SousCatégorie1'] === 'Pression' ||
+  (docData['TypeIntervention'] === 'Entretien - Spécial' &&
+    docData['SousCatégorie1'] === 'Diffuseur') ||
+  (docData['TypeIntervention'] === 'Travaux saisonniers' &&
+    docData['SousCatégorie1'] === 'Diffuseur') ||
+  docData['SousCatégorie1'] === 'Numéro'
+) {
+  dateDue.setMonth(dateDue.getMonth() + 3)
+} else if (
+  (docData['TypeIntervention'] === 'Travaux' &&
+    docData['SousCatégorie1'] === 'Débranchement HQ') ||
+  (docData['TypeIntervention'] === 'Travaux' &&
+    docData['SousCatégorie1'] === 'Rebranchement HQ') ||
+  (docData['TypeIntervention'] === 'Déploiement' &&
+    docData['SousCatégorie1'] === 'Branchement HQ') ||
+  (docData['TypeIntervention'] === 'Déploiement' &&
+    docData['SousCatégorie1'] === 'Débranchement HQ')
+) {
+  dateDue.setMonth(dateDue.getMonth() + 6)
+} else if (docData['SousCatégorie1'] === 'Régulier - ÉTÉ' || docData['SousCatégorie1'] === 'Régulier - Supplémentaire') {
+  dateDue.setDate(dateDue.getDate() + 4)
+} else if (
+  docData['SousCatégorie1'] === 'Drive' ||
+  (docData['TypeIntervention'] === 'Déneigement' &&
+    docData['SousCatégorie1'] === 'Dalle') ||
+  docData['SousCatégorie1'] === 'Vérification' ||
+  (docData['TypeIntervention'] === 'Polissage' &&
+    docData['SousCatégorie1'] === 'Verre') ||
+  docData['SousCatégorie1'] === 'Inox' ||
+  docData['SousCatégorie1'] === 'Braquette' ||
+  (docData['TypeIntervention'] === 'Réparation' &&
+    docData['SousCatégorie1'] === 'Structure') ||
+  docData['SousCatégorie1'] === 'Vis' ||
+  (docData['TypeIntervention'] === 'Réparation' &&
+    docData['SousCatégorie1'] === 'Diffuseur') ||
+  docData['SousCatégorie1'] === 'Toit' ||
+  (docData['TypeIntervention'] === 'Réparation' &&
+    docData['SousCatégorie1'] === 'Autre') ||
+  (docData['TypeIntervention'] === 'Travaux' &&
+    docData['SousCatégorie1'] === 'Désinstallation') ||
+  docData['SousCatégorie1'] === 'Réinstallation' ||
+  (docData['TypeIntervention'] === 'Travaux' &&
+    docData['SousCatégorie1'] === 'Dalle') ||
+  (docData['TypeIntervention'] === 'Travaux' &&
+    docData['SousCatégorie1'] === 'Autre') ||
+  (docData['TypeIntervention'] === 'Numérique' &&
+    docData['SousCatégorie1'] === 'Numérique')
+) {
+  dateDue.setDate(dateDue.getDate() + 7)
+} else {
+  console.log(docData['DélaiSLA'])
+  dateDue.setDate(dateDue.getDate() + 1)
+}
+dateDue.setMinutes(dateDue.getMinutes() - dateDue.getTimezoneOffset())
+return { DateDue: dateDue.toISOString().substring(0, 19) }

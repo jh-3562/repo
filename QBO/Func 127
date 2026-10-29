@@ -1,0 +1,35 @@
+if (docData['Kit']) {
+    const mapping = [
+        { from: 'Produit_CodeFournisseur', to: 'Kit|2|codeFournisseur' }
+    ];
+    const filters = [
+    ];
+    const collection = docData['Kit'];     //Key de la collection
+    const currentRow = collection[indexItemChange];    //A ne pas toucher
+    const searchField = 'Kit|1|Produit';             //Key du champs address dans la collection
+    const searchValue = currentRow[searchField];    //Ne pas toucher
+    if (searchValue) {
+        api({ local: true })
+            .post(
+                `suggestion?fieldID=${'6291112B-8F33-402A-936C-775F802E2AB7'}&fieldValue=${searchValue}`, { filters })
+            .then(res => {
+                if (res?.data?.suggestions?.length > 0) {
+                    callback({
+                        suggestions: {
+                            [searchField]: res.data?.suggestions.map(s => ({
+                                title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                                    ...a,
+                                    value: a.value || '',
+                                    key: mapping.find(m => m.from === a.key).to,
+                                }))
+                            }))
+                        }
+                    })
+                }
+                else { callback({ suggestions:{ [searchField]:[] }}) }
+            })
+    }
+    else {
+        callback({ suggestions:{ [searchField]:[] }});
+    }
+    }

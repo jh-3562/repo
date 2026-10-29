@@ -1,0 +1,3 @@
+let qteTotale = parseFloat(docData['QuantiteProduitsNeufs']||0)+parseFloat(docData['QuantiteProduitsUsages']||0);
+return  { 'QuantiteTotaleProduit':`${qteTotale.toFixed(0)}` }
+

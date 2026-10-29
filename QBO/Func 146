@@ -1,0 +1,195 @@
+//console.log(context);
+// store
+const batchData0 = store.pageContentStore.processData[0].edits;
+const batchData1 = store.pageContentStore.processData[1].edits;
+console.log('batchData0', batchData0);
+console.log('batchData1', batchData1);
+
+// constant
+const templateId = '87CBDB19-0AD7-45CE-80D1-34D3A00DC174';
+const domaine = window.location.origin;
+const gridName = 'TableAbribusSequencement2';
+
+let nbAbribus = 0;
+
+const seqCollecKey = 'Seq';
+const seqCollecKeys = {
+    Equipe: 'Seq|1|Equipe',
+    Frequence: 'Seq|3|Frequence',
+    Periode: 'Seq|4|Periode',
+    Categorie: 'Seq|6|SousCategorie',
+};
+
+// list of collection keys whose data is grouped together
+const groupedDataCollec = [
+    'Seq|3|Frequence',
+    'Seq|4|Periode',
+    'Seq|6|SousCategorie',
+];
+
+const formFilter = {
+    Abribus_Modele: batchData0.ModeleFiltre,
+    EquipeAbribus: batchData0.EquipeFiltre,
+    Arrondissement: batchData0.ArrondissementFiltre,
+    STATUS: batchData0.StatutFiltre,
+    Partenaire: batchData0.PartenaireFiltre,
+};
+const collecFilter = {
+    [seqCollecKeys.Frequence]: batchData0[seqCollecKeys.Frequence],
+    [seqCollecKeys.Categorie]: batchData0[seqCollecKeys.Categorie],
+};
+
+// fonction
+const getCollecRowstoUpdate = (rows, filter) =>
+    rows.reduce((results, { status, rowID, data }) => {
+        const collecRowstoUpdate = Object.entries(data)
+            .reduce((acc, [key, value]) => {
+                if (key.startsWith(seqCollecKey + '|')) {
+                    if (groupedDataCollec.includes(key)) {
+                        const parts = value.split('\\');
+
+                        parts.forEach((part, index) => {
+                            const collecNum = index + 1;
+                            acc[collecNum] = acc[collecNum] || { collecNum };
+                            acc[collecNum][key] = part;
+                        });
+                    } else {
+                        const parts = key.split('|');
+                        const collecNum = parseInt(parts.pop());
+                        const baseKey = parts.join('|');
+
+                        acc[collecNum] = acc[collecNum] || { collecNum };
+                        acc[collecNum][baseKey] = value;
+                    }
+                }
+                return acc;
+            }, [])
+            .filter(Boolean);
+
+        const filterCollecRowstoUpdate = Object.values(collecRowstoUpdate).filter(
+            (collecRow) =>
+                (!filter[seqCollecKeys.Frequence] ||
+                    collecRow[seqCollecKeys.Frequence] ===
+                    filter[seqCollecKeys.Frequence]) &&
+                (!filter[seqCollecKeys.Categorie] ||
+                    collecRow[seqCollecKeys.Categorie] ===
+                    filter[seqCollecKeys.Categorie])
+        );
+
+        const newData = {};
+        Object.entries(batchData1).forEach(([key, value]) => {
+            if (value) {
+                const processKey = (array) => {
+                    array.forEach((item) => {
+                        newData[`${key}|${item.collecNum}`] = value;
+                    });
+                };
+
+                if (key === seqCollecKeys.Periode || key === seqCollecKeys.Frequence) {
+                    processKey(filterCollecRowstoUpdate);
+                } else if (key === seqCollecKeys.Equipe) {
+                    processKey(collecRowstoUpdate);
+                    newData['EquipeAbribus'] = value;
+                }
+            }
+        });
+
+        if (filterCollecRowstoUpdate.length) {
+            results.push({
+                status,
+                rowID,
+                newData,
+            });
+        }
+
+        return results;
+    }, []);
+
+const getUrlFilter = (domaine, gridName, filter) =>
+    domaine +
+    '/api/tabledata/' +
+    gridName +
+    '?' +
+    Object.entries(filter)
+        .map(([key, value]) => (value ? `&fields=${key}&values=${value}` : ''))
+        .join('');
+
+const createOrUpdateElement = (id, tag, style, innerHTML = '') => {
+    let element = document.getElementById(id);
+    if (!element) {
+        element = document.createElement(tag);
+        element.id = id;
+        document.body.appendChild(element);
+    }
+    element.style = style;
+    element.innerHTML = innerHTML;
+    return element;
+};
+
+const updateDocuments = async (documentsToUpdate) => {
+    try {
+        const response = await api({ local: true }).put("document/Many", {
+            documents: documentsToUpdate,
+        });
+
+        return response?.data?.documents || [];
+    } catch (error) {
+        console.error("Failed to update documents:", error);
+        return [];
+    }
+};
+
+// api
+const apiCall = async () => {
+    try {
+        const grid = await api({ local: true }).get(
+            getUrlFilter(domaine, gridName, formFilter)
+        );
+
+        const rows = grid?.data?.tableData?.rows;
+        rows?.forEach((row) => (row.data = JSON.parse(row.data)));
+
+        if (rows?.length > 0) {
+
+            // ⛔ FILTRE RUE SUPPRIMÉ
+            const filterRows = rows;
+
+            if (filterRows.length > 0) {
+                console.log('filterRows', filterRows);
+
+                const updatable = getCollecRowstoUpdate(filterRows, collecFilter);
+
+                const documents = updatable.map(({ rowID, status, newData }) => ({
+                    data: JSON.stringify(newData),
+                    status: status,
+                    active: true,
+                    template: { templateId: templateId },
+                    documentID: rowID,
+                }));
+
+                console.log('documents', documents);
+                nbAbribus = documents.length;
+
+                await updateDocuments(documents);
+            }
+        }
+    } catch (error) {
+        console.error('Erreur des appels api:', error);
+        throw error;
+    }
+};
+
+const process = async () => {
+    showPopupLoading("Modification en cours...");
+    try {
+        await apiCall();
+        await hidePopupLoading();
+        await showSuccessBanner(nbAbribus + " abribus mis à jour.");
+    } catch (error) {
+        hidePopupLoading();
+        console.error(error);
+    }
+};
+
+process();
+

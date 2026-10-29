@@ -1,0 +1,2 @@
+return docData['SousCatégorie1'] === 'Régulier'||docData['TypeIntervention'] === 'Déneigement'&&docData['SousCatégorie1'] === 'Dalle'||docData['TypeIntervention'] === 'Déneigement'&&docData['SousCatégorie1'] === 'Plainte'||docData['SousCatégorie1'] === 'Accès pub'||docData['SousCatégorie1'] === 'Déglaçage'||docData['SousCatégorie1'] === 'Mécanique' ?    
+{'Photo_AbribusCompletDeneige': true    }: {'Photo_AbribusCompletDeneige': null    };

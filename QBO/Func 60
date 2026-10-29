@@ -1,0 +1,12 @@
+console.log('60',context);
+return {'Photo_AbribusCompletLave': null, 'Photo_BraquetteInstallee': null,'Photo_SiteSansAbribus': null, 'Photo_PanneauArret': null,
+'Photo_SiteApresSecurisation': null, 'Photo_VerreAvant': null,'Photo_SiteEnArrivant': null, 'Photo_ProblemeAReparer': null,
+'Photo_DalleCoulee': null, 'Photo_PlanEloigneAbribusCompletFaceExt': null,'Photo_AbribusCompletLave': null, 'Photo_GrosPlanFaceExt': null,
+'Photo_NumSerieFABCO': null, 'Photo_PlanRaproccheReparation': null,'Photo_AbribusCompletDeneige': null, 'Photo_AbribusCompletCoteReparation': null,
+'Photo_GrosPlanFaceInt': null, 'Photo_NumSerie': null,'Photo_PlanEloigneAbribusCompletFaceInt': null, 'Photo_Intervention': null,
+'Photo_VerreApresPolissage': null, 'Photo_VerreBrise': null,'Photo_4BoulonsSecuriteToit': null,'Photo_AbribusCompletLaveCoteOppose': null,
+'Photo_AvantCoupeHerbe':null,'Photo_AprèsCoupeHerbe':null,'Photo_INTPorteOuverteEntiere':null,'Photo_INTBarreNoirBas':null,'Photo_INTAfficheReplacee':null,
+'Photo_INTTubeFluo':null,'Photo_EXTPorteOuverteEntiere':null,'Photo_EXTTubeFluo':null,'Photo_EXTAfficheReplacee':null,'Photo_EXTBarreNoirBas':null,
+'Photo_VisGraissees':null,'Photo_EmplacementAvantNumero':null,'Photo_NumeroPose':null,
+'Desinstallation_Tache1':null,'Desinstallation_Tache2':null,'Desinstallation_Tache3':null,
+'Installation_Tache1':null,'Installation_Tache2':null,'Installation_Tache3':null};

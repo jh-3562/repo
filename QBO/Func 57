@@ -1,0 +1,209 @@
+console.log('Function 57', context)
+
+const fourHours = '4h'
+const twelveHours = '12h'
+const oneDay = '24h'
+const twoDays = '48h'
+const threeDays = '72h'
+const fourDays = '4 jours'
+const sevenDays = '7 jours'
+const oneMonth = '1 mois'
+const threeMonths = '3 mois'
+const sixMonths = '6 mois'
+
+const delaiSLA =
+  docData['SousCatégorie1'] === 'Régulier - ÉTÉ' || docData['SousCatégorie1'] === 'Régulier - Supplémentaire'
+    ? { DélaiSLA: fourDays }
+    : docData['SousCatégorie1'] === 'Régulier - HIVER'
+    ? { DélaiSLA: threeDays }
+    : docData['SousCatégorie1'] === 'Régulier - NUM'
+    ? { DélaiSLA: twoDays }
+    : docData['SousCatégorie1'] === 'Herbes/Émondage'
+    ? { DélaiSLA: threeMonths }
+    : docData['SousCatégorie1'] === 'Poubelle'
+    ? { DélaiSLA: oneDay }
+    : docData['SousCatégorie1'] === 'Drive'
+    ? { DélaiSLA: sevenDays }
+    : docData['SousCatégorie1'] === 'Collant'
+    ? { DélaiSLA: oneDay }
+    : docData['SousCatégorie1'] === 'Graffiti'
+    ? { DélaiSLA: oneDay }
+    : docData['SousCatégorie1'] === 'Pression'
+    ? { DélaiSLA: threeMonths }
+    : docData['TypeIntervention'] === 'Entretien - Spécial' &&
+      docData['SousCatégorie1'] === 'Diffuseur'
+    ? { DélaiSLA: threeMonths }
+    : docData['TypeIntervention'] === 'Entretien - Spécial' &&
+      docData['SousCatégorie1'] === 'Plainte'
+    ? { DélaiSLA: oneDay }
+    : docData['TypeIntervention'] === 'Entretien - Spécial' &&
+      docData['SousCatégorie1'] === 'Après installation'
+    ? { DélaiSLA: threeDays }
+    : docData['SousCatégorie1'] === 'Régulier'
+    ? { DélaiSLA: threeDays }
+    : docData['SousCatégorie1'] === 'Accès pub'
+    ? { DélaiSLA: threeDays }
+    : docData['SousCatégorie1'] === 'Déglaçage'
+    ? { DélaiSLA: threeDays }
+    : docData['SousCatégorie1'] === 'Mécanique'
+    ? { DélaiSLA: threeDays }
+    : docData['TypeIntervention'] === 'Déneigement' &&
+      docData['SousCatégorie1'] === 'Dalle'
+    ? { DélaiSLA: sevenDays }
+    : docData['TypeIntervention'] === 'Déneigement' &&
+      docData['SousCatégorie1'] === 'Plainte'
+    ? { DélaiSLA: twelveHours }
+    : docData['SousCatégorie1'] === 'Vérification'
+    ? { DélaiSLA: sevenDays }
+    : docData['TypeIntervention'] === 'Polissage' &&
+      docData['SousCatégorie1'] === 'Verre'
+    ? { DélaiSLA: sevenDays }
+    : docData['SousCatégorie1'] === 'Inox'
+    ? { DélaiSLA: sevenDays }
+    : docData['SousCatégorie1'] === 'Braquette'
+    ? { DélaiSLA: sevenDays }
+    : docData['TypeIntervention'] === 'Réparation' &&
+      docData['SousCatégorie1'] === 'Verre'
+    ? { DélaiSLA: threeDays }
+    : docData['TypeIntervention'] === 'Réparation' &&
+      docData['SousCatégorie1'] === 'Verre Pub'
+    ? { DélaiSLA: oneDay }
+    : docData['TypeIntervention'] === 'Signalement' &&
+      docData['SousCatégorie1'] === 'Verre Pub'
+    ? { DélaiSLA: oneDay }
+    : docData['SousCatégorie1'] === 'Banc'
+    ? { DélaiSLA: oneDay }
+    : docData['TypeIntervention'] === 'Réparation' &&
+      docData['SousCatégorie1'] === 'Structure'
+    ? { DélaiSLA: sevenDays }
+    : docData['SousCatégorie1'] === 'Vis'
+    ? { DélaiSLA: sevenDays }
+    : docData['SousCatégorie1'] === 'Velcro'
+    ? { DélaiSLA: oneDay }
+    : docData['TypeIntervention'] === 'Réparation' &&
+      docData['SousCatégorie1'] === 'Diffuseur'
+    ? { DélaiSLA: sevenDays }
+    : docData['SousCatégorie1'] === 'Toit'
+    ? { DélaiSLA: sevenDays }
+    : docData['SousCatégorie1'] === 'Affichage'
+    ? { DélaiSLA: twoDays }
+    : docData['TypeIntervention'] === 'Réparation' &&
+      docData['SousCatégorie1'] === 'Autre'
+    ? { DélaiSLA: sevenDays }
+    : docData['TypeIntervention'] === 'URGENCE' &&
+      docData['SousCatégorie1'] === 'Désinstallation'
+    ? { DélaiSLA: fourHours }
+    : docData['TypeIntervention'] === 'URGENCE' &&
+      docData['SousCatégorie1'] === 'Débranchement'
+    ? { DélaiSLA: fourHours }
+    : docData['SousCatégorie1'] === 'Sécurisation'
+    ? { DélaiSLA: fourHours }
+    : docData['SousCatégorie1'] === 'Conversion'
+    ? { DélaiSLA: oneMonth }
+    : docData['SousCatégorie1'] === 'Nouveau Site'
+    ? { DélaiSLA: oneMonth }
+    : docData['TypeIntervention'] === 'Déploiement' &&
+      docData['SousCatégorie1'] === 'Numérique'
+    ? { DélaiSLA: oneMonth }
+    : docData['TypeIntervention'] === 'Déploiement' &&
+      docData['SousCatégorie1'] === 'Installation'
+    ? { DélaiSLA: oneMonth }
+    : docData['TypeIntervention'] === 'Déploiement' &&
+      docData['SousCatégorie1'] === 'Désinstallation'
+    ? { DélaiSLA: oneMonth }
+    : docData['TypeIntervention'] === 'Déploiement' &&
+      docData['SousCatégorie1'] === 'Dalle'
+    ? { DélaiSLA: oneMonth }
+    : docData['TypeIntervention'] === 'Déploiement' &&
+      docData['SousCatégorie1'] === 'Débranchement'
+    ? { DélaiSLA: oneMonth }
+    : docData['TypeIntervention'] === 'Déploiement' &&
+      docData['SousCatégorie1'] === 'Rebranchement'
+    ? { DélaiSLA: oneMonth }
+    : docData['TypeIntervention'] === 'Déploiement' &&
+      docData['SousCatégorie1'] === 'Autre'
+    ? { DélaiSLA: oneMonth }
+    : docData['TypeIntervention'] === 'Déploiement' &&
+      docData['SousCatégorie1'] === 'Finition'
+    ? { DélaiSLA: threeDays }
+    : docData['TypeIntervention'] === 'Déploiement' &&
+      docData['SousCatégorie1'] === 'Branchement HQ'
+    ? { DélaiSLA: sixMonths }
+    : docData['TypeIntervention'] === 'Déploiement' &&
+      docData['SousCatégorie1'] === 'Débranchement HQ'
+    ? { DélaiSLA: sixMonths }
+    : docData['TypeIntervention'] === 'Travaux' &&
+      docData['SousCatégorie1'] === 'Désinstallation'
+    ? { DélaiSLA: sevenDays }
+    : docData['SousCatégorie1'] === 'Réinstallation'
+    ? { DélaiSLA: sevenDays }
+    : docData['TypeIntervention'] === 'Travaux' &&
+      docData['SousCatégorie1'] === 'Dalle'
+    ? { DélaiSLA: sevenDays }
+    : docData['TypeIntervention'] === 'Travaux' &&
+      docData['SousCatégorie1'] === 'Autre'
+    ? { DélaiSLA: sevenDays }
+    : docData['TypeIntervention'] === 'Travaux' &&
+      docData['SousCatégorie1'] === 'Débranchement Tardif'
+    ? { DélaiSLA: threeDays }
+    : docData['TypeIntervention'] === 'Travaux' &&
+      docData['SousCatégorie1'] === 'Rebranchement Tardif'
+    ? { DélaiSLA: threeDays }
+    : docData['TypeIntervention'] === 'Travaux' &&
+      docData['SousCatégorie1'] === 'Débranchement HQ'
+    ? { DélaiSLA: sixMonths }
+    : docData['TypeIntervention'] === 'Travaux' &&
+      docData['SousCatégorie1'] === 'Rebranchement HQ'
+    ? { DélaiSLA: sixMonths }
+    : docData['TypeIntervention'] === 'Travaux' &&
+      docData['SousCatégorie1'] === 'Finition'
+    ? { DélaiSLA: threeDays }
+    : docData['TypeIntervention'] === 'Numérique' &&
+      docData['SousCatégorie1'] === 'Numérique'
+    ? { DélaiSLA: sevenDays }
+    : docData['TypeIntervention'] === 'Numérique' &&
+      docData['SousCatégorie1'] === 'Dépannage'
+    ? { DélaiSLA: oneDay }
+    : docData['TypeIntervention'] === 'Signalement' &&
+      docData['SousCatégorie1'] === 'Verre'
+    ? { DélaiSLA: oneDay }
+    : docData['SousCatégorie1'] === 'Vandalisme'
+    ? { DélaiSLA: oneDay }
+    : docData['TypeIntervention'] === 'Signalement' &&
+      docData['SousCatégorie1'] === 'Structure'
+    ? { DélaiSLA: oneDay }
+    : docData['TypeIntervention'] === 'Signalement' &&
+      docData['SousCatégorie1'] === 'Autre'
+    ? { DélaiSLA: oneDay }
+    : docData['SousCatégorie1'] === 'Riveter Velcro'
+    ? { DélaiSLA: oneDay }
+    : docData['SousCatégorie1'] === 'Diffuseur anomalie'
+    ? { DélaiSLA: oneDay }
+    : docData['SousCatégorie1'] === 'Abribus absent'
+    ? { DélaiSLA: oneDay }
+    : docData['SousCatégorie1'] === 'Inaccessible'
+    ? { DélaiSLA: oneDay }
+    : docData['SousCatégorie1'] === 'Vis coincée'
+    ? { DélaiSLA: oneDay }
+    : docData['TypeIntervention'] === 'NO POST' &&
+      docData['SousCatégorie1'] === 'Autre'
+    ? { DélaiSLA: oneDay }
+    : docData['SousCatégorie1'] === 'Herbes'
+    ? { DélaiSLA: oneMonth }
+    : docData['SousCatégorie1'] === 'Numéro'
+    ? { DélaiSLA: threeMonths }
+    : [
+        'Tâches désinstallation',
+        'Tâches installation',
+        'Avis d’entrave'
+      ].includes(docData['SousCatégorie1'])
+    ? { DélaiSLA: oneDay }
+    : docData['TypeIntervention'] === 'Travaux saisonniers' &&
+      docData['SousCatégorie1'] === 'Diffuseur'
+    ? { DélaiSLA: threeMonths }
+    : undefined
+
+
+// TODO : If we are in an intervention form, use function 109.
+
+return delaiSLA

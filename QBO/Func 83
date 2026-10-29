@@ -1,0 +1,1 @@
+return { 'Seq|6|SousCategorie|Entretien': docData['Seq|5|Type'] === 'Entretien' ? true : null };

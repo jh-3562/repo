@@ -1,0 +1,2 @@
+return docData['SousCatégorie1'] === 'Braquette' ?    
+{'Photo_BraquetteInstallee': true    }: {'Photo_BraquetteInstallee': null    };

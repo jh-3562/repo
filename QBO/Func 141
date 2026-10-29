@@ -1,0 +1,107 @@
+const role = store.moduleStore?.user?.roles[0];
+const user = docData['USER'];
+const typeWO = docData['TypeIntervention'];
+const SousCat = docData['SousCatégorie1']
+
+if (docData['STATUS'] === 'Draft') {
+
+    if (role === 'DISPATCHERMDDO') {
+
+        if (SousCat === 'Numéro'||SousCat === 'Vérification'||typeWO === 'NO POST'||typeWO === 'Signalement') {
+ 
+//Brouillon + MDDO + Numéro, Vérification ou NO POST, Signalement : ok
+            
+            return{'DateHeureComplete':true,'SPVM':true,'DocumentsSupp':false,'EquipeAbribus':true,'DateDue':true,'CommandDate':true,'TypeIntervention':false, 'SousCatégorie1':false, 'NumAbribus':false, 'DélaiSLA':true, 'NumArret':false, 'Abribus_Adresse':true, 'Abribus_route':true, 'AdresseLieu':true, 'VilleLieu':true, 'Arrondissement':true, 'Abribus_province':true, 'Positionnement':true, 'Abribus_CodePostal':true, 'LatitudeLieu':true, 'LongitudeLieu':true, 'Partenaire':true, 'Market':true, 'Abribus_Modele':true, 'DescriptionLieu':true, 'Poubelle':true, 'Abribus_Deneigement':true, 'Abribus_Deneigement_Notes':true, 'LienGoogleMaps':true, 'UDF_Electricite_Statut':true, 'UDF_Electricite_TypeAlimentation':true, 'UDF_Face_Illumination_Hours':true, 'UDF_Numero_Face4':true, 'UDF_Numero_Face3':true, 'UDF_Numero_Face1':true, 'UDF_Numero_Face2':true, 'UDF_Electricite_IlluminationFace4':true, 'UDF_Electricite_IlluminationFace2':true, 'UDF_Electricite_IlluminationFace1':true, 'UDF_Electricite_IlluminationFace3':true, 'UDF_AdManagerKey':true,'PositionTournee':true,'DateRetraitFace1':true,'DateRetraitFace2':true,'DateRetraitFace3':true,'DateRetraitFace4':true,'DateInactif':true,'DateInactifFin':true}
+
+        }
+
+        else {
+
+//Brouillon + MDDO + tous les autres type de WO et Sous catégorie : pas ok
+
+            return{'DateHeureComplete':true,'SPVM':true,'DocumentsSupp':true,'EquipeAbribus':true,'CommandDate':true,'DateDue':true,'TypeIntervention':false, 'SousCatégorie1':true, 'NumAbribus':true, 'DélaiSLA':true, 'NumArret':true, 'Abribus_Adresse':true, 'Abribus_route':true, 'AdresseLieu':true, 'VilleLieu':true, 'Arrondissement':true, 'Abribus_province':true, 'Positionnement':true, 'Abribus_CodePostal':true, 'LatitudeLieu':true, 'LongitudeLieu':true, 'Partenaire':true, 'Market':true, 'Abribus_Modele':true, 'DescriptionLieu':true, 'Poubelle':true, 'Abribus_Deneigement':true, 'Abribus_Deneigement_Notes':true, 'LienGoogleMaps':true, 'UDF_Electricite_Statut':true, 'UDF_Electricite_TypeAlimentation':true, 'UDF_Face_Illumination_Hours':true, 'UDF_Numero_Face4':true, 'UDF_Numero_Face3':true, 'UDF_Numero_Face1':true, 'UDF_Numero_Face2':true, 'UDF_Electricite_IlluminationFace4':true, 'UDF_Electricite_IlluminationFace2':true, 'UDF_Electricite_IlluminationFace1':true, 'UDF_Electricite_IlluminationFace3':true, 'UDF_AdManagerKey':true,'PositionTournee':true,'DateRetraitFace1':true,'DateRetraitFace2':true,'DateRetraitFace3':true,'DateRetraitFace4':true,'DateInactif':true,'DateInactifFin':true}
+
+        }
+
+    }
+
+    else if (user === 'DRIVERTEST@FASTERCOM.CA'||user === 'GAUTHIER_01@QUEBECOR.COM'||user === 'GAUTHIER_03@QUEBECOR.COM'||user === 'GAUTHIER_04@QUEBECOR.COM'||user === 'GAUTHIER_06@QUEBECOR.COM'||user === 'GAUTHIER_07@QUEBECOR.COM'||user === 'GAUTHIER_09@QUEBECOR.COM'||user === 'GAUTHIER_10@QUEBECOR.COM'||user === 'GAUTHIER_11@QUEBECOR.COM'||user === 'GAUTHIER_12@QUEBECOR.COM'||user === 'GAUTHIER_16@QUEBECOR.COM'||user === 'ETINSTALLATION@ETCONSTRUCTION.COM'||user === 'ETREPARATION@ETCONSTRUCTION.COM') {
+
+        if (typeWO === 'Signalement') {
+ 
+//Brouillon + (équipes, ET installation et réparation) + Signalement : ok
+            
+            return{'DateHeureComplete':true,'SPVM':true,'DocumentsSupp':false,'EquipeAbribus':true,'DateDue':true,'CommandDate':true,'TypeIntervention':false, 'SousCatégorie1':false, 'NumAbribus':false, 'DélaiSLA':true, 'NumArret':false, 'Abribus_Adresse':true, 'Abribus_route':true, 'AdresseLieu':true, 'VilleLieu':true, 'Arrondissement':true, 'Abribus_province':true, 'Positionnement':true, 'Abribus_CodePostal':true, 'LatitudeLieu':true, 'LongitudeLieu':true, 'Partenaire':true, 'Market':true, 'Abribus_Modele':true, 'DescriptionLieu':true, 'Poubelle':true, 'Abribus_Deneigement':true, 'Abribus_Deneigement_Notes':true, 'LienGoogleMaps':true, 'UDF_Electricite_Statut':true, 'UDF_Electricite_TypeAlimentation':true, 'UDF_Face_Illumination_Hours':true, 'UDF_Numero_Face4':true, 'UDF_Numero_Face3':true, 'UDF_Numero_Face1':true, 'UDF_Numero_Face2':true, 'UDF_Electricite_IlluminationFace4':true, 'UDF_Electricite_IlluminationFace2':true, 'UDF_Electricite_IlluminationFace1':true, 'UDF_Electricite_IlluminationFace3':true, 'UDF_AdManagerKey':true,'PositionTournee':true,'DateRetraitFace1':true,'DateRetraitFace2':true,'DateRetraitFace3':true,'DateRetraitFace4':true,'DateInactif':true,'DateInactifFin':true}
+
+        }
+
+        else {
+
+//Brouillon + (équipes, ET installation et réparation) + tous les autres type de WO et Sous catégorie : pas ok
+
+            return{'DateHeureComplete':true,'SPVM':true,'DocumentsSupp':true,'EquipeAbribus':true,'CommandDate':true,'DateDue':true,'TypeIntervention':false, 'SousCatégorie1':true, 'NumAbribus':true, 'DélaiSLA':true, 'NumArret':true, 'Abribus_Adresse':true, 'Abribus_route':true, 'AdresseLieu':true, 'VilleLieu':true, 'Arrondissement':true, 'Abribus_province':true, 'Positionnement':true, 'Abribus_CodePostal':true, 'LatitudeLieu':true, 'LongitudeLieu':true, 'Partenaire':true, 'Market':true, 'Abribus_Modele':true, 'DescriptionLieu':true, 'Poubelle':true, 'Abribus_Deneigement':true, 'Abribus_Deneigement_Notes':true, 'LienGoogleMaps':true, 'UDF_Electricite_Statut':true, 'UDF_Electricite_TypeAlimentation':true, 'UDF_Face_Illumination_Hours':true, 'UDF_Numero_Face4':true, 'UDF_Numero_Face3':true, 'UDF_Numero_Face1':true, 'UDF_Numero_Face2':true, 'UDF_Electricite_IlluminationFace4':true, 'UDF_Electricite_IlluminationFace2':true, 'UDF_Electricite_IlluminationFace1':true, 'UDF_Electricite_IlluminationFace3':true, 'UDF_AdManagerKey':true,'PositionTournee':true,'DateRetraitFace1':true,'DateRetraitFace2':true,'DateRetraitFace3':true,'DateRetraitFace4':true,'DateInactif':true,'DateInactifFin':true}
+
+        }
+
+    }
+
+    else if (user === 'STM_01@STM.INFO'||user === 'STM_02@STM.INFO'||user === 'STM_03@STM.INFO'||user === 'STM_04@STM.INFO') {
+
+        if (typeWO=== 'Braquette') {
+
+//Brouillon + STM + Braquette : ok
+
+            return{'Sequence':true,'DateHeureComplete':true,'SPVM':true,'DocumentsSupp':false,'EquipeAbribus':true,'CommandDate':true,'DateDue':true,'TypeIntervention':false, 'SousCatégorie1':false, 'NumAbribus':false, 'DélaiSLA':true, 'NumArret':false, 'Abribus_Adresse':true, 'Abribus_route':true, 'AdresseLieu':true, 'VilleLieu':true, 'Arrondissement':true, 'Abribus_province':true, 'Positionnement':true, 'Abribus_CodePostal':true, 'LatitudeLieu':true, 'LongitudeLieu':true, 'Partenaire':true, 'Market':true, 'Abribus_Modele':true, 'DescriptionLieu':true, 'Poubelle':true, 'Abribus_Deneigement':true, 'Abribus_Deneigement_Notes':true, 'LienGoogleMaps':true, 'UDF_Electricite_Statut':true, 'UDF_Electricite_TypeAlimentation':true, 'UDF_Face_Illumination_Hours':true, 'UDF_Numero_Face4':true, 'UDF_Numero_Face3':true, 'UDF_Numero_Face1':true, 'UDF_Numero_Face2':true, 'UDF_Electricite_IlluminationFace4':true, 'UDF_Electricite_IlluminationFace2':true, 'UDF_Electricite_IlluminationFace1':true, 'UDF_Electricite_IlluminationFace3':true, 'UDF_AdManagerKey':true,'PositionTournee':true,'DateRetraitFace1':true,'DateRetraitFace2':true,'DateRetraitFace3':true,'DateRetraitFace4':true,'DateInactif':true,'DateInactifFin':true}
+
+        }
+	
+        else {
+
+//Brouillon + STM + Tous les autres type de WO : pas ok
+        
+            return{'Sequence':true,'DateHeureComplete':true,'SPVM':true,'DocumentsSupp':true,'EquipeAbribus':true,'CommandDate':true,'DateDue':true,'TypeIntervention':false, 'SousCatégorie1':true, 'NumAbribus':true, 'DélaiSLA':true, 'NumArret':true, 'Abribus_Adresse':true, 'Abribus_route':true, 'AdresseLieu':true, 'VilleLieu':true, 'Arrondissement':true, 'Abribus_province':true, 'Positionnement':true, 'Abribus_CodePostal':true, 'LatitudeLieu':true, 'LongitudeLieu':true, 'Partenaire':true, 'Market':true, 'Abribus_Modele':true, 'DescriptionLieu':true, 'Poubelle':true, 'Abribus_Deneigement':true, 'Abribus_Deneigement_Notes':true, 'LienGoogleMaps':true, 'UDF_Electricite_Statut':true, 'UDF_Electricite_TypeAlimentation':true, 'UDF_Face_Illumination_Hours':true, 'UDF_Numero_Face4':true, 'UDF_Numero_Face3':true, 'UDF_Numero_Face1':true, 'UDF_Numero_Face2':true, 'UDF_Electricite_IlluminationFace4':true, 'UDF_Electricite_IlluminationFace2':true, 'UDF_Electricite_IlluminationFace1':true, 'UDF_Electricite_IlluminationFace3':true, 'UDF_AdManagerKey':true,'PositionTournee':true,'DateRetraitFace1':true,'DateRetraitFace2':true,'DateRetraitFace3':true,'DateRetraitFace4':true,'DateInactif':true,'DateInactifFin':true}
+
+        }
+
+    }
+
+}
+
+else { //Tous les autres statuts
+
+    if (role === 'DRIVER'||role === 'PARTENAIRE') {
+
+//Tous les autres statuts, Driver et Partenaire : pas ok
+
+        return{'Sequence':true,'DateHeureComplete':true,'SPVM':true,'DocumentsSupp':true,'EquipeAbribus':true,'CommandDate':true,'DateDue':true,'TypeIntervention':true, 'SousCatégorie1':true, 'NumAbribus':true, 'DélaiSLA':true, 'NumArret':true, 'Abribus_Adresse':true, 'Abribus_route':true, 'AdresseLieu':true, 'VilleLieu':true, 'Arrondissement':true, 'Abribus_province':true, 'Positionnement':true, 'Abribus_CodePostal':true, 'LatitudeLieu':true, 'LongitudeLieu':true, 'Partenaire':true, 'Market':true, 'Abribus_Modele':true, 'DescriptionLieu':true, 'Poubelle':true, 'Abribus_Deneigement':true, 'Abribus_Deneigement_Notes':true, 'LienGoogleMaps':true, 'UDF_Electricite_Statut':true, 'UDF_Electricite_TypeAlimentation':true, 'UDF_Face_Illumination_Hours':true, 'UDF_Numero_Face4':true, 'UDF_Numero_Face3':true, 'UDF_Numero_Face1':true, 'UDF_Numero_Face2':true, 'UDF_Electricite_IlluminationFace4':true, 'UDF_Electricite_IlluminationFace2':true, 'UDF_Electricite_IlluminationFace1':true, 'UDF_Electricite_IlluminationFace3':true, 'UDF_AdManagerKey':true,'PositionTournee':false,'DateRetraitFace1':true,'DateRetraitFace2':true,'DateRetraitFace3':true,'DateRetraitFace4':true,'DateInactif':true,'DateInactifFin':true}
+
+    }
+
+    if (role === 'DISPATCHERMDDO') {
+        
+        if (SousCat === 'Numéro'||SousCat === 'Vérification') {
+
+//Tous les autres statuts + MDDO + Numéro, Vérification, NO POST et Signalement : ok complétion
+
+            return{'Sequence':true,'DateHeureComplete':true,'SPVM':true,'DocumentsSupp':true,'EquipeAbribus':true,'CommandDate':true,'DateDue':true,'TypeIntervention':true, 'SousCatégorie1':true, 'NumAbribus':true, 'DélaiSLA':true, 'NumArret':true, 'Abribus_Adresse':true, 'Abribus_route':true, 'AdresseLieu':true, 'VilleLieu':true, 'Arrondissement':true, 'Abribus_province':true, 'Positionnement':true, 'Abribus_CodePostal':true, 'LatitudeLieu':true, 'LongitudeLieu':true, 'Partenaire':true, 'Market':true, 'Abribus_Modele':true, 'DescriptionLieu':true, 'Poubelle':true, 'Abribus_Deneigement':true, 'Abribus_Deneigement_Notes':true, 'LienGoogleMaps':true, 'UDF_Electricite_Statut':true, 'UDF_Electricite_TypeAlimentation':true, 'UDF_Face_Illumination_Hours':true, 'UDF_Numero_Face4':true, 'UDF_Numero_Face3':true, 'UDF_Numero_Face1':true, 'UDF_Numero_Face2':true, 'UDF_Electricite_IlluminationFace4':true, 'UDF_Electricite_IlluminationFace2':true, 'UDF_Electricite_IlluminationFace1':true, 'UDF_Electricite_IlluminationFace3':true, 'UDF_AdManagerKey':true,'PositionTournee':false,'DateRetraitFace1':true,'DateRetraitFace2':true,'DateRetraitFace3':true,'DateRetraitFace4':true,'DateInactif':true,'DateInactifFin':true}
+
+        }
+        
+        else {
+
+            return{'Sequence':true,'DateHeureComplete':true,'SPVM':true,'DocumentsSupp':true,'EquipeAbribus':true,'CommandDate':true,'DateDue':true,'TypeIntervention':true, 'SousCatégorie1':true, 'NumAbribus':true, 'DélaiSLA':true, 'NumArret':true, 'Abribus_Adresse':true, 'Abribus_route':true, 'AdresseLieu':true, 'VilleLieu':true, 'Arrondissement':true, 'Abribus_province':true, 'Positionnement':true, 'Abribus_CodePostal':true, 'LatitudeLieu':true, 'LongitudeLieu':true, 'Partenaire':true, 'Market':true, 'Abribus_Modele':true, 'DescriptionLieu':true, 'Poubelle':true, 'Abribus_Deneigement':true, 'Abribus_Deneigement_Notes':true, 'LienGoogleMaps':true, 'UDF_Electricite_Statut':true, 'UDF_Electricite_TypeAlimentation':true, 'UDF_Face_Illumination_Hours':true, 'UDF_Numero_Face4':true, 'UDF_Numero_Face3':true, 'UDF_Numero_Face1':true, 'UDF_Numero_Face2':true, 'UDF_Electricite_IlluminationFace4':true, 'UDF_Electricite_IlluminationFace2':true, 'UDF_Electricite_IlluminationFace1':true, 'UDF_Electricite_IlluminationFace3':true, 'UDF_AdManagerKey':true,'PositionTournee':false,'DateRetraitFace1':true,'DateRetraitFace2':true,'DateRetraitFace3':true,'DateRetraitFace4':true,'DateInactif':true,'DateInactifFin':true,
+            'Photo_PanneauArret': true} //pour empecher complétion, à revoir
+
+        }
+
+    }
+
+    else {
+
+//Tous les autres statuts, tous les autres roles : ok
+
+        return{'CommandDate':true,'DateDue':true}
+
+    }
+
+}

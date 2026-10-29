@@ -1,0 +1,3 @@
+return docData['SousCatégorie1'] === 'Numéro' ?    
+{'Photo_EmplacementAvantNumero': true    }: {'Photo_EmplacementAvantNumero': null    };
+

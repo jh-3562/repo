@@ -1,0 +1,1 @@
+return { 'SousCatégorie1|Réparations': docData['TypeIntervention'] === 'Réparation' ? true : null };

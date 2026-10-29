@@ -1,0 +1,40 @@
+console.log('Function 58')
+
+return docData['SousCatégorie1'] === 'Numérique'
+||(docData['TypeIntervention']!='Entretien - Spécial'&&docData['SousCatégorie1'] === 'Herbes/Émondage')
+||(docData['TypeIntervention'] === 'Travaux'&&docData['SousCatégorie1'] === 'Dalle')
+||(docData['TypeIntervention'] === 'Déploiement'&&docData['SousCatégorie1'] === 'Dalle')
+||(docData['TypeIntervention'] === 'Déploiement'&&docData['SousCatégorie1'] === 'Installation')
+||(docData['TypeIntervention'] === 'Déploiement'&&docData['SousCatégorie1'] === 'Finition')
+||(docData['TypeIntervention'] === 'Travaux'&&docData['SousCatégorie1'] === 'Finition')
+||(docData['TypeIntervention']!='Entretien - Spécial'&&docData['SousCatégorie1'] === 'Poubelle')
+||(docData['TypeIntervention']!='Entretien - Spécial'&&docData['SousCatégorie1'] === 'Drive')
+||(docData['TypeIntervention']!='Entretien - Spécial'&&docData['SousCatégorie1'] === 'Collant')
+||(docData['TypeIntervention']!='Entretien - Spécial'&&docData['SousCatégorie1'] === 'Graffiti')
+||(docData['TypeIntervention']!='Entretien - Spécial'&&docData['SousCatégorie1'] === 'Pression')
+||((docData['TypeIntervention']!='Entretien - Spécial'&&docData['TypeIntervention']!='Travaux saisonniers')&&docData['SousCatégorie1'] === 'Diffuseur')
+||docData['SousCatégorie1'] === 'Verre'
+||docData['SousCatégorie1'] === 'Inox'
+||docData['SousCatégorie1'] === 'Braquette'
+||docData['SousCatégorie1'] === 'Banc'
+||docData['SousCatégorie1'] === 'Structure'
+||docData['SousCatégorie1'] === 'Vis'
+||docData['SousCatégorie1'] === 'Velcro'
+||docData['SousCatégorie1'] === 'Toit'
+||docData['SousCatégorie1'] === 'Affichage'
+||(docData['TypeIntervention']!='Entretien - Spécial'&&docData['SousCatégorie1'] === 'Autre')
+||docData['SousCatégorie1'] === 'Désinstallation'
+||docData['SousCatégorie1'] === 'Sécurisation'
+||docData['SousCatégorie1'] === 'Conversion'
+||docData['SousCatégorie1'] === 'Nouveau Site'
+||docData['SousCatégorie1'] === 'Désinstallation'
+||docData['SousCatégorie1'] === 'Réinstallation'
+||docData['SousCatégorie1'] === 'Vandalisme'
+||docData['SousCatégorie1'] === 'Riveter Velcro'
+||docData['SousCatégorie1'] === 'Diffuseur anomalie'
+||docData['SousCatégorie1'] === 'Abribus absent'
+||docData['SousCatégorie1'] === 'Inaccessible'
+||docData['SousCatégorie1'] === 'Vis coincée'
+||docData['SousCatégorie1'] === 'Herbes'
+||docData['SousCatégorie1'] === 'Numéro'?
+{'Photo_PanneauArret': true }: {'Photo_PanneauArret': null };

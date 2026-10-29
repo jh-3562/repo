@@ -1,0 +1,1 @@
+return { 'SousCatégorie1|Déneigement': docData['TypeIntervention'] === 'Déneigement' ? true : null };

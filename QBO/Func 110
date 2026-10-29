@@ -1,0 +1,9 @@
+if (docData['DateHeureComplete']!=''||docData['DateHeureComplete']!=NULL) {
+	
+	console.log('date de complétion remplie')
+	
+	}
+	
+else {
+	console.log('date de complétion vide')
+	}

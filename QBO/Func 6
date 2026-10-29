@@ -1,0 +1,1 @@
+return docData['When value is 1'] === '1'?{'My value will be 2': '2'}: undefined;

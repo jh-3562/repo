@@ -1,0 +1,2 @@
+return docData['TypeIntervention'] === 'Signalement'&&docData['SousCatégorie1'] === 'Verre' ?    
+{'Photo_VerreBrise': true    }: {'Photo_VerreBrise': null    };

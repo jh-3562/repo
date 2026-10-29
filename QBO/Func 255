@@ -1,0 +1,75 @@
+console.log("255", context);
+
+// constants
+const sessionToken = new google.maps.places.AutocompleteSessionToken();
+
+const addressInput = "AdresseDepart";
+const addressValue = docData[inputKey];
+
+// sync functions
+// returns the value of a specific address component based on its type
+const getComponent = (addressComponents, type) => {
+  for (c in addressComponents) {
+    const types = addressComponents[c].types;
+    if (types.includes(type)) return addressComponents[c].longText;
+  }
+  return "";
+};
+
+// async functions
+// Returns a list of suggested places, in order of relevance.
+const getGoogleAutocompleteSuggestions = async (address) => {
+  return new Promise((resolve, reject) => {
+    google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+      input: address,
+      sessionToken: sessionToken,
+    }).then(({ suggestions }) => {
+      resolve(suggestions);
+    });
+  });
+};
+
+// Fetches the formatted address and geolocation
+// and returns a formatted list containing these fields
+const formatSuggestions = async (suggestions) => {
+  let formattedSuggestions = [];
+  for (let suggestion of suggestions) {
+    const placePrediction = suggestion.placePrediction;
+    const place = placePrediction.toPlace();
+
+    await place.fetchFields({
+      fields: [
+        "formattedAddress", 
+        "displayName", 
+        "location", 
+        "addressComponents"
+      ],
+    });
+
+    formattedSuggestions.push({
+      title: place.formattedAddress,
+      fields: [],
+    });
+  }
+  return formattedSuggestions;
+};
+
+const main = async () => {
+  let suggestions = {};
+
+  if (addressValue) {
+    const googleSuggestions = await getGoogleAutocompleteSuggestions(addressValue);
+
+    const formattedSuggestions = await formatSuggestions(googleSuggestions);
+
+    suggestions = formattedSuggestions;
+  }
+  callback({
+    suggestions: {
+      [addressInput]: suggestions,
+    },
+  });
+};
+
+main();
+

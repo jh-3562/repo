@@ -1,0 +1,40 @@
+const mapping = [
+    {from:'EquipeAbribus',to:'Seq|1|Equipe'}];
+const filters = [];
+if (docData['Seq|1|Equipe']) {
+    api({ local: true })
+        .post(
+            `suggestion?fieldID=${'5A8FBFD5-4524-429C-8F76-78B8F6E1B6E1'}&fieldValue=${docData['Seq|1|Equipe']
+            }`
+            , { filters })
+            .then(res => {
+                if (res?.data?.suggestions?.length > 0) {
+                    const mySugg = res.data?.suggestions?.map(s => ({
+                        title: s?.value,
+                        fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                            ...a,
+                            value: a.value || '',
+                            key: mapping.find(m => m.from === a.key).to,
+                        }))
+                    }));
+                    callback({
+                        suggestions: {                      
+                            'Seq|1|Equipe': mySugg                
+                        }
+                    })
+                }
+                else {
+                    callback({                                      //Vider les suggestions le cas échéant
+                        suggestions: {
+                            'Seq|1|Equipe': []              
+                        }
+                    });
+    
+                }
+            }
+            );
+} else {
+    callback({suggestions : {                                         //Vider les suggestions si on supprime tout
+        'Seq|1|Equipe':[]
+}});
+};

@@ -1,0 +1,1 @@
+let lat = geolocationCoordinatesinstance.latitude; return {'LatitudeLieu': lat };

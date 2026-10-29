@@ -1,0 +1,2 @@
+return docData['SousCatégorie1'] === 'Inox'||docData['TypeIntervention'] === 'Polissage'&&docData['SousCatégorie1'] === 'Verre' ?    
+{'Photo_VerreAvant': true    }: {'Photo_VerreAvant': null    };

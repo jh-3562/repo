@@ -1,0 +1,154 @@
+console.log('118',context);
+const processData = store.pageContentStore?.processData;
+
+// Check if processData is a non-empty array
+if (!Array.isArray(processData) || processData.length === 0) {
+  return undefined;
+}
+
+const filters = processData[0].filters;
+
+// Check if filters is a non-empty array
+if (!Array.isArray(filters)) {
+  return undefined;
+}
+
+const user1 = filters[1]?.value || "";
+const user2 = filters[2]?.value || "";
+
+return user2 === 'Régulier - ÉTÉ' || user2 === 'Régulier - Supplémentaire' ? {
+    'DélaiSLA': '4 jours'
+} : user2 === 'Régulier - HIVER' ? {
+    'DélaiSLA': '72h'
+} : user2 === 'Régulier - NUM' ? {
+    'DélaiSLA': '48h'
+} : user2 === 'Herbes/Émondage' ? {
+    'DélaiSLA': '3 mois'
+} : user2 === 'Poubelle' ? {
+    'DélaiSLA': '24h'
+} : user2 === 'Drive' ? {
+    'DélaiSLA': '7 jours'
+} : user2 === 'Collant' ? {
+    'DélaiSLA': '24h'
+} : user2 === 'Graffiti' ? {
+    'DélaiSLA': '24h'
+} : user2 === 'Pression' ? {
+    'DélaiSLA': '3 mois'
+} : (user1 === 'Entretien - Spécial' && user2 === 'Diffuseur') ? {
+    'DélaiSLA': '3 mois'
+} : (user1 === 'Entretien - Spécial' && user2 === 'Plainte') ? {
+    'DélaiSLA': '24h'
+} : user2 === 'Régulier' ? {
+    'DélaiSLA': '72h'
+} : user2 === 'Accès pub' ? {
+    'DélaiSLA': '72h'
+} : user2 === 'Déglaçage' ? {
+    'DélaiSLA': '72h'
+} : user2 === 'Mécanique' ? {
+    'DélaiSLA': '72h'
+} : (user1 === 'Déneigement' && user2 === 'Dalle') ? {
+    'DélaiSLA': '7 jours'
+} : (user1 === 'Déneigement' && user2 === 'Plainte') ? {
+    'DélaiSLA': '12h'
+} : user2 === 'Vérification' ? {
+    'DélaiSLA': '7 jours'
+} : (user1 === 'Polissage' && user2 === 'Verre') ? {
+    'DélaiSLA': '7 jours'
+} : user2 === 'Inox' ? {
+    'DélaiSLA': '7 jours'
+} : user2 === 'Braquette' ? {
+    'DélaiSLA': '7 jours'
+} : (user1 === 'Réparation' && user2 === 'Verre') ? {
+    'DélaiSLA': '72h'
+} : (user1 === 'Réparation' && user2 === 'Verre Pub') ? {
+    'DélaiSLA': '24h'
+} : (user1 === 'Signalement' && user2 === 'Verre Pub') ? {
+    'DélaiSLA': '24h'
+} : user2 === 'Banc' ? {
+    'DélaiSLA': '24h'
+} : (user1 === 'Réparation' && user2 === 'Structure') ? {
+    'DélaiSLA': '7 jours'
+} : user2 === 'Vis' ? {
+    'DélaiSLA': '7 jours'
+} : user2 === 'Velcro' ? {
+    'DélaiSLA': '24h'
+} : (user1 === 'Réparation' && user2 === 'Diffuseur') ? {
+    'DélaiSLA': '7 jours'
+} : user2 === 'Toit' ? {
+    'DélaiSLA': '7 jours'
+} : user2 === 'Affichage' ? {
+    'DélaiSLA': '48h'
+} : (user1 === 'Réparation' && user2 === 'Autre') ? {
+    'DélaiSLA': '7 jours'
+} : (user1 === 'URGENCE' && user2 === 'Désinstallation') ? {
+    'DélaiSLA': '4h'
+} : (user1 === 'URGENCE' && user2 === 'Débranchement') ? {
+    'DélaiSLA': '4h'
+} : user2 === 'Sécurisation' ? {
+    'DélaiSLA': '4h'
+} : user2 === 'Conversion' ? {
+    'DélaiSLA': '1 mois'
+} : user2 === 'Nouveau Site' ? {
+    'DélaiSLA': '1 mois'
+} : (user1 === 'Déploiement' && user2 === 'Numérique') ? {
+    'DélaiSLA': '1 mois'
+} : (user1 === 'Déploiement' && user2 === 'Dalle') ? {
+    'DélaiSLA': '1 mois'
+} : (user1 === 'Déploiement' && user2 === 'Débranchement') ? {
+    'DélaiSLA': '1 mois'
+} : (user1 === 'Déploiement' && user2 === 'Rebranchement') ? {
+    'DélaiSLA': '1 mois'
+} : (user1 === 'Déploiement' && user2 === 'Installation') ? {
+    'DélaiSLA': '1 mois'
+} : (user1 === 'Déploiement' && user2 === 'Désinstallation') ? {
+    'DélaiSLA': '1 mois'
+} : (user1 === 'Déploiement' && user2 === 'Autre') ? {
+    'DélaiSLA': '1 mois'
+} : (user1 === 'Travaux' && user2 === 'Désinstallation') ? {
+    'DélaiSLA': '7 jours'
+} : user2 === 'Réinstallation' ? {
+    'DélaiSLA': '7 jours'
+} : (user1 === 'Travaux' && user2 === 'Dalle') ? {
+    'DélaiSLA': '7 jours'
+} : (user1 === 'Travaux' && user2 === 'Autre') ? {
+    'DélaiSLA': '7 jours'
+} : (user1 === 'Travaux' && user2 === 'Débranchement') ? {
+    'DélaiSLA': '7 jours'
+} : (user1 === 'Travaux' && user2 === 'Rebranchement') ? {
+    'DélaiSLA': '7 jours'
+} : (user1 === 'Numérique' && user2 === 'Numérique') ? {
+    'DélaiSLA': '7 jours'
+} : (user1 === 'Numérique' && user2 === 'Dépannage') ? {
+    'DélaiSLA': '24h'
+} : (user1 === 'Signalement' && user2 === 'Verre') ? {
+    'DélaiSLA': '24h'
+} : user2 === 'Vandalisme' ? {
+    'DélaiSLA': '24h'
+} : (user1 === 'Signalement' && user2 === 'Structure') ? {
+    'DélaiSLA': '24h'
+} : (user1 === 'Signalement' && user2 === 'Autre') ? {
+    'DélaiSLA': ''
+} : user2 === 'Riveter Velcro' ? {
+    'DélaiSLA': '24h'
+} : user2 === 'Diffuseur anomalie' ? {
+    'DélaiSLA': '24h'
+} : user2 === 'Abribus absent' ? {
+    'DélaiSLA': '24h'
+} : user2 === 'Inaccessible' ? {
+    'DélaiSLA': '24h'
+} : user2 === 'Vis coincée' ? {
+    'DélaiSLA': '24h'
+} : (user1 === 'NO POST' && user2 === 'Autre') ? {
+    'DélaiSLA': ''
+} : (user2 === 'Herbes') ? {
+    'DélaiSLA': '1 mois'
+} : (user2 === 'Numéro') ? {
+    'DélaiSLA': '3 mois'
+} : (user2 === 'Tâches désinstallation') ? {
+    'DélaiSLA': '24h'
+} : (user2 === 'Tâches installation') ? {
+    'DélaiSLA': '24h'
+} : (user1 === 'Travaux saisonniers' && user2 === 'Diffuseur') ? {
+    'DélaiSLA': '3 mois'
+}
+    : undefined;

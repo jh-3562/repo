@@ -1,0 +1,93 @@
+console.log('Function 151', context)
+
+/**
+ * This function takes a file Url and downloads it.
+ * @param {string} fileUrl
+ * @param {string} fileName
+ */
+const downloadFile = (fileUrl, fileName) => {
+  const link = document.createElement('a')
+  link.href = fileUrl
+  link.download = fileName
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+// function to create the popup loading element
+const createOrUpdateElement = (id, tag, style, innerHTML = '') => {
+  let element = document.getElementById(id)
+  if (!element) {
+    element = document.createElement(tag)
+    element.id = id
+    document.body.appendChild(element)
+  }
+  element.style = style
+  element.innerHTML = innerHTML
+  return element
+}
+// function to show the popup loading
+const showPopupLoading = loadingMessage => {
+  createOrUpdateElement(
+    'loadingPopup',
+    'div',
+    `
+              position: fixed;
+              left: 0;
+              top: 0;
+              width: 100%;
+              height: 100%;
+              background-color: rgba(0,0,0,0.5);
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              z-index: 9999;
+            `,
+    `
+              <div style="background-color: white; padding: 20px; border-radius: 5px; display: flex; flex-direction: column; align-items: center;">
+                <div>${loadingMessage}</div>
+                <div class="loader" style="border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 40px; height: 40px; margin-top: 20px; animation: spin 1s linear infinite;"></div>
+              </div>
+            `
+  )
+  if (!document.getElementById('spinnerStyle')) {
+    let style = document.createElement('style')
+    style.id = 'spinnerStyle'
+    style.innerHTML = `
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `
+    document.head.appendChild(style)
+  }
+}
+// function to hide the popuploading
+const hidePopupLoading = () => {
+  const loadingPopup = document.getElementById('loadingPopup')
+  if (loadingPopup) loadingPopup.style.display = 'none'
+}
+
+const main = async () => {
+  // Gather the ids of the form needed for the API call
+  const ids = store.pageContentStore.processData['0'].result.ids
+  // Call the API in order to get the file url to download
+  try {
+    showPopupLoading('Téléchargement en cours.')
+    const apiResult = await api({ local: true }).post(
+      'document/download/Intervention/PDF?&fileNameBuildKeys=NUMBER',
+      { ids: ids }
+    )
+
+    console.log('apiResult :', apiResult)
+    // Download the resulting file. The aim of this function.
+    downloadFile(apiResult.data.fileUrl, 'Impression en lot')
+  } catch (error) {
+    console.error(error)
+  } finally {
+    hidePopupLoading()
+  }
+}
+
+main()
+

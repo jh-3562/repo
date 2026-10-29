@@ -1,0 +1,1 @@
+return { 'SousCatégorie1|NO POST': docData['TypeIntervention'] === 'NO POST' ? true : null };

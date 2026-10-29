@@ -1,0 +1,3 @@
+return docData['TypeIntervention'] === 'Déploiement'&&docData['SousCatégorie1'] === 'Dalle'||docData['TypeIntervention'] === 'Travaux'&&docData['SousCatégorie1'] === 'Dalle' ?    
+{'Photo_DalleCoulee': true    }: {'Photo_DalleCoulee': null    };
+

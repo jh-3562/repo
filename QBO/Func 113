@@ -1,0 +1,17 @@
+console.log('113',context);
+const user = store.moduleStore?.user?.roles[0];
+
+if (docData['STATUS'] === 'Draft'&&(user === 'PARTENAIRE')) {
+
+    return{'TypeIntervention':'Braquette'}
+
+}
+
+else if (docData['STATUS'] === 'Draft'&&(user === 'DRIVER')) {
+
+    return{'TypeIntervention':'Signalement'}
+    
+}
+
+else 
+	console.log('RIEN')

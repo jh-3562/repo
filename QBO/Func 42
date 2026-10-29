@@ -1,0 +1,13 @@
+const dateOptim = docData['DateOptim'];
+
+const endDate = new Date(dateOptim);
+
+endDate.setDate(endDate.getDate() + 1);
+
+
+
+return dateOptim
+
+    ? `${endDate.toISOString().substring(0,10)}`
+
+    : '2000-01-01';

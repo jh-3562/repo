@@ -1,0 +1,13 @@
+console.log('134',context);
+const user = store.moduleStore?.user?.roles[0];
+
+if (user == 'ADMIN'||user == 'EXPRESSIMMO') {
+
+	console.log(user);
+    return{'InterventionFacturable':true};
+}
+
+else {
+    console.log(user);
+	return{'InterventionFacturable':null};
+}

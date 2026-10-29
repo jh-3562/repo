@@ -1,0 +1,3 @@
+return docData['SousCatégorie1'] === 'Tâches installation' ? 
+{'Installation_Tache1': true,'Installation_Tache2': true,'Installation_Tache3': true }: {'Installation_Tache1': null,'Installation_Tache2': null,'Installation_Tache3': null };
+

@@ -1,0 +1,1 @@
+return { 'QtyProduit2': docData['Add1'] === 'TRUE' ? true : null };

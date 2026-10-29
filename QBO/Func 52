@@ -1,0 +1,1 @@
+return { 'SousCatégorie1|Déploiement ': docData['TypeIntervention'] === 'Déploiement' ? true : null };

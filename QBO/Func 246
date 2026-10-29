@@ -1,0 +1,21 @@
+const dateValue = docData["DateDue"];
+
+if (!dateValue) {
+  return {};
+}
+
+const dueDate = new Date(dateValue);
+if (isNaN(dueDate.getTime())) {
+  return {};
+}
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+dueDate.setHours(0, 0, 0, 0);
+
+if (dueDate >= today) {
+  return { backgroundColor: "#2ecc71" };
+} else {
+  return { backgroundColor: "#e74c3c" };
+}
+

@@ -1,0 +1,3 @@
+if (docData['TypeImportation'] === 'Inspection') {
+	return {'EquipeAbribus':true,'CommandDate':true}}
+else return {'EquipeAbribus':null,'CommandDate':null}

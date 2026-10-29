@@ -1,0 +1,265 @@
+
+
+const createOrUpdateElement = (id, tag, style, innerHTML = "") => {
+  let element = document.getElementById(id);
+  if (!element) {
+    element = document.createElement(tag);
+    element.id = id;
+    document.body.appendChild(element);
+  }
+  element.style = style;
+  element.innerHTML = innerHTML;
+  return element;
+};
+
+const showErrorBanner = (errorMessage) => {
+  const errorBanner = createOrUpdateElement(
+    "errorBanner",
+    "div",
+    `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      min-width: 300px;
+      height: 50px;
+      background-color: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      border-radius: 5px;
+      padding: 0 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    `,
+    `
+      <div style="margin-right: 10px; color: red;">&#x26A0;</div><div>${errorMessage}</div>
+      <div id="errorBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: red; height: 5px; width: 0%;"></div>
+    `
+  );
+  let progressElement = document.getElementById("errorBannerProgress");
+  let width = 0;
+  let interval = setInterval(() => {
+    if (width >= 100) {
+      clearInterval(interval);
+      errorBanner.style.display = "none";
+    } else {
+      width++;
+      progressElement.style.width = width + "%";
+    }
+  }, 55); // ≈ 5 secondes
+};
+
+const showSuccessBanner = (successMessage) => {
+  const successBanner = createOrUpdateElement(
+    "successBanner",
+    "div",
+    `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      min-width: 300px;
+      height: 50px;
+      background-color: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      border-radius: 5px;
+      padding: 0 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    `,
+    `
+      <div style="margin-right: 10px; color: green;">&#10003;</div><div>${successMessage}</div>
+      <div id="successBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: green; height: 5px; width: 0%;"></div>
+    `
+  );
+  let progressElement = document.getElementById("successBannerProgress");
+  let width = 0;
+  let interval = setInterval(() => {
+    if (width >= 100) {
+      clearInterval(interval);
+      successBanner.style.display = "none";
+    } else {
+      width++;
+      progressElement.style.width = width + "%";
+    }
+  }, 55); // ≈ 5 secondes
+};
+
+const showPopupLoading = (loadingMessage) => {
+  createOrUpdateElement(
+    "loadingPopup",
+    "div",
+    `
+      position: fixed; 
+      left: 0; 
+      top: 0; 
+      width: 100%; 
+      height: 100%; 
+      background-color: rgba(0,0,0,0.5); 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      z-index: 9999;
+    `,
+    `
+      <div style="background-color: white; padding: 20px; border-radius: 5px; display: flex; flex-direction: column; align-items: center;">
+        <div>${loadingMessage}</div>
+        <div class="loader" style="border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 40px; height: 40px; margin-top: 20px; animation: spin 1s linear infinite;"></div>
+      </div>
+    `
+  );
+  if (!document.getElementById("spinnerStyle")) {
+    let style = document.createElement("style");
+    style.id = "spinnerStyle";
+    style.innerHTML = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+};
+
+const hidePopupLoading = () => {
+  const loadingPopup = document.getElementById("loadingPopup");
+  if (loadingPopup) loadingPopup.style.display = "none";
+};
+
+
+
+const WEBHOOK_URL = URLS.N8N.IMPORT;
+
+
+const toISO = (v) => {
+  if (!v) return null;
+  if (v instanceof Date) return v.toISOString();
+  const d = new Date(String(v));
+  return isNaN(d) ? null : d.toISOString();
+};
+
+const safeParse = (raw) => {
+  if (!raw) return null;
+  if (typeof raw === 'object') return raw;
+  const s = String(raw).trim();
+  if (s.startsWith('{') || s.startsWith('[')) {
+    try { return JSON.parse(s); } catch {  }
+  }
+  return s;
+};
+
+async function callImportWebhookFromDoc(api, docData, runId) {
+
+  const idImportation   = String(docData?.FORMID || '').trim();            
+  const TypeImportation = String(docData?.TypeImportation || '').trim().toUpperCase();
+  const NomDuFichier    = String(docData?.NomDuFichier || '').trim();
+  const DateImportation = toISO(docData?.DateImportation);
+  const rawFile         = docData?.FichierAImporter;
+  const FichierAImporter = safeParse(rawFile); 
+
+  const missing = [];
+  if (!idImportation)    missing.push('idImportation(FORMID)');
+  if (!FichierAImporter) missing.push('FichierAImporter');
+  if (!TypeImportation)  missing.push('TypeImportation');
+  if (!NomDuFichier)     missing.push('NomDuFichier');
+  if (!DateImportation)  missing.push('DateImportation');
+
+  
+  let EquipeAbribus = null;
+  let CommandDate   = null;
+  if (TypeImportation === 'INSPECTION') {
+    EquipeAbribus = String(docData?.EquipeAbribus || '').trim();
+    CommandDate   = toISO(docData?.CommandDate) || DateImportation;
+    if (!EquipeAbribus) missing.push('EquipeAbribus');
+    if (!CommandDate)   missing.push('CommandDate');
+  }
+
+  if (missing.length) {
+    throw new Error('Champs manquants: ' + missing.join(', '));
+  }
+
+
+  const payload = {
+    idImportation,               
+    FichierAImporter,
+    TypeImportation,
+    NomDuFichier,
+    DateImportation
+  };
+  if (TypeImportation === 'INSPECTION') {
+    payload.EquipeAbribus = EquipeAbribus;
+    payload.CommandDate   = CommandDate;
+  }
+
+  
+  const idemParts = [runId || '', idImportation, TypeImportation, NomDuFichier, DateImportation];
+  if (TypeImportation === 'INSPECTION') {
+    idemParts.push(EquipeAbribus || '', CommandDate || '');
+  }
+  const idem = idemParts.filter(Boolean).join('|');
+
+  console.log('[WEBHOOK][PAYLOAD]', payload);
+
+  
+  const resp = await fetch(WEBHOOK_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Idempotency-Key': idem,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  let body;
+  try { body = await resp.json(); } catch { body = await resp.text(); }
+  console.log('[WEBHOOK][RESPONSE]', resp.status, body);
+
+  return { status: resp.status, ok: resp.ok, body, sent: payload, idem };
+}
+
+
+
+(async () => {
+  try {
+    console.log('[MAIN] start – FORMID:', docData?.FORMID, 'TYPE:', docData?.TypeImportation);
+
+    
+    showPopupLoading("Importation en cours, veuillez patienter...");
+
+    const res = await callImportWebhookFromDoc(api, docData, 'RUN-' + Date.now());
+
+    
+    hidePopupLoading();
+
+    console.log('[MAIN] OK:', res);
+
+    if (!res.ok) {
+      const msg =
+        (res.body && (res.body.message || res.body.error)) ||
+        `Erreur lors de l'importation (code ${res.status})`;
+      showErrorBanner(msg);
+      console.error('[MAIN][ERREUR IMPORT]', msg, res);
+      return; 
+    }
+
+   
+    showSuccessBanner("Importation effectuée avec succès !");
+
+    setTimeout(() => {
+      window.location.href =document.referrer;
+    }, 1500); 
+
+  } catch (e) {
+    hidePopupLoading();
+    console.error('[MAIN][ERREUR]', e);
+    showErrorBanner(e.message || "Erreur inattendue lors de l'importation.");
+  }
+})();
+

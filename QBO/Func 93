@@ -1,0 +1,2 @@
+return docData['SousCatégorie1'] === 'Régulier - Supplémentaire'||docData['SousCatégorie1'] === 'Régulier - ÉTÉ'||docData['SousCatégorie1'] === 'Régulier - HIVER'||docData['TypeIntervention'] === 'Entretien'&&docData['SousCatégorie1'] === 'Régulier - NUM' ?    
+{'Photo_AbribusCompletLaveCoteOppose': true    }: {'Photo_AbribusCompletLaveCoteOppose': null    };

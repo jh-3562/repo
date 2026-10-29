@@ -1,0 +1,2 @@
+return docData['SousCatégorie1'] === 'Conversion'||docData['SousCatégorie1'] === 'Nouveau Site'||docData['SousCatégorie1'] === 'Réinstallation'||(docData['TypeIntervention']==='Déploiement'&&docData['SousCatégorie1'] === 'Installation') ?    
+{'Photo_NumSerieFABCO': true    }: {'Photo_NumSerieFABCO': null    };

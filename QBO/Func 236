@@ -1,0 +1,536 @@
+console.log('236', context);
+
+/* ============================== UI HELPERS (POPUPS/BANNERS) ============================== */
+const createOrUpdateElement = (id, tag, style, innerHTML = "") => {
+  let element = document.getElementById(id);
+  if (!element) {
+    element = document.createElement(tag);
+    element.id = id;
+    document.body.appendChild(element);
+  }
+  element.style = style;
+  element.innerHTML = innerHTML;
+  return element;
+};
+
+const showErrorBanner = (errorMessage) => {
+  const errorBanner = createOrUpdateElement(
+    "errorBanner",
+    "div",
+    `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      min-width: 300px;
+      height: 50px;
+      background-color: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      border-radius: 5px;
+      padding: 0 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    `,
+    `
+      <div style="margin-right: 10px; color: red;">&#x26A0;</div><div>${errorMessage}</div>
+      <div id="errorBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: red; height: 5px; width: 0%;"></div>
+    `
+  );
+  let progressElement = document.getElementById("errorBannerProgress");
+  let width = 0;
+  let interval = setInterval(() => {
+    if (width >= 100) {
+      clearInterval(interval);
+      errorBanner.style.display = "none";
+    } else {
+      width++;
+      progressElement.style.width = width + "%";
+    }
+  }, 55);
+};
+
+const showSuccessBanner = (successMessage) => {
+  const successBanner = createOrUpdateElement(
+    "successBanner",
+    "div",
+    `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      min-width: 300px;
+      height: 50px;
+      background-color: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      border-radius: 5px;
+      padding: 0 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    `,
+    `
+      <div style="margin-right: 10px; color: green;">&#10003;</div><div>${successMessage}</div>
+      <div id="successBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: green; height: 5px; width: 0%;"></div>
+    `
+  );
+  let progressElement = document.getElementById("successBannerProgress");
+  let width = 0;
+  let interval = setInterval(() => {
+    if (width >= 100) {
+      clearInterval(interval);
+      successBanner.style.display = "none";
+    } else {
+      width++;
+      progressElement.style.width = width + "%";
+    }
+  }, 55);
+};
+
+const showPopupLoading = (loadingMessage) => {
+  createOrUpdateElement(
+    "loadingPopup",
+    "div",
+    `
+      position: fixed; 
+      left: 0; 
+      top: 0; 
+      width: 100%; 
+      height: 100%; 
+      background-color: rgba(0,0,0,0.5); 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      z-index: 9999;
+    `,
+    `
+      <div style="background-color: white; padding: 20px; border-radius: 5px; display: flex; flex-direction: column; align-items: center;">
+        <div>${loadingMessage}</div>
+        <div class="loader" style="border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 40px; height: 40px; margin-top: 20px; animation: spin 1s linear infinite;"></div>
+      </div>
+    `
+  );
+  if (!document.getElementById("spinnerStyle")) {
+    let style = document.createElement("style");
+    style.id = "spinnerStyle";
+    style.innerHTML = `
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    `;
+    document.head.appendChild(style);
+  }
+};
+
+const hidePopupLoading = () => {
+  const loadingPopup = document.getElementById("loadingPopup");
+  if (loadingPopup) loadingPopup.style.display = "none";
+};
+
+// Sécurité: définir applyRegexMask s'il n'existe pas (évite ReferenceError)
+if (typeof window.applyRegexMask !== 'function') {
+  window.applyRegexMask = (inputEl, regex) => {
+    if (!(inputEl instanceof HTMLElement) || !(regex instanceof RegExp)) return;
+    inputEl.addEventListener('input', () => {
+      const m = String(inputEl.value).match(regex);
+      inputEl.value = m ? m[0] : '';
+    });
+  };
+}
+
+const showCustomPopup = ({ title, commentHTML, fields, buttons }) => {
+  function getInput({
+    key,
+    name,
+    type,
+    options,
+    mask,
+    style,
+    defaultValue,
+    min,
+    max,
+    required,
+  }) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "popup-input";
+
+    const label = document.createElement("label");
+    label.textContent = name || key;
+    label.htmlFor = key;
+
+    let input;
+
+    switch (String(type || '').toLowerCase()) {
+      case "select":
+        input = document.createElement("select");
+        input.name = key;
+        if (style) input.style = style;
+        input.id = key;
+        (options || []).forEach(({ value, label }) => {
+          const opt = document.createElement("option");
+          opt.value = value;
+          opt.textContent = label;
+          input.appendChild(opt);
+        });
+        wrapper.append(label, input);
+        break;
+
+      case "checkbox":
+        input = document.createElement("input");
+        input.type = "checkbox";
+        input.name = key;
+        if (style) input.style = style;
+        input.id = key;
+        wrapper.classList.add("popup-input-row");
+        wrapper.append(input, label);
+        break;
+
+      case "number":
+        input = document.createElement("input");
+        input.type = "number";
+        input.name = key;
+        if (style) input.style = style;
+        if (defaultValue !== undefined) input.value = defaultValue;
+        if (min !== undefined) input.min = min;
+        if (max !== undefined) input.max = max;
+        if (required) input.required = true;
+        input.step = 1;
+        input.id = key;
+        input.addEventListener("input", () => {
+          input.value = input.value.replace(/[^\d]/g, "");
+        });
+        wrapper.append(label, input);
+        break;
+
+      case "label":
+        const span = document.createElement("span");
+        span.innerHTML = name || "";
+        if (style) span.style = style;
+        wrapper.appendChild(span);
+        break;
+
+      default:
+        input = document.createElement("input");
+        input.type = String(type || 'text').toLowerCase();
+        input.name = key;
+        if (style) input.style = style;
+        input.id = key;
+        if (mask instanceof RegExp) {
+          applyRegexMask(input, mask);
+        }
+        wrapper.append(label, input);
+        break;
+    }
+
+    return wrapper;
+  }
+
+  const overlay = document.createElement("div");
+  overlay.className = "popup-overlay";
+
+  const popup = document.createElement("div");
+  popup.className = "popup-box";
+
+  const style = document.createElement("style");
+  style.textContent = `
+  .popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeInOverlay 0.15s ease-out;
+  }
+
+  @keyframes fadeInOverlay {
+    from { background: rgba(0, 0, 0, 0); }
+    to   { background: rgba(0, 0, 0, 0.4); }
+  }
+
+  .popup-box {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    background: white;
+    border-radius: 0.375rem;
+    padding: 15px 25px;
+    width: 500px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    animation: fadeInScale 0.15s ease-out;
+  }
+
+  @keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .popup-box h1,
+  .popup-box h2,
+  .popup-box h3,
+  .popup-box p,
+  .popup-box span { color: #202127; }
+
+  .popup-box h2 { margin: 0 0 20px; font-size: 1.25rem; }
+
+  .popup-box p, .popup-box span { font-size: 1rem; }
+
+  .popup-comment { margin-bottom: 20px; }
+
+  .popup-input { display: flex; flex-direction: column; margin-bottom: 10px; }
+  .popup-input-row { flex-direction: row; align-items: center; gap: 10px; }
+
+  .popup-input label { margin-bottom: 5px; font-size: 12px; }
+
+  .popup-input input,
+  .popup-input select {
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+  }
+
+  .popup-buttons { display: flex; justify-content: flex-end; gap: 10px; }
+
+  .popup-buttons button {
+    border: none;
+    padding: 3px 30px;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 768px) {
+    .popup-input input, .popup-input select { width: 100%; }
+  }`;
+
+  popup.appendChild(style);
+
+  if (title) {
+    const titleElem = document.createElement("h2");
+    titleElem.textContent = title;
+    titleElem.style.fontWeight = "bold";
+    popup.appendChild(titleElem);
+  }
+
+  if (commentHTML) {
+    const comment = document.createElement("div");
+    comment.className = "popup-comment";
+    comment.innerHTML = commentHTML;
+    popup.appendChild(comment);
+  }
+
+  if (fields) {
+    for (const field of fields) popup.appendChild(getInput(field));
+  }
+
+  const buttonRow = document.createElement("div");
+  buttonRow.className = "popup-buttons";
+
+  if (buttons) {
+    for (const { name, onClick, backgroundColor, color, preset } of buttons) {
+      const btn = document.createElement("button");
+      btn.textContent = name;
+
+      switch (preset) {
+        case "action":
+          btn.style.backgroundColor = "#3182ce";
+          btn.style.color = "#f2f7fb";
+          break;
+        case "cancel":
+          btn.style.backgroundColor = "#f5f5f6";
+          btn.style.color = "#2c2d32";
+          break;
+        default:
+          btn.style.backgroundColor = "#3182ce";
+          btn.style.color = "#f2f7fb";
+          break;
+      }
+
+      if (backgroundColor) btn.style.backgroundColor = backgroundColor;
+      if (color) btn.style.color = color;
+
+      btn.onclick = () => {
+        const values = {};
+        const inputs = popup.querySelectorAll("input, select");
+        for (const el of inputs) {
+          values[el.name] = el.type === "checkbox" ? el.checked : el.value;
+        }
+        onClick(values);
+        document.body.removeChild(overlay);
+      };
+
+      buttonRow.appendChild(btn);
+    }
+  }
+
+  popup.appendChild(buttonRow);
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+};
+
+const showPopupConfirmation = (titleInput, message, yesText = "Oui", noText = "Non") => {
+  return new Promise((resolve) => {
+    showCustomPopup({
+      title: titleInput,
+      commentHTML: message,
+      buttons: [
+        { name: noText,  backgroundColor: "#ffc9c9", color: "#1e1e1e", onClick: () => resolve(false) },
+        { name: yesText, backgroundColor: "#b2f2bb", color: "#1e1e1e", onClick: () => resolve(true) },
+      ],
+    });
+  });
+};
+
+/* ---------- Bridge pour afficher les erreurs via les helpers ci-dessus ---------- */
+const __displayError = (msg) => {
+  if (typeof showErrorBanner === 'function') return showErrorBanner(msg);
+  if (typeof showCustomPopup === 'function') {
+    return showCustomPopup({
+      title: 'Champs obligatoires manquants',
+      commentHTML: `<div>${msg}</div>`,
+      buttons: [{ name: 'OK', preset: 'action', onClick: () => {} }],
+    });
+  }
+  alert(msg);
+};
+
+/* ============================== VALIDATION: CHAMPS OBLIGATOIRES ============================== */
+const requireFields = (doc) => {
+  const REQUIRED = ['TypeIntervention', 'SousCatégorie1', 'DélaiSLA', 'NumAbribus'];
+  const missing = [];
+  for (const k of REQUIRED) {
+    const v = doc?.[k];
+    const s = v == null ? '' : String(v).trim();
+    if (!s) missing.push(k);
+  }
+  if (missing.length) {
+    __displayError(`Veuillez compléter les champs obligatoires:\n- ${missing.join('\n- ')}`);
+    throw new Error(`Champs obligatoires manquants: ${missing.join(', ')}`);
+  }
+};
+
+/* ============================== FONCTION PRINCIPALE (NON-ASSIGNÉE + WEBHOOK) ============================== */
+// Crée un document avec le statut "Non-assignée" puis déclenche le webhook
+async function creerNonAssigneeEtNotifier(api, docData, templateId, webhookUrl) {
+  // Valider les champs requis AVANT toute requête réseau
+  requireFields(docData);
+
+  // ---------- Helpers ----------
+  const DataCollection = (key, array) => {
+    let result = {};
+    let itemCount = array?.length || 0;
+    array?.forEach((obj, index) => {
+      Object.keys(obj || {}).forEach((k) => {
+        result[`${k}|${index + 1}`] = obj[k];
+      });
+    });
+    result[key] = String(itemCount);
+    return result;
+  };
+
+  const excludeKeys = (obj, keys) =>
+    Object.keys(obj || {}).reduce((res, k) => {
+      if (!keys.includes(k)) res[k] = obj[k];
+      return res;
+    }, {});
+
+  const formatDataAPI = (data) => {
+    Object.keys(data || {}).forEach((k) => {
+      if (Array.isArray(data[k])) data = { ...data, ...DataCollection(k, data[k]) };
+    });
+    return JSON.stringify(excludeKeys(data, ['FORMID', 'NUMBER']));
+  };
+
+  // ---------- Données ----------
+  const data = docData;
+
+  // ---------- Création : statut "Non-assignée" ----------
+  const payloadCreate = {
+    data: formatDataAPI(data),
+    status: 'Non-assignée',
+    active: true,
+    template: { templateId },
+  };
+  console.log('[NON-ASSIGNEE][POST][PAYLOAD]', payloadCreate);
+
+  showPopupLoading('Création en cours...');
+  let res;
+  try {
+    res = await api({ local: true }).post('document', { document: payloadCreate });
+  } finally {
+    hidePopupLoading();
+  }
+  console.log('[NON-ASSIGNEE][POST][RAW]', res);
+
+  // Récupération de l’ID créé
+  let formId = res?.data?.id;
+  if (!formId && typeof res?.headers?.location === 'string') {
+    const parts = res.headers.location.split('/');
+    formId = parts[parts.length - 1] || null;
+  }
+
+  console.log('[NON-ASSIGNEE][FLOW] formId à notifier:', formId);
+  if (!formId) throw new Error("Impossible de déterminer l'ID du formulaire");
+
+  // ---------- Webhook ----------
+  const repWebhook = await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ids: [formId] }),
+  });
+  let webhookBody; 
+  try { webhookBody = await repWebhook.json(); } catch { webhookBody = true; }
+  console.log('[NON-ASSIGNEE][WEBHOOK]', repWebhook.status, webhookBody);
+
+  showSuccessBanner('Demande créée (Non-assignée) et webhook déclenché.');
+
+  return { formId, webhookBody, mode: 'create-non-assignee' };
+}
+
+const redirectToViewGroup = () => {
+	const lastCustomPage = localStorage.getItem("lastCustomPage");
+	if (lastCustomPage && lastCustomPage.startsWith("/")) {
+	window.location.replace(lastCustomPage);
+	return;
+	}
+	
+	// fallback
+	const pathname = window.location.pathname; // ex: "/repartition/ff1cb5c3-..."
+	const segments = pathname.split("/").filter(Boolean); // ["repartition", "ff1cb5c3-..."]
+	const basePath = segments.length > 0 ? `/${segments[0]}` : "/"; // "/repartition" ou "/"
+	window.location.replace(basePath);
+};
+
+/* ============================== MAIN ============================== */
+(async function mainCreateNonAssignee () {
+  try {
+    const templateId = 'f7b9a59a-e708-45c4-b786-2a5130cfee2b';
+    const webhookUrl = URLS.N8N.NOTIF_EMAIL;
+
+    console.log('[MAIN-NON-ASSIGNEE] start');
+    
+    // Mettre à jour InterventionDateCreationValide
+    const updateDocData = {
+      ...docData,
+      InterventionDateCreationValide:
+        docData?.CommandDate && typeof isFutureDate === "function"
+          ? isFutureDate(docData?.CommandDate)
+          : "Non",
+    };
+    docData = updateDocData;
+
+    const out = await creerNonAssigneeEtNotifier(api, docData, templateId, webhookUrl);
+    console.log('[MAIN-NON-ASSIGNEE] done:', out);
+
+    // Redirection éventuelle
+    redirectToViewGroup();
+  } catch (e) {
+    console.error('[MAIN-NON-ASSIGNEE][ERREUR]', e);
+  }
+})();
+

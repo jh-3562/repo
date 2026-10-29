@@ -1,0 +1,107 @@
+console.log(context);
+const formid = store.pageContentStore?.active?.[0];
+const edits = store.pageContentStore?.processData?.[0]?.edits;
+
+if (!formid) {
+  console.error("Aucun formid trouvé");
+  return;
+}
+
+if (!edits) {
+  console.error("Aucun edits trouvé");
+  return;
+}
+
+const getDateCompletionAndYear = (dateHeureComplete) => {
+  const v = String(dateHeureComplete || "").trim();
+  if (!v) return { DateCompletion: "", AnneeCompletion: "" };
+  const datePart = v.split("T")[0].split(" ")[0]; 
+  const m = datePart.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return { DateCompletion: "", AnneeCompletion: "" };
+  return {
+    DateCompletion: `${m[1]}-${m[2]}-${m[3]}`,
+    AnneeCompletion: m[1],
+  };
+}
+
+const {
+  CommandDate,
+  DelaiSLA,
+  DateHeureComplete,
+  STATUS
+} = edits;
+
+console.log("AVANT duplication", context);
+
+api({ local: true })
+  .post("document/id", {
+    ids: [formid]
+  })
+  .then((res) => {
+    console.log("Formulaire source récupéré", res);
+
+    const sourceDoc = res?.data?.documents?.[0];
+
+    if (!sourceDoc) {
+      console.error("Impossible de récupérer le formulaire source");
+      return;
+    }
+
+    let sourceData = {};
+
+    try {
+      sourceData =
+        typeof sourceDoc.data === "string"
+          ? JSON.parse(sourceDoc.data)
+          : (sourceDoc.data || {});
+    } catch (e) {
+      console.error("Erreur parsing data du formulaire source", e);
+      return;
+    }
+
+    const newData = {
+      ...sourceData,
+      CommandDate,
+      DelaiSLA,
+      DateHeureComplete,
+      ...getDateCompletionAndYear(DateHeureComplete),
+      DuppliquerNotif: true,
+      InterventionDateCreationValide: CommandDate && typeof isFutureDate === "function"
+        ? isFutureDate(docData?.CommandDate)
+        : "Non"
+    };
+
+    const document2 = {
+      data: JSON.stringify(newData),
+      status: STATUS,
+      active: true,
+      template: { templateId: "f7b9a59a-e708-45c4-b786-2a5130cfee2b" }
+    };
+
+    console.log("Document à créer", document2);
+
+    return api({ local: true }).post("document", {
+      document: document2
+    });
+  })
+  .then((res5) => {
+    if (!res5) return;
+
+    console.log("Nouveau formulaire créé", res5);
+
+   const newFormId = res5?.data?.id;
+
+    if (!newFormId) {
+      console.error("Impossible de récupérer l'id du nouveau formulaire");
+      return;
+    }
+
+    console.log("ID du nouveau formulaire :", newFormId);
+
+    window.open("/command/" + newFormId, "_blank");
+
+    console.log("APRES ouverture du nouveau formulaire", context);
+  })
+  .catch((err) => {
+    console.error("Erreur pendant la duplication du formulaire", err);
+  });

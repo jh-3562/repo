@@ -1,0 +1,1 @@
+return { 'SousCatégorie1|Électricité': docData['TypeIntervention'] === 'Électricité' ? true : null };

@@ -1,0 +1,7 @@
+if (docData['USER'] === 'DRIVERTEST@FASTERCOM.CA') {
+
+    return{'Role':'DRIVER'}
+
+}
+
+else return{'Role':'ADMIN'}

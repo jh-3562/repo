@@ -1,0 +1,188 @@
+console.log('function 244', docData?.NUMBER, 'FORMID:', docData?.FORMID);
+
+
+if (typeof showPopupLoading !== 'function') {
+  window.showPopupLoading = (loadingMessage) => {
+    const el = document.createElement("div");
+    el.id = "loadingPopup";
+    el.style = `
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 9999;
+    `;
+    el.innerHTML = `
+      <div style="background:white;padding:20px;border-radius:6px;display:flex;flex-direction:column;align-items:center;">
+        <div>${loadingMessage}</div>
+        <div style="border:6px solid #f3f3f3;border-top:6px solid #3498db;border-radius:50%;width:40px;height:40px;margin-top:20px;animation:spin 1s linear infinite;"></div>
+      </div>
+    `;
+    document.body.appendChild(el);
+    if (!document.getElementById("spinnerStyle")) {
+      const style = document.createElement("style");
+      style.id = "spinnerStyle";
+      style.innerHTML = `@keyframes spin {0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}`;
+      document.head.appendChild(style);
+    }
+  };
+}
+
+if (typeof hidePopupLoading !== 'function') {
+  window.hidePopupLoading = () => {
+    const el = document.getElementById("loadingPopup");
+    if (el) el.remove();
+  };
+}
+
+if (typeof showSuccessBanner !== 'function') {
+  window.showSuccessBanner = (msg) => alert(msg);
+}
+if (typeof showErrorBanner !== 'function') {
+  window.showErrorBanner = (msg) => alert(msg);
+}
+
+
+const TEMPLATE_ID = 'f7b9a59a-e708-45c4-b786-2a5130cfee2b';
+const PREVENT_NOTIFY = "FULL";
+const STATUS_CANCEL = "Annulée";
+
+const pad = (n) => String(n).padStart(2, '0');
+const nowLocalISO = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+};
+
+const DataCollection = (key, array) => {
+  let result = {};
+  let itemCount = array?.length || 0;
+  array?.forEach((obj, index) => {
+    Object.keys(obj || {}).forEach((k) => {
+      result[`${k}|${index + 1}`] = obj[k];
+    });
+  });
+  result[key] = String(itemCount);
+  return result;
+};
+
+const excludeKeys = (obj, keys) =>
+  Object.keys(obj || {}).reduce((res, k) => {
+    if (!keys.includes(k)) res[k] = obj[k];
+    return res;
+  }, {});
+
+const formatDataAPI = (data) => {
+  let d = { ...(data || {}) };
+
+ 
+  Object.keys(d || {}).forEach((k) => {
+    if (Array.isArray(d[k])) d = { ...d, ...DataCollection(k, d[k]) };
+  });
+
+
+  return JSON.stringify(excludeKeys(d, ['FORMID', 'NUMBER']));
+};
+
+
+async function creerOuMettreAJourEnAnnulee(api, docData, templateId) {
+  console.log('docData',docData);
+
+  const number = Number(docData?.NUMBER);
+  let formId = String(docData?.FORMID || '').trim();
+  console.log('aaa', { number, formId });
+ 
+  const stampedData = {
+    ...(docData || {}),
+    DateHeureAnnulee: (docData?.DateHeureAnnulee && String(docData.DateHeureAnnulee).trim() !== '')
+      ? docData.DateHeureAnnulee
+      : nowLocalISO(),
+  };
+  console.log('stampedData', stampedData);
+  showPopupLoading('Annulation en cours...');
+  try {
+    if (number === 0) {
+      // CREATE
+      const payloadCreate = {
+        data: formatDataAPI(stampedData),
+        status: STATUS_CANCEL,
+        active: true,
+        template: { templateId },
+      };
+
+      console.log('[CANCEL][POST][PAYLOAD]', payloadCreate);
+
+      const res = await api({ local: true }).post('document', {
+        document: payloadCreate,
+        preventNotify: PREVENT_NOTIFY,
+      });
+
+      console.log('[CANCEL][POST][RAW]', res);
+
+      
+      formId = res?.data?.id || res?.headers?.location?.split('/').pop() || null;
+    } else {
+    
+      if (!formId) throw new Error('FORMID manquant pour la mise à jour');
+
+      const payloadUpdate = {
+        data: formatDataAPI(stampedData),
+        status: STATUS_CANCEL,
+        active: true,
+        template: { templateId },
+        documentID: formId,
+      };
+
+      console.log('[CANCEL][PUT][PAYLOAD]', payloadUpdate);
+
+      const res = await api({ local: true }).put('document', {
+        document: payloadUpdate,
+        preventNotify: PREVENT_NOTIFY,
+      });
+
+      console.log('[CANCEL][PUT][RAW]', res);
+    }
+  } finally {
+    hidePopupLoading();
+  }
+
+  if (!formId) throw new Error("Impossible de déterminer l'ID du formulaire");
+
+  showSuccessBanner(`Statut mis à jour : ${STATUS_CANCEL}\nFormID : ${formId}`);
+  return { formId };
+}
+
+const redirectToViewGroup = () => {
+	const lastCustomPage = localStorage.getItem("lastCustomPage");
+	if (lastCustomPage && lastCustomPage.startsWith("/")) {
+	window.location.replace(lastCustomPage);
+	return;
+	}
+	
+	// fallback
+	const pathname = window.location.pathname; // ex: "/repartition/ff1cb5c3-..."
+	const segments = pathname.split("/").filter(Boolean); // ["repartition", "ff1cb5c3-..."]
+	const basePath = segments.length > 0 ? `/${segments[0]}` : "/"; // "/repartition" ou "/"
+	window.location.replace(basePath);
+};
+
+(async function mainCancel() {
+  try {
+	// Mettre à jour InterventionDateCreationValide
+    const updateDocData = {
+      ...docData,
+      InterventionDateCreationValide:
+        docData?.CommandDate && typeof isFutureDate === "function"
+          ? isFutureDate(docData?.CommandDate)
+          : "Non",
+    };
+    docData = updateDocData;
+
+    const out = await creerOuMettreAJourEnAnnulee(api, docData, TEMPLATE_ID);
+    console.log('[MAIN-CANCEL] done:', out);
+
+    redirectToViewGroup();
+  } catch (e) {
+    console.error('[MAIN-CANCEL][ERREUR]', e);
+    showErrorBanner(String(e?.message || e || 'Erreur inconnue'));
+  }
+})();
+

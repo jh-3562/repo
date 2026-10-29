@@ -1,0 +1,2 @@
+return docData['SousCatégorie1'] === 'Herbes'? 
+{'Photo_AvantCoupeHerbe': true,'Photo_AprèsCoupeHerbe': true }: {'Photo_AvantCoupeHerbe': null,'Photo_AprèsCoupeHerbe': null };
