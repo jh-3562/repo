@@ -57,6 +57,9 @@ const common = {
   Demande_RaisonAttente: true,
   NomTransporteurSearch: true,
   Demande_AccompagnateurMatricule: !canEditMatriculeConfirme,
+  JOUR_ECART : true,
+  Facturation_Transporteur : true,
+  
 };
 let value = {};
 
@@ -464,3 +467,4 @@ return {
   ...common,
   ...value,
 };
+

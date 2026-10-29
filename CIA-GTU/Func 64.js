@@ -1,10 +1,10 @@
 console.log("Fonction 64 • Activer courant / Inactiver autres", context);
 
 // Constantes de base
-const LAYOUT_OPTIM = "e371bcfb-1eba-4f0e-aeac-a528b22667e5"; // ID du layout Optimisation
-const FIELD_IN_DATA = "User_Status"; // Champ métier où je stocke le statut
-const ACTIVE_VALUE = "Actif"; // Valeur pour actif
-const INACTIVE_VALUE = "Inactif"; // Valeur pour inactif
+const LAYOUT_OPTIM    = "e371bcfb-1eba-4f0e-aeac-a528b22667e5";  // ID du layout Optimisation
+const FIELD_IN_DATA   = "User_Status";       // Champ métier où je stocke le statut
+const ACTIVE_VALUE    = "Actif";        // Valeur pour actif
+const INACTIVE_VALUE  = "Inactif";      // Valeur pour inactif
 
 // ID du formulaire courant (celui qui doit rester actif)
 const currentId =
@@ -12,12 +12,7 @@ const currentId =
 
 // Filtre pour récupérer uniquement les documents de ce layout
 const apiFilters = [
-  {
-    key: "FORMLAYOUTID",
-    operator: "EQUALS",
-    value: LAYOUT_OPTIM,
-    type: "TEXT",
-  },
+  { key: "FORMLAYOUTID", operator: "EQUALS", value: LAYOUT_OPTIM, type: "TEXT" }
 ];
 
 // --- Fonctions utilitaires ---
@@ -49,25 +44,18 @@ const formatDataAPI = (obj) => JSON.stringify(flattenCollections(obj || {}));
 
     // 1) Je force d’abord le formulaire courant en "Actif"
     if (currentId) {
-      const curField =
-        String(docData?.[FIELD_IN_DATA] ?? "").trim() || "(vide)";
+      const curField = String(docData?.[FIELD_IN_DATA] ?? "").trim() || "(vide)";
       console.log(`→ Courant: ${currentId}`);
       console.log(`   - ${FIELD_IN_DATA} (dans data) :`, curField);
 
       const curData = { ...(docData || {}) };
-      if (
-        String(curData[FIELD_IN_DATA] || "").toLowerCase() !==
-        ACTIVE_VALUE.toLowerCase()
-      ) {
-        curData[FIELD_IN_DATA] = ACTIVE_VALUE; // mise à jour du champ métier
+      if (String(curData[FIELD_IN_DATA] || "").toLowerCase() !== ACTIVE_VALUE.toLowerCase()) {
+        curData[FIELD_IN_DATA] = ACTIVE_VALUE;  // mise à jour du champ métier
       }
 
       // Je reflète immédiatement le changement dans l’UI si possible
       if (typeof injectDocData === "function") {
-        injectDocData({
-          documentId: currentId,
-          data: { [FIELD_IN_DATA]: ACTIVE_VALUE },
-        });
+        injectDocData({ documentId: currentId, data: { [FIELD_IN_DATA]: ACTIVE_VALUE } });
         console.log("   • injectDocData courant => Actif");
       }
 
@@ -75,23 +63,21 @@ const formatDataAPI = (obj) => JSON.stringify(flattenCollections(obj || {}));
       updates.push({
         documentID: currentId,
         active: true,
-        status: ACTIVE_VALUE, // statut API
+        status: ACTIVE_VALUE,                          // statut API
         template: { templateId: LAYOUT_OPTIM },
-        data: formatDataAPI(curData), // data.STATUS = Actif
+        data: formatDataAPI(curData)                   // data.STATUS = Actif
       });
       console.log("   • Prépare MAJ courant (=> Actif)");
     }
 
     // 2) Je récupère tous les documents de ce layout
-    const resIds = await api({ local: true }).post("document/id/filter", {
-      filters: apiFilters,
-    });
-    const ids = resIds?.data?.ids || [];
+    const resIds  = await api({ local: true }).post("document/id/filter", { filters: apiFilters });
+    const ids     = resIds?.data?.ids || [];
     console.log("→ IDs trouvés:", ids);
 
     if (ids.length) {
       const resDocs = await api({ local: true }).post("document/id", { ids });
-      const docs = resDocs?.data?.documents || [];
+      const docs    = resDocs?.data?.documents || [];
       console.log("→ Docs chargés:", docs.length);
 
       // 3) Pour chaque autre document, je les mets à "Inactif"
@@ -102,14 +88,13 @@ const formatDataAPI = (obj) => JSON.stringify(flattenCollections(obj || {}));
         // Je parse la data
         let formData = {};
         try {
-          formData =
-            typeof d?.data === "string" ? JSON.parse(d.data) : d?.data || {};
+          formData = typeof d?.data === "string" ? JSON.parse(d.data) : (d?.data || {});
         } catch {
           formData = {};
         }
 
         // Je log le statut côté API et côté data
-        const apiStatus = d?.status || "(inconnu)";
+        const apiStatus   = d?.status || "(inconnu)";
         const fieldStatus = formData?.[FIELD_IN_DATA] ?? "(vide)";
 
         console.log(`→ Doc ${id}`);
@@ -117,13 +102,9 @@ const formatDataAPI = (obj) => JSON.stringify(flattenCollections(obj || {}));
         console.log(`   - ${FIELD_IN_DATA} (dans data) :`, fieldStatus);
 
         const alreadyInactive =
-          String(fieldStatus).trim().toLowerCase() ===
-          INACTIVE_VALUE.toLowerCase();
+          String(fieldStatus).trim().toLowerCase() === INACTIVE_VALUE.toLowerCase();
 
-        if (
-          alreadyInactive &&
-          String(apiStatus).toLowerCase() === INACTIVE_VALUE.toLowerCase()
-        ) {
+        if (alreadyInactive && String(apiStatus).toLowerCase() === INACTIVE_VALUE.toLowerCase()) {
           console.log("   • Déjà Inactif → skip");
           continue;
         }
@@ -134,9 +115,9 @@ const formatDataAPI = (obj) => JSON.stringify(flattenCollections(obj || {}));
         updates.push({
           documentID: id,
           active: true,
-          status: INACTIVE_VALUE, // statut API
+          status: INACTIVE_VALUE,                      // statut API
           template: { templateId: LAYOUT_OPTIM },
-          data: formatDataAPI(formData), // data.STATUS = Inactif
+          data: formatDataAPI(formData)                // data.STATUS = Inactif
         });
         console.log("   • Prépare MAJ: => Inactif");
       }
@@ -149,9 +130,7 @@ const formatDataAPI = (obj) => JSON.stringify(flattenCollections(obj || {}));
     }
 
     console.log("→ Payload PUT /document/Many:", { documents: updates });
-    const putRes = await api({ local: true }).put("document/Many", {
-      documents: updates,
-    });
+    const putRes = await api({ local: true }).put("document/Many", { documents: updates });
     console.log("→ PUT /document/Many OK:", putRes?.status || putRes);
   } catch (err) {
     console.error("Erreur:", err);
@@ -160,3 +139,4 @@ const formatDataAPI = (obj) => JSON.stringify(flattenCollections(obj || {}));
 
 // Je retourne Actif pour le document courant dans l’UI
 return { [FIELD_IN_DATA]: ACTIVE_VALUE };
+

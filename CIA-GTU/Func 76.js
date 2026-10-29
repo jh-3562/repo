@@ -11,7 +11,7 @@ if (docData.STATUS === "Inactif") {
   backgroundColor = "#F4E3C0";
 }
 if (docData.STATUS === "Soumise") {
-  backgroundColor = "#d2f9f6";
+  backgroundColor = "#d2f9f9";
   color = "#012834";
 }
 
@@ -35,11 +35,11 @@ if (docData.STATUS === "À assigner") {
 }
 
 if (docData.STATUS === "Planifiée") {
-  backgroundColor = "#d2e9f9";
+  backgroundColor = "#C5CFF6";
   color = "#000517";
 }
 if (docData.STATUS === "Confirmée") {
-  backgroundColor = "#d2d5f9";
+  backgroundColor = "#e5cbe6";
   color = "#2F012F";
 }
 if (docData.STATUS === "En route") {
@@ -62,6 +62,10 @@ if (docData.STATUS === "Payée") {
   backgroundColor = "#CCC6A1";
   color = "#2B2500";
 }
+if (docData.STATUS === "Facturée") {
+  backgroundColor = "#B1B398";
+  color = "#2B2500";
+}
 if (docData.STATUS === "Remboursée") {
   backgroundColor = "#B1B398";
   color = "#2B2500";
@@ -74,27 +78,30 @@ if (docData.STATUS === "Refusée") {
   backgroundColor = "#E6D9CB";
   color = "#2E1600";
 }
-
+  
 if (docData.STATUS === "Attente imprévue") {
   backgroundColor = "#F9B48E";
   color = "#2B2500";
-}
-
+  }
+  
 if (docData.STATUS === "Prise en charge") {
   backgroundColor = "#C9B6E4";
   color = "#2B2500";
-}
+  }
 if (docData.STATUS === "En route - Retour") {
   backgroundColor = "#9ED9D6";
   color = "#2B2500";
-}
+  }
 if (docData.STATUS === "En route - Aller") {
   backgroundColor = "#A9CCEB";
   color = "#2B2500";
-}
+  }
 if (docData.STATUS === "Arrivé à destination") {
   backgroundColor = "#A8DABD";
   color = "#2B2500";
-}
+  }
 
+  
+  
 return { backgroundColor: backgroundColor, color: color };
+

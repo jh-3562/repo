@@ -55,15 +55,15 @@ const showCustomPopup = (params) => {
         });
         wrapper.append(fieldTitle, inputEl);
         break;
-      case "search": {
-        const searchOptions = options || {};
-        const debounce = (fn, delay = 300) => {
+      case "search":
+        function debounce(fn, delay = 300) {
           let timer;
-          return (value) => {
+          return (...args) => {
             clearTimeout(timer);
-            timer = setTimeout(() => fn(value), delay);
+            timer = setTimeout(() => fn(...args), delay);
           };
-        };
+        }
+
         inputEl = document.createElement("input");
         inputEl.type = "search";
         inputEl.name = key;
@@ -71,74 +71,75 @@ const showCustomPopup = (params) => {
         if (style2) inputEl.style = style2;
         if (required) inputEl.required = true;
         if (defaultValue) inputEl.value = defaultValue;
-        // Pas de datalist ni d'autocomplétion du navigateur : seule la liste de la fenêtre doit s'afficher
-        inputEl.setAttribute("autocomplete", "off");
-        let suggestions = searchOptions.suggestions || [];
+
+        const listId = `${key}-list`;
+        const dataList = document.createElement("datalist");
+        dataList.id = listId;
+
+        inputEl.setAttribute("list", listId);
+
+        let suggestions = (options && options.suggestions) || [];
+
+        suggestions.forEach((item) => {
+          const opt = document.createElement("option");
+          opt.value = item;
+          dataList.appendChild(opt);
+        });
+
         const dropdown = document.createElement("div");
         dropdown.className = "popup-search-dropdown";
+
         wrapper.classList.add("popup-search-wrapper");
-        const updateDropdown = () => {
+
+        const updateDropdown = (value) => {
           dropdown.innerHTML = "";
+
           suggestions.forEach((item) => {
             const optionEl = document.createElement("div");
             optionEl.className = "popup-search-option";
-            // Une suggestion peut être un texte ou un objet { title, fields } comme les recherches natives de l'application
-            const itemTitle = typeof item === "object" ? item.title : item;
-            const titleEl = document.createElement("div");
-            titleEl.className = "popup-search-option-title";
-            titleEl.textContent = itemTitle;
-            optionEl.appendChild(titleEl);
-            (typeof item === "object" ? item.fields || [] : []).forEach(
-              (field) => {
-                const fieldEl = document.createElement("div");
-                fieldEl.className = "popup-search-option-field";
-                const fieldName = document.createElement("span");
-                fieldName.className = "popup-search-option-field-name";
-                fieldName.textContent = `${field.name} - `;
-                const fieldValue = document.createElement("span");
-                fieldValue.textContent = field.value;
-                fieldEl.append(fieldName, fieldValue);
-                optionEl.appendChild(fieldEl);
-              },
-            );
+            optionEl.textContent = item;
+
             optionEl.addEventListener("click", () => {
-              inputEl.value = itemTitle;
+              inputEl.value = item;
               dropdown.classList.remove("visible");
               inputEl.dispatchEvent(new Event("change", { bubbles: true }));
             });
+
             dropdown.appendChild(optionEl);
           });
+
           dropdown.classList.add("visible");
         };
-        const updateSuggestions = async (value) => {
-          if (searchOptions.fetchSuggestions) {
+
+        const debouncedUpdate = debounce(async (value) => {
+          if (options?.fetchSuggestions) {
             try {
-              suggestions = await searchOptions.fetchSuggestions(value);
+              suggestions = await options.fetchSuggestions(value);
             } catch (e) {
               console.error("Erreur fetchSuggestions:", e);
               suggestions = [];
             }
           }
-          updateDropdown();
-        };
-        const debouncedUpdate = debounce(
-          updateSuggestions,
-          searchOptions.debounce || 300,
-        );
-        inputEl.addEventListener("input", (event) => {
-          debouncedUpdate(event.target.value);
+
+          updateDropdown(value);
+        }, options?.debounce || 300);
+
+        inputEl.addEventListener("input", (e) => {
+          debouncedUpdate(e.target.value);
         });
+
         inputEl.addEventListener("focus", () => {
-          updateSuggestions(inputEl.value);
+          updateDropdown(inputEl.value);
         });
-        document.addEventListener("click", (event) => {
-          if (!wrapper.contains(event.target)) {
+
+        document.addEventListener("click", (e) => {
+          if (!wrapper.contains(e.target)) {
             dropdown.classList.remove("visible");
           }
         });
-        wrapper.append(fieldTitle, inputEl, dropdown);
+
+        wrapper.append(fieldTitle, inputEl, dataList, dropdown);
         break;
-      }
       case "checkbox":
         inputEl = document.createElement("input");
         inputEl.type = "checkbox";
@@ -232,185 +233,158 @@ const showCustomPopup = (params) => {
   popup.className = "popup-box";
   const style = document.createElement("style");
   style.textContent = `
-  .popup-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    animation: fadeInOverlay 0.15s ease-out;
-  }
-
-  @keyframes fadeInOverlay {
-    from {
-      background: rgba(0, 0, 0, 0);
-    }
-    to {
+    .popup-overlay {
+      position: fixed;
+      inset: 0;
       background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      animation: fadeInOverlay 0.15s ease-out;
     }
-  }
 
-  .popup-box {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    background: white;
-    border-radius: 0.375rem;
-    padding: 15px 25px;
-    width: 500px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    animation: fadeInScale 0.15s ease-out;
-  }
-
-  @keyframes fadeInScale {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-      background: rgba(0, 0, 0, 0);
+    @keyframes fadeInOverlay {
+      from {
+        background: rgba(0, 0, 0, 0);
+      }
+      to {
+        background: rgba(0, 0, 0, 0.4);
+      }
     }
-    to {
-      opacity: 1;
-      transform: scale(1);
+
+    .popup-box {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      background: white;
+      border-radius: 0.375rem;
+      padding: 15px 25px;
+      width: 500px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      animation: fadeInScale 0.15s ease-out;
     }
-  }
 
-  .popup-box h1,
-  .popup-box h2,
-  .popup-box h3,
-  .popup-box p,
-  .popup-box span {
-    color: #202127;
-  }
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+        background: rgba(0, 0, 0, 0);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
 
-  .popup-box h2 {
-    margin: 0 0 20px;
-    font-size: 1.25rem;
-  }
+    .popup-box h1,
+    .popup-box h2,
+    .popup-box h3,
+    .popup-box p,
+    .popup-box span {
+      color: #202127;
+    }
 
-  .popup-box p,
-  .popup-box span {
-    font-size: 1rem;
-  }
+    .popup-box h2 {
+      margin: 0 0 20px;
+      font-size: 1.25rem;
+    }
 
-  .popup-comment {
-    margin-bottom: 20px;
-  }
+    .popup-box p,
+    .popup-box span {
+      font-size: 1rem;
+    }
 
-  .popup-input {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 10px;
-  }
+    .popup-comment {
+      margin-bottom: 20px;
+    }
 
-  .popup-input-row {
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-  }
+      .popup-search-wrapper {
+          position: relative;
+      }
 
-  .popup-input label {
-    margin-bottom: 5px;
-    font-size: 12px;
-  }
+      .popup-search-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 0.375rem;
+      z-index: 1000;
+      max-height: 150px;
+      overflow-y: auto;
+      display: none;
+      }
 
-  .popup-input input,
-  .popup-input select {
-    padding: 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 0.375rem;
-    font-size: 1rem;
-  }
+      .popup-search-dropdown.visible {
+      display: block;
+      }
 
-  .popup-input.invalid input,
-.popup-input.invalid select {
-  border: 1px solid #FF0000;
-}
+      .popup-search-option {
+      padding: 8px 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #202127;
+      }
 
-  .popup-search-wrapper {
-    position: relative;
-  }
+      .popup-search-option:hover {
+      background: #f5f5f6;
+      }
+      .popup-input input[type="search"]::-webkit-search-cancel-button {
+      cursor: pointer;
+      }
 
-  .popup-search-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background: var(--chakra-colors-white, #ffffff);
-    border: 1px solid var(--chakra-colors-gray-200, #e0e0e1);
-    border-radius: var(--chakra-radii-md, 6px);
-    padding: var(--chakra-space-1-5, 6px);
-    box-sizing: border-box;
-    z-index: 1000;
-    max-height: 21rem;
-    overflow-y: auto;
-    display: none;
-  }
+    .popup-input {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
 
-  .popup-search-dropdown.visible {
-    display: block;
-  }
+    .popup-input-row {
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+    }
 
-  .popup-search-option {
-    padding: 8px 10px;
-    cursor: pointer;
-    font-size: 1rem;
-    color: #202127;
-  }
+    .popup-input label {
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
 
-  .popup-search-option:not(:last-child) {
-    border-bottom: 1px solid #e5e5e5;
-  }
-
-  .popup-search-option:hover {
-    background: #e6f4e4;
-  }
-
-  /* Valeurs relevées sur les suggestions natives (Chakra) du popup « Modifier » de la répartition */
-  .popup-search-option-title {
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 16.8px;
-    color: #202127;
-  }
-
-  .popup-search-option-field,
-  .popup-search-option-field span {
-    font-size: var(--chakra-fontSizes-sm, 14px);
-    font-weight: 400;
-    line-height: 1.1rem;
-    color: #202127;
-  }
-
-  .popup-search-option-field-name {
-    opacity: 0.5;
-  }
-
-  .popup-input input[type="search"]::-webkit-search-cancel-button {
-    cursor: pointer;
-  }
-
-  .popup-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-
-  .popup-buttons button, .popup-buttons input[type='button'] {
-    border: none;
-    padding: 3px 30px;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.875rem;
-  }
-
-  @media (max-width: 768px) {
     .popup-input input,
     .popup-input select {
-        width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 0.375rem;
+      font-size: 1rem;
     }
-  }
-`;
+
+    .popup-input.invalid input,
+    .popup-input.invalid select {
+      border: 1px solid #FF0000;
+    }
+
+    .popup-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .popup-buttons button, .popup-buttons input[type='button'] {
+      border: none;
+      padding: 3px 30px;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    @media (max-width: 768px) {
+      .popup-input input,
+      .popup-input select {
+          width: 100%;
+      }
+    }
+  `;
   popup.appendChild(style);
   if (title) {
     const titleElem = document.createElement("h2");
@@ -453,7 +427,7 @@ const showCustomPopup = (params) => {
       if (button.color) btn.style.color = button.color;
       btn.onclick = () => {
         const form = document.getElementById("customPopup");
-        if (button.key != "cancel" && !form.reportValidity()) {
+        if (button.preset != "cancel" && !form.reportValidity()) {
           const fields2 = form.querySelectorAll(
             ".popup-input input, .popup-input select",
           );
@@ -528,9 +502,8 @@ const updateDocument = async (documentToUpdate) => {
 };
 
 const getTransporteurSuggestions = async (searchValue) => {
-  const trimmedValue = String(searchValue ?? "").trim();
+  if (!searchValue || searchValue.trim().length < 2) return [];
 
-  // Comme la fonction 137 : sans texte saisi, on propose tous les transporteurs actifs
   const filters = [
     {
       key: "FORMLAYOUTNAME",
@@ -538,16 +511,12 @@ const getTransporteurSuggestions = async (searchValue) => {
       value: "Transporteur",
       type: "TEXT",
     },
-    ...(trimmedValue
-      ? [
-          {
-            key: "NomTransporteur",
-            operator: "CONTAINS",
-            value: trimmedValue,
-            type: "TEXT",
-          },
-        ]
-      : []),
+    {
+      key: "NomTransporteur",
+      operator: "CONTAINS",
+      value: searchValue.trim(),
+      type: "TEXT",
+    },
     {
       key: "STATUS",
       operator: "EQUALS",
@@ -571,17 +540,7 @@ const getTransporteurSuggestions = async (searchValue) => {
       try {
         const data = JSON.parse(document.data);
         const nomTransporteur = String(data.NomTransporteur || "").trim();
-        if (!nomTransporteur) return [];
-
-        return [
-          {
-            title: nomTransporteur,
-            fields: [
-              { name: "Transporteur", value: nomTransporteur },
-              { name: "Nom du transporteur", value: nomTransporteur },
-            ],
-          },
-        ];
+        return nomTransporteur ? [nomTransporteur] : [];
       } catch (error) {
         console.error("Erreur lors de la lecture d'un transporteur :", error);
         return [];
@@ -704,6 +663,7 @@ const buildBillingData = async (transporteur) => {
   if (!transporteur) return {};
 
   const tarifs = await getTransporteurTarifs(transporteur);
+  console.log("Fonction 190 - tarifs trouvés pour", transporteur, tarifs);
   const tarifLines = [
     ...(docData?.[TARIF_COLLECTION_FIELD] || []),
     ...tarifs.map(toTarifLine),
@@ -759,11 +719,11 @@ const submitStatusSoumise = async (transporteurSaisi) => {
 };
 const main = async () => {
   showCustomPopup({
-    title: "Planifier le transport",
+    title: "Sélectionner un transporteur",
     fields: [
       {
         key: "NomTransporteurSearch",
-        name: "Sélectionner le transporteur",
+        name: "Nom du transporteur",
         type: "search",
         required: true,
         defaultValue: docData?.NomTransporteurSearch || "",
@@ -781,7 +741,7 @@ const main = async () => {
         onClick: () => {},
       },
       {
-        name: "Confirmer",
+        name: "Sélectionner",
         key: "select",
         preset: "action",
         onClick: (values) => submitStatusSoumise(values.NomTransporteurSearch),
@@ -791,3 +751,4 @@ const main = async () => {
 };
 
 main();
+

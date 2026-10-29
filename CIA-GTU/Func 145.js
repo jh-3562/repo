@@ -62,7 +62,7 @@ async function main() {
     hidePopupLoading();
     showSuccessBanner("Transport annulé avec succès.");
     setTimeout(() => {
-     window.location.href = "https://web.cat-gtm-test.fastercom.io/repartition";
+     window.location.href = "/repartition";
      }, 1000);
 
   } catch (e) {
@@ -72,3 +72,4 @@ async function main() {
 }
 
 main();
+

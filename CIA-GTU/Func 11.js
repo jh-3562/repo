@@ -1,4 +1,4 @@
-console.log("Function 11", context);
+console.log("FunctionAnnuler", context);
 
 const showPopupMessage = (message, color = "#2ecc71", duration = 3000) => {
   let popup = document.getElementById("messagePopup");
@@ -67,11 +67,9 @@ if (formID) {
 
   const doc = {
     data: formatDataAPI(docData),
-    status: "Annulé",
-    active: false,
-    template: {
-      templateId: "7e0a41c7-b3f3-4c91-aaad-461caf36cb2e",
-    },
+    status: "Annulé",   // <- statut d’annulation
+    active: false,      // <- désactiver le document
+    template: { templateId: "7e0a41c7-b3f3-4c91-aaad-461caf36cb2e" },
     documentID: formID,
   };
 
@@ -81,12 +79,8 @@ if (formID) {
       showPopupMessage("Document annulé avec succès", "#e67e22");
       setTimeout(() => window.location.reload(), 1500);
     })
-    .catch(() =>
-      showPopupMessage("Erreur lors de l’annulation", "#e74c3c"),
-    );
+    .catch(() => showPopupMessage("Erreur lors de l’annulation", "#e74c3c"));
 } else {
-  showPopupMessage(
-    "Impossible d’annuler : aucun document trouvé",
-    "#e74c3c",
-  );
+  showPopupMessage("Impossible d’annuler : aucun document trouvé", "#e74c3c");
 }
+
