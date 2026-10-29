@@ -653,6 +653,40 @@ const buildTransportPayload = (localDocData, kind) => {
   };
 };
 
+const getErreurRecurrence = (localDocData) => {
+  const frequence = String(
+    localDocData?.Demande_Transport_FréquenceRécurrence || "",
+  ).trim();
+
+  if (frequence === "Hebdomadaire") {
+    const jours = String(localDocData?.Demande_JourneesApplicables || "").trim();
+    const dateDebut = String(
+      localDocData?.Demande_DateDebutRecurrences || "",
+    ).trim();
+    const dateFin = String(localDocData?.Demande_DateFinRecurrences || "").trim();
+
+    if (!jours) return "Choisissez au moins un jour pour la récurrence.";
+    if (!dateDebut || !dateFin) {
+      return "Indiquez la date de début et la date de fin de la récurrence.";
+    }
+    if (dateFin < dateDebut) {
+      return "La date de fin de la récurrence doit être après la date de début.";
+    }
+    return null;
+  }
+
+  if (frequence === "Variable") {
+    const dates = String(localDocData?.Demande_DatesRecurrences || "")
+      .split("|")
+      .filter(Boolean);
+
+    if (dates.length === 0) return "Choisissez au moins une date pour la récurrence.";
+    return null;
+  }
+
+  return "Choisissez la fréquence de la récurrence.";
+};
+
 /* main */
 
 const createDemandeAndTransport = async () => {
@@ -692,6 +726,14 @@ const createDemandeAndTransport = async () => {
       ) {
         hidePopupLoading();
         showErrorBanner("Heure de départ/arrivée incomplète.");
+        return;
+      }
+
+      const erreurRecurrence = getErreurRecurrence(docData);
+
+      if (erreurRecurrence) {
+        hidePopupLoading();
+        showErrorBanner(erreurRecurrence);
         return;
       }
     } else {
@@ -886,7 +928,12 @@ const createDemandeAndTransport = async () => {
 
       hidePopupLoading();
       console.log("[Récurrence] Fin du mode récurrence — succès");
-      window.location.href = "/demandes/Demandes_DonneesPrincipales";
+      showSuccessBanner(`Récurrence #${demandeResult.number} créée avec succès.`);
+
+      // Comme CIA-GTU : laisser le temps de lire le message avant de quitter la page.
+      setTimeout(() => {
+        window.location.href = "/demandes/Demandes_DonneesPrincipales";
+      }, 2000);
       return;
     }
 
