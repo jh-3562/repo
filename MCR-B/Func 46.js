@@ -210,7 +210,7 @@ const timeToMinutes = (time) => {
   return hours * 60 + minutes;
 };
 const isRDVPec =
-  docData.TypeTransport === "RDV au lieu de prise en charge" ? true : false;
+  docData.TypeTransport === "Retour" ? true : false;
 
 // constant needed to calculate embarquement and arrivée time
 // both checkbox needed
@@ -619,7 +619,10 @@ const getArrivalTime = (tempsTrajet) => {
   const pec = docData.CC_Récupération;
   const tempsTrajetMinutes = timeToMinutes(tempsTrajet);
   const pecMinutes = timeToMinutes(pec);
-  const arrivalMinutes = tempsTrajetMinutes + pecMinutes;
+  const loadingTimeMinutes = timeToMinutes(loadingTime || "00:00");
+  const unloadingTimeMinutes = timeToMinutes(unloadingTime || "00:00");
+  const arrivalMinutes =
+    pecMinutes + loadingTimeMinutes + tempsTrajetMinutes + unloadingTimeMinutes;
   const arrival = convertMinutesToHHMM(arrivalMinutes);
   console.log("ARRIVAL ", arrival);
   return arrival;
@@ -661,9 +664,9 @@ const main = async () => {
   const result = {};
   const partialResult = {};
   const isRDVPec =
-    docData.TypeTransport === "RDV au lieu de prise en charge" ? true : false;
+    docData.TypeTransport === "Retour" ? true : false;
   if (
-    docData.TypeTransport === "RDV au lieu de prise en charge" &&
+    docData.TypeTransport === "Retour" &&
     !docData.CC_Récupération
   ) {
     const errorMessage = "Vous devez sélectionner une heure de prise en charge";
@@ -753,7 +756,7 @@ const main = async () => {
             if (meetingStart && manuallyEnteredHours !== "true") {
               const { embarquementFormatted, missionStartFormatted } =
                 calculateEmbarquementTime(firstItem);
-              if (docData.TypeTransport === "RDV à la destination") {
+              if (docData.TypeTransport === "Aller ou aller-retour") {
                 newDocData.CC_Récupération = embarquementFormatted;
               }
               newDocData.heureDebutMission = isRDVPec
@@ -851,7 +854,7 @@ const main = async () => {
             if (meetingStart && manuallyEnteredHours !== "true") {
               const { embarquementFormatted, missionStartFormatted } =
                 calculateEmbarquementTime(firstItem);
-              if (docData.TypeTransport === "RDV à la destination") {
+              if (docData.TypeTransport === "Aller ou aller-retour") {
                 newDocData.CC_Récupération = embarquementFormatted;
               }
               newDocData.heureDebutMission = isRDVPec
@@ -938,7 +941,7 @@ const main = async () => {
           if (meetingStart && manuallyEnteredHours !== "true") {
             const { embarquementFormatted, missionStartFormatted } =
               calculateEmbarquementTime(firstItem);
-            if (docData.TypeTransport === "RDV à la destination") {
+            if (docData.TypeTransport === "Aller ou aller-retour") {
               newDocData.CC_Récupération = embarquementFormatted;
             }
             newDocData.heureDebutMission = isRDVPec
