@@ -1,0 +1,1281 @@
+console.log("Function 256", context);
+
+const INTERVENTION_TEMPLATE_ID = "f7b9a59a-e708-45c4-b786-2a5130cfee2b";
+const STATUS_FIELD_KEY = "NouveauStatutIntervention";
+
+const STATUTS = {
+  A_FAIRE: "À faire",
+  COMPLETE: "Complété",
+  ANNULEE: "Annulée",
+  A_REFAIRE: "À refaire",
+  NON_ASSIGNEE: "Non-assignée",
+};
+
+// -------------------- POPUPS --------------------
+const createOrUpdateElement = (id, tag, style, innerHTML = "") => {
+  let element = document.getElementById(id);
+  if (!element) {
+    element = document.createElement(tag);
+    element.id = id;
+    document.body.appendChild(element);
+  }
+  element.style = style;
+  element.innerHTML = innerHTML;
+  return element;
+};
+
+const showBanner = (id, message, color, icon) => {
+  const banner = createOrUpdateElement(
+    id,
+    "div",
+    `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: 300px;
+      height: 50px;
+      background-color: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      border-radius: 5px;
+      padding: 0 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    `,
+    `
+      <div style="margin-right: 10px; color: ${color};">${icon}</div><div>${message}</div>
+      <div id="${id}Progress" style="position: absolute; bottom: 0; left: 0; background-color: ${color}; height: 5px; width: 0%;"></div>
+    `,
+  );
+  const progress = document.getElementById(`${id}Progress`);
+  let width = 0;
+  const interval = setInterval(() => {
+    if (width >= 100) {
+      clearInterval(interval);
+      banner.style.display = "none";
+      return;
+    }
+    width++;
+    progress.style.width = width + "%";
+  }, 55);
+};
+
+const showSuccessBanner = (message) =>
+  showBanner("successBanner", message, "green", "&#10003;");
+
+const showPopupLoading = (message) => {
+  createOrUpdateElement(
+    "loadingPopup",
+    "div",
+    `
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    `,
+    `
+      <div style="background-color: white; padding: 20px; border-radius: 5px; display: flex; flex-direction: column; align-items: center;">
+        <div>${message}</div>
+        <div style="border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 40px; height: 40px; margin-top: 20px; animation: spin 1s linear infinite;"></div>
+      </div>
+    `,
+  );
+  if (document.getElementById("spinnerStyle")) return;
+  const style = document.createElement("style");
+  style.id = "spinnerStyle";
+  style.innerHTML = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
+  document.head.appendChild(style);
+};
+
+const hidePopupLoading = () => {
+  const loadingPopup = document.getElementById("loadingPopup");
+  if (loadingPopup) loadingPopup.style.display = "none";
+};
+
+const showMessagePopup = (title, lines) =>
+  new Promise((resolve) => {
+    const overlay = createOrUpdateElement(
+      "statusMessagePopup",
+      "div",
+      `
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0,0,0,0.4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+      `,
+      `
+        <div style="background: white; padding: 15px 25px; border-radius: 0.375rem; width: 520px; max-height: 70vh; overflow-y: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.2); font-family: var(--chakra-fonts-body, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif); font-size: 1rem; color: #202127;">
+          <h2 style="margin: 0 0 20px; font-family: var(--chakra-fonts-heading, inherit); font-size: 1.25rem; font-weight: bold;">${title}</h2>
+          <ul style="margin: 0 0 16px 0; padding-left: 20px;">
+            ${lines.map((line) => `<li style="margin-bottom: 6px;">${line}</li>`).join("")}
+          </ul>
+          <div style="display: flex; justify-content: flex-end;">
+            <button id="statusMessagePopupOk" style="padding: 3px 30px; height: 2rem; background: #3182ce; color: #f2f7fb; border: none; border-radius: 0.375rem; cursor: pointer; font-family: inherit; font-weight: 600; font-size: 0.875rem;">OK</button>
+          </div>
+        </div>
+      `,
+    );
+    document.getElementById("statusMessagePopupOk").onclick = () => {
+      overlay.remove();
+      resolve();
+    };
+  });
+
+// -------------------- CHAMPS REQUIS (Complété) --------------------
+const getConditionalRequiredFields = (d) => {
+  const type = d.TypeIntervention;
+  const cat = d["SousCatégorie1"];
+  const notSpecial = type !== "Entretien - Spécial";
+  const isOneOf = (value, list) => list.includes(value);
+  const rules = {};
+
+  rules.Photo_PanneauArret =
+    cat === "Numérique" ||
+    (notSpecial &&
+      isOneOf(cat, [
+        "Herbes/Émondage",
+        "Poubelle",
+        "Drive",
+        "Collant",
+        "Graffiti",
+        "Pression",
+        "Autre",
+      ])) ||
+    (type === "Travaux" && isOneOf(cat, ["Dalle", "Finition"])) ||
+    (type === "Déploiement" &&
+      isOneOf(cat, ["Dalle", "Installation", "Finition"])) ||
+    (notSpecial && type !== "Travaux saisonniers" && cat === "Diffuseur") ||
+    isOneOf(cat, [
+      "Verre",
+      "Inox",
+      "Braquette",
+      "Banc",
+      "Structure",
+      "Vis",
+      "Velcro",
+      "Toit",
+      "Affichage",
+      "Désinstallation",
+      "Sécurisation",
+      "Conversion",
+      "Nouveau Site",
+      "Réinstallation",
+      "Vandalisme",
+      "Riveter Velcro",
+      "Diffuseur anomalie",
+      "Abribus absent",
+      "Inaccessible",
+      "Vis coincée",
+      "Herbes",
+      "Numéro",
+    ]);
+
+  rules.Photo_AbribusCompletLave =
+    isOneOf(cat, [
+      "Régulier - Supplémentaire",
+      "Régulier - ÉTÉ",
+      "Régulier - HIVER",
+    ]) ||
+    (type === "Entretien" && cat === "Régulier - NUM") ||
+    (notSpecial &&
+      isOneOf(cat, [
+        "Herbes/Émondage",
+        "Poubelle",
+        "Drive",
+        "Collant",
+        "Graffiti",
+        "Pression",
+      ]));
+
+  const isDeneigement =
+    isOneOf(cat, ["Régulier", "Accès pub", "Déglaçage", "Mécanique"]) ||
+    (type === "Déneigement" && isOneOf(cat, ["Dalle", "Plainte"]));
+  rules.Photo_AbribusCompletDeneige = isDeneigement;
+  rules.Photo_AbribusCompletDeneigeCoteOppose = isDeneigement;
+  rules.Photo_DeneigementPoubelles =
+    d.Poubelle === "Poubelle à faire" && isDeneigement;
+
+  const isPolissage =
+    cat === "Inox" || (type === "Polissage" && cat === "Verre");
+  rules.Photo_VerreAvant = isPolissage;
+  rules.Photo_VerreApresPolissage = isPolissage;
+
+  rules.Photo_BraquetteInstallee = cat === "Braquette";
+
+  const isReparation =
+    isOneOf(cat, ["Banc", "Vis", "Velcro", "Toit", "Affichage"]) ||
+    (type === "Réparation" &&
+      isOneOf(cat, [
+        "Autre",
+        "Diffuseur",
+        "Structure",
+        "Verre Pub",
+        "Verre",
+      ])) ||
+    (type === "Signalement" && cat === "Verre Pub");
+  rules.Photo_AbribusCompletCoteReparation = isReparation;
+  rules.Photo_PlanRaproccheReparation = isReparation;
+
+  rules.Photo_SiteSansAbribus = cat === "Désinstallation";
+  rules.Photo_SiteEnArrivant = cat === "Sécurisation";
+  rules.Photo_SiteApresSecurisation = cat === "Sécurisation";
+
+  const isInstallation =
+    isOneOf(cat, ["Conversion", "Nouveau Site", "Réinstallation"]) ||
+    (type === "Déploiement" && cat === "Installation");
+  const isInstallationOuFinition =
+    isInstallation ||
+    (isOneOf(type, ["Déploiement", "Travaux"]) && cat === "Finition");
+  rules.Photo_PlanEloigneAbribusCompletFaceInt = isInstallationOuFinition;
+  rules.Photo_PlanEloigneAbribusCompletFaceExt = isInstallationOuFinition;
+  rules.Photo_4BoulonsSecuriteToit = isInstallation;
+  rules.Photo_NumSerieFABCO = isInstallation;
+
+  rules.Photo_ProblemeAReparer =
+    isOneOf(cat, [
+      "Vandalisme",
+      "Riveter Velcro",
+      "Diffuseur anomalie",
+      "Abribus absent",
+      "Inaccessible",
+      "Vis coincée",
+    ]) ||
+    (isOneOf(type, ["NO POST", "Signalement"]) && cat === "Autre") ||
+    (type === "Signalement" && cat === "Structure");
+
+  const isDeploiementNumerique = type === "Déploiement" && cat === "Numérique";
+  const isInterventionNumerique = type === "Numérique" && cat === "Numérique";
+  rules.Photo_GrosPlanFaceInt = isDeploiementNumerique;
+  rules.Photo_GrosPlanFaceExt = isDeploiementNumerique;
+  rules.Photo_NumeroDeSerie = isDeploiementNumerique || isInterventionNumerique;
+  rules.Photo_FaceInt = isInterventionNumerique;
+  rules.Photo_FaceExt = isInterventionNumerique;
+
+  rules.Photo_DalleCoulee =
+    isOneOf(type, ["Déploiement", "Travaux"]) && cat === "Dalle";
+  rules.Photo_Intervention =
+    isOneOf(type, ["Déploiement", "Travaux"]) && cat === "Autre";
+  rules.Photo_VerreBrise = type === "Signalement" && cat === "Verre";
+
+  rules.Photo_AbribusCompletLaveCoteOppose =
+    isOneOf(cat, [
+      "Régulier - Supplémentaire",
+      "Régulier - ÉTÉ",
+      "Régulier - HIVER",
+    ]) ||
+    (type === "Entretien" && cat === "Régulier - NUM");
+
+  const isAvantApres =
+    type === "Entretien - Spécial" ||
+    (type === "Travaux saisonniers" && cat === "Autre");
+  rules.Photo_AbribusAvantIntervention = isAvantApres;
+  rules.Photo_AbribusApresIntervention = isAvantApres;
+
+  rules.Photo_AvantCoupeHerbe = cat === "Herbes";
+  rules.Photo_AprèsCoupeHerbe = cat === "Herbes";
+
+  if (type === "Travaux saisonniers" && cat === "Diffuseur") {
+    const modele = d.Abribus_Modele;
+    const isNum = isOneOf(modele, ["COLONNE NUM", "INOX NUM"]);
+    const isPubRtl =
+      isOneOf(modele, ["CLASSIQUE PUB", "INOX PUB", "MARQUISE PUB"]) &&
+      d.Partenaire === "RTL Longueuil";
+    rules.Photo_INTPorteOuverteEntiere = true;
+    rules.Photo_INTAfficheReplacee = true;
+    rules.Photo_INTBarreNoirBas = !isPubRtl;
+    rules.Photo_INTTubeFluo = !isNum && isPubRtl;
+    rules.Photo_EXTPorteOuverteEntiere = !isNum;
+    rules.Photo_EXTAfficheReplacee = !isNum;
+    rules.Photo_EXTBarreNoirBas = !isNum && !isPubRtl;
+    rules.Photo_EXTTubeFluo = !isNum && isPubRtl;
+    rules.Photo_VisGraissees = !isNum && isPubRtl;
+  }
+
+  rules.Photo_EmplacementAvantNumero = cat === "Numéro";
+  rules.Photo_NumeroPose = cat === "Numéro";
+
+  const isTachesDesinstallation = cat === "Tâches désinstallation";
+  rules.Desinstallation_Tache1 = isTachesDesinstallation;
+  rules.Desinstallation_Tache2 = isTachesDesinstallation;
+  rules.Desinstallation_Tache3 = isTachesDesinstallation;
+  rules.installationPlanned = cat === "Avis d’entrave";
+  rules.takedownValidation = cat === "Avis d’entrave";
+
+  const isTachesInstallation = cat === "Tâches installation";
+  rules.Installation_Tache1 = isTachesInstallation;
+  rules.Installation_Tache2 = isTachesInstallation;
+  rules.Installation_Tache3 = isTachesInstallation;
+
+  return Object.keys(rules).filter((key) => rules[key]);
+};
+
+// Noms affichés dans le formulaire (Field.Name).
+const FIELD_LABELS = {
+  Desinstallation_Tache1:
+    "Faire les Takedowns et balancer les contrats impactés (sur toutes les faces)",
+  Desinstallation_Tache2: "Balancer les contrats à venir",
+  Desinstallation_Tache3: "Mise à jour de COMMB",
+  Installation_Tache1:
+    "Ad Manager : entrer les affiches installées ou créer des tâches d’affichage en urgence",
+  Installation_Tache2: "Mise à jour de COMMB",
+  Installation_Tache3: "Ad Manager : saisir les circulations et l’ID de COMMB",
+  installationPlanned: "Tâche d’installation planifiée",
+  takedownValidation: "Validations des dates de takedown des visuels en cours",
+  Photo_4BoulonsSecuriteToit: "4 boulons de sécurité du toit",
+  Photo_AbribusApresIntervention: "Abribus - Après intervention",
+  Photo_AbribusAvantIntervention: "Abribus - Avant intervention",
+  Photo_AbribusCompletCoteReparation: "Abribus complet - côté de la réparation",
+  Photo_AbribusCompletDeneige: "Abribus complet déneigé",
+  Photo_AbribusCompletDeneigeCoteOppose:
+    "Abribus complet déneigé - côté opposé",
+  Photo_AbribusCompletLave: "Abribus complet lavé",
+  Photo_AbribusCompletLaveCoteOppose: "Abribus complet lavé - côté opposé",
+  Photo_AprèsCoupeHerbe: "Après coupe herbe",
+  Photo_AvantCoupeHerbe: "Avant coupe herbe",
+  Photo_BraquetteInstallee: "Braquette Installée",
+  Photo_DalleCoulee: "Dalle coulée",
+  Photo_DeneigementPoubelles: "Déneigement des poubelles",
+  Photo_EXTAfficheReplacee: "EXT : Affiche replacée",
+  Photo_EXTBarreNoirBas: "EXT : Barre noir bas",
+  Photo_EXTPorteOuverteEntiere: "EXT : Porte ouverte entière",
+  Photo_EXTTubeFluo: "EXT : Tubes fluorescents propres",
+  Photo_EmplacementAvantNumero: "Emplacement avant numéro",
+  Photo_FaceExt: "Plan éloigné abribus complet - FACE EXT",
+  Photo_FaceInt: "Plan éloigné abribus complet - FACE INT",
+  Photo_GrosPlanFaceExt: "Gros plan face ext (écran num)",
+  Photo_GrosPlanFaceInt: "Gros plan face Int",
+  Photo_INTAfficheReplacee: "INT : Affiche replacée",
+  Photo_INTBarreNoirBas: "INT : Barre noir bas",
+  Photo_INTPorteOuverteEntiere: "INT : Porte ouverte entière",
+  Photo_INTTubeFluo: "INT : Tubes fluorescents propres",
+  Photo_Intervention: "Intervention",
+  Photo_NumSerieFABCO: "# de série FABCO",
+  Photo_NumeroDeSerie: "Numéro de série",
+  Photo_NumeroPose: "Numéro posé",
+  Photo_PanneauArret: "Panneau d'arrêt",
+  Photo_PlanEloigneAbribusCompletFaceExt:
+    "Plan éloigné abribus complet - FACE EXT",
+  Photo_PlanEloigneAbribusCompletFaceInt:
+    "Plan éloigné abribus complet - FACE INT",
+  Photo_PlanRaproccheReparation: "Plan rapproché de la réparation",
+  Photo_ProblemeAReparer: "Problème à réparer",
+  Photo_SiteApresSecurisation: "Site après sécurisation",
+  Photo_SiteEnArrivant: "Site en arrivant",
+  Photo_SiteSansAbribus: "Site sans abribus",
+  Photo_VerreApresPolissage: "Verre après polissage",
+  Photo_VerreAvant: "Verre avant polissage",
+  Photo_VerreBrise: "Verre brisé",
+  Photo_VisGraissees: "Vis graissées",
+};
+
+const getFieldLabel = (key) => {
+  const label = FIELD_LABELS[key] || key;
+  return key.startsWith("Photo_") ? `Photo « ${label} »` : label;
+};
+
+const isMissing = (value) => {
+  if (value == null) return true;
+  const text = String(value).trim();
+  return text === "" || text === "[]" || text === "false";
+};
+
+const getMissingFields = (data, requiredKeys) =>
+  requiredKeys.filter((key) => isMissing(data[key]));
+
+// Les champs exigés à la création sont déjà remplis : seuls les photos et tâches de complétion restent.
+const getRequiredFields = (targetStatus, intervention) => {
+  if (targetStatus !== STATUTS.COMPLETE) return [];
+  return getConditionalRequiredFields(intervention.data);
+};
+
+// -------------------- LECTURE --------------------
+// Bouton : étape de sélection puis popup. Clic droit : popup en premier, sur la ligne cliquée.
+const getSelection = () => {
+  const rawProcessData = store?.pageContentStore?.processData || {};
+  const processData = Object.keys(rawProcessData)
+    .sort((a, b) => Number(a) - Number(b))
+    .map((key) => rawProcessData[key]);
+  const popupIndex = processData.findIndex(
+    (step) => step?.edits && STATUS_FIELD_KEY in step.edits,
+  );
+  const edits = processData[popupIndex]?.edits || {};
+  if (popupIndex > 0) {
+    return { ids: processData[popupIndex - 1]?.result?.ids || [], edits };
+  }
+  const clickedId = store?.pageContentStore?.active?.[0];
+  return { ids: clickedId ? [clickedId] : [], edits };
+};
+
+const parseDocument = (doc) => {
+  let data = {};
+  try {
+    data =
+      typeof doc.data === "string"
+        ? JSON.parse(doc.data || "{}")
+        : doc.data || {};
+  } catch {
+    data = {};
+  }
+  const formId = doc.metaData?.FORMID;
+  return {
+    formId,
+    number: doc.metaData?.NUMBER ?? data.NUMBER ?? formId,
+    status: doc.metaData?.STATUS,
+    data: { ...data, FORMID: formId },
+  };
+};
+
+const getInterventions = async (ids) => {
+  const response = await api({ local: true }).post("document/id", { ids });
+  const documents = response?.data?.documents;
+  if (!Array.isArray(documents))
+    throw new Error("Impossible de lire les interventions sélectionnées.");
+  return documents.map(parseDocument);
+};
+
+// -------------------- VALIDATION --------------------
+const getBlockingReason = (intervention, targetStatus) => {
+  if (
+    intervention.status === STATUTS.COMPLETE &&
+    targetStatus !== STATUTS.A_REFAIRE
+  ) {
+    return {
+      text: `déjà complétée, elle peut seulement passer à « ${STATUTS.A_REFAIRE} ».`,
+      hasMissingFields: false,
+    };
+  }
+  const missing = getMissingFields(
+    intervention.data,
+    getRequiredFields(targetStatus, intervention),
+  );
+  if (!missing.length) return null;
+  const items = missing.map((key) => `<li>${getFieldLabel(key)}</li>`).join("");
+  return {
+    text: `à compléter :<ul style="margin: 4px 0 0 0; padding-left: 18px;">${items}</ul>`,
+    hasMissingFields: true,
+  };
+};
+
+const getBlockedInterventions = (interventions, targetStatus) =>
+  interventions
+    .map((intervention) => ({
+      intervention,
+      reason: getBlockingReason(intervention, targetStatus),
+    }))
+    .filter(({ reason }) => reason);
+
+const getBlockedMessageLines = (blocked) => {
+  const lines = blocked.map(
+    ({ intervention, reason }) =>
+      `<b>Intervention ${intervention.number}</b> : ${reason.text}`,
+  );
+  if (!blocked.some(({ reason }) => reason.hasMissingFields)) return lines;
+  return [
+    ...lines,
+    "<i>Complétez ces informations dans le formulaire de l'intervention, puis réessayez.</i>",
+  ];
+};
+
+// -------------------- MISE À JOUR --------------------
+const pad2 = (n) => String(n).padStart(2, "0");
+
+const nowLocalISO = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+};
+
+const getDateCompletionAndYear = (dateHeureComplete) => {
+  const v = String(dateHeureComplete || "").trim();
+  if (!v) return { DateCompletion: "", AnneeCompletion: "" };
+  const datePart = v.split("T")[0].split(" ")[0];
+  const m = datePart.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return { DateCompletion: "", AnneeCompletion: "" };
+  return {
+    DateCompletion: `${m[1]}-${m[2]}-${m[3]}`,
+    AnneeCompletion: m[1],
+  };
+};
+
+const getCreationDateValidity = (data) =>
+  data?.CommandDate && typeof isFutureDate === "function"
+    ? isFutureDate(data.CommandDate)
+    : "Non";
+
+const putIntervention = async (formId, changedData, status, preventNotify) => {
+  const body = {
+    document: {
+      documentID: formId,
+      data: JSON.stringify(changedData),
+      status,
+      active: true,
+      template: { templateId: INTERVENTION_TEMPLATE_ID },
+    },
+  };
+  if (preventNotify) body.preventNotify = preventNotify;
+  const response = await api({ local: true }).put("document", body);
+  if (!response || response.status >= 300)
+    throw new Error(`mise à jour refusée (statut ${response?.status})`);
+};
+
+const postJSON = async (url, body) => {
+  try {
+    const rep = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    return { ok: rep.ok, status: rep.status };
+  } catch (e) {
+    return { ok: false, status: 0 };
+  }
+};
+
+// -------------------- SÉQUENÇAGE --------------------
+// Copie exacte de mainSequencing2 (fonction 235) : crée l'intervention future.
+const mainSequencing2 = async (API, docData) => {
+  const sequencingPad2 = (value) => String(value).padStart(2, "0");
+
+  const sequencingNowLocalISO = () => {
+    const date = new Date();
+    return `${date.getFullYear()}-${sequencingPad2(
+      date.getMonth() + 1,
+    )}-${sequencingPad2(date.getDate())}T${sequencingPad2(
+      date.getHours(),
+    )}:${sequencingPad2(date.getMinutes())}:${sequencingPad2(
+      date.getSeconds(),
+    )}`;
+  };
+
+  const sequencingIsFutureDate = (dateString) => {
+    if (!dateString) return "";
+
+    const parts = String(dateString).split("-").map(Number);
+    if (parts.length !== 3 || parts.some(Number.isNaN)) return "";
+
+    const [year, month, day] = parts;
+    const inputDate = new Date(year, month - 1, day);
+    if (Number.isNaN(inputDate.getTime())) return "";
+
+    const now = new Date();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (now.getHours() >= 22) {
+      today.setDate(today.getDate() + 1);
+    }
+
+    return inputDate <= today ? "Non" : "Oui";
+  };
+
+  const getNumAbribusFilterValue = (data) => {
+    const rawValue = data?.NumAbribus;
+    const values = Array.isArray(rawValue)
+      ? rawValue
+      : String(rawValue || "").split("|");
+    const uniqueValues = [
+      ...new Set(values.map((value) => String(value).trim()).filter(Boolean)),
+    ];
+
+    if (!uniqueValues.length) {
+      throw new Error("NumAbribus manquant pour le sequencage");
+    }
+
+    return uniqueValues.join("|");
+  };
+
+  const getLocalISOInDays = (days) => {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    return `${date.getFullYear()}-${sequencingPad2(
+      date.getMonth() + 1,
+    )}-${sequencingPad2(date.getDate())}T${sequencingPad2(
+      date.getHours(),
+    )}:${sequencingPad2(date.getMinutes())}:${sequencingPad2(
+      date.getSeconds(),
+    )}`;
+  };
+
+  const getDocumentIdsByFilters = async (
+    filters,
+    errorMessage,
+    requestOptions = {},
+  ) => {
+    const response = await API({ local: true }).post("document/id/filter", {
+      filters,
+      ...requestOptions,
+    });
+
+    if (response?.status !== 200) {
+      throw new Error(errorMessage);
+    }
+
+    return Array.isArray(response?.data?.ids) ? response.data.ids : [];
+  };
+
+  const getDocumentsByIds = async (ids) => {
+    if (!ids.length) return [];
+
+    const response = await API({ local: true }).post("document/id", { ids });
+
+    if (response?.status !== 200) {
+      throw new Error("Probleme pendant la recuperation des donnees abribus");
+    }
+
+    return Array.isArray(response?.data?.documents)
+      ? response.data.documents
+      : [];
+  };
+
+  const INTERVENTION_TEMPLATE_ID = "f7b9a59a-e708-45c4-b786-2a5130cfee2b";
+  const STATUS_KEY = "À faire";
+  const TYPE_INTERVENTION = "Entretien";
+
+  const norm = (value) => String(value ?? "").trim();
+
+  const toDate = (value) => {
+    if (!value) return null;
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  };
+
+  const toLocalYMD = (value) => {
+    const stringValue = norm(value);
+    const match = stringValue.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) return null;
+
+    const date = new Date(
+      Number(match[1]),
+      Number(match[2]) - 1,
+      Number(match[3]),
+    );
+    return Number.isNaN(date.getTime()) ? null : date;
+  };
+
+  const addDays = (date, days) =>
+    new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate() + days,
+      date.getHours(),
+      date.getMinutes(),
+      date.getSeconds(),
+    );
+
+  const addHours = (date, hours) =>
+    new Date(date.getTime() + hours * 60 * 60 * 1000);
+
+  const addMonths = (date, months) =>
+    new Date(
+      date.getFullYear(),
+      date.getMonth() + months,
+      date.getDate(),
+      date.getHours(),
+      date.getMinutes(),
+      date.getSeconds(),
+    );
+
+  const midnight = (date) =>
+    new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+  const isoDate = (date) =>
+    `${date.getFullYear()}-${sequencingPad2(
+      date.getMonth() + 1,
+    )}-${sequencingPad2(date.getDate())}`;
+
+  const isoDateTime = (date) =>
+    `${isoDate(date)}T${sequencingPad2(date.getHours())}:${sequencingPad2(
+      date.getMinutes(),
+    )}:${sequencingPad2(date.getSeconds())}`;
+
+  const applySLAFromLast = (date, slaLabel) => {
+    const normalizedSla = norm(slaLabel).toLowerCase();
+    if (normalizedSla === "4h") return addHours(date, 4);
+    if (normalizedSla === "12h") return addHours(date, 12);
+    if (normalizedSla === "24h") return addDays(date, 1);
+    if (normalizedSla === "48h") return addDays(date, 2);
+    if (normalizedSla === "72h") return addDays(date, 3);
+    if (normalizedSla === "4 jours") return addDays(date, 4);
+    if (normalizedSla === "7 jours") return addDays(date, 7);
+    if (normalizedSla === "1 mois") return addMonths(date, 1);
+    if (normalizedSla === "3 mois") return addMonths(date, 3);
+    return addDays(date, 1);
+  };
+
+  const parseApiDoc = (doc) => {
+    const rawData = doc?.data ?? doc;
+    let dataObj = {};
+
+    if (typeof rawData === "string") {
+      try {
+        dataObj = JSON.parse(rawData || "{}");
+      } catch {
+        dataObj = {};
+      }
+    } else if (rawData && typeof rawData === "object") {
+      dataObj = rawData;
+    }
+
+    const metadata = doc?.metaData || {};
+    const formLayoutId =
+      metadata.FORMLAYOUTID ||
+      doc?.template?.templateId ||
+      INTERVENTION_TEMPLATE_ID;
+
+    return { dataObj, formLayoutId };
+  };
+
+  const excludeKeys = new Set([
+    "Photo_NumSerieFABCO",
+    "IDplainte",
+    "Photo_4BoulonsSecuriteToit",
+    "Photo_AbribusApresIntervention",
+    "Photo_AbribusAvantIntervention",
+    "Photo_AbribusCompletCoteReparation",
+    "Photo_AbribusCompletDeneige",
+    "Photo_AbribusCompletDeneigeCoteOppose",
+    "Photo_AbribusCompletLave",
+    "Photo_AbribusCompletLaveCoteOppose",
+    "Photo_BraquetteInstallee",
+    "Intervention_commentaires",
+    "Photo_DalleCoulee",
+    "CommandDate",
+    "DateDue",
+    "DateHeureComplete",
+    "DateCompletion",
+    "AnneeCompletion",
+    "DélaiSLA",
+    "DocumentsSupp",
+    "EquipeAbribus",
+    "Photo_GrosPlanFaceExt",
+    "Photo_GrosPlanFaceInt",
+    "Photo_Intervention",
+    "Intervention_Notes_Solution",
+    "Intervention_Notes_Probleme",
+    "Photo_NumSerie",
+    "Photo_NumeroDeSerie",
+    "Photo_PanneauArret",
+    "Photos",
+    "Photo_PlanEloigneAbribusCompletFaceExt",
+    "Photo_PlanEloigneAbribusCompletFaceInt",
+    "Photo_PlanRaproccheReparation",
+    "PositionTournee",
+    "Photo_ProblemeAReparer",
+    "RaisonNonComplétion",
+    "Photo_SiteApresSecurisation",
+    "Photo_SiteEnArrivant",
+    "Photo_SiteSansAbribus",
+    "SousCatégorie1",
+    "SPVM",
+    "Photo_VerreApresPolissage",
+    "Photo_VerreAvant",
+    "Photo_VerreBrise",
+    "Abribus_Deneigement",
+    "Abribus_Deneigement_Notes",
+    "Poubelle",
+    "Positionnement",
+    "Notifications_Assignation",
+    "Notifications_Completion",
+    "Notifications_AssignationManuel",
+    "Notifications_CompletionManuel",
+    "Photo_obligatoire3",
+  ]);
+
+  const excludePrefixes = [
+    "DocumentsSupp|",
+    "Photos|",
+    "Notifications_Assignation|",
+    "Notifications_Completion|",
+    "Notifications_AssignationManuel|",
+    "Notifications_CompletionManuel|",
+  ];
+
+  const scrubClone = (source) => {
+    const output = {};
+    for (const [key, value] of Object.entries(source || {})) {
+      if (excludeKeys.has(key)) continue;
+      if (excludePrefixes.some((prefix) => key.startsWith(prefix))) continue;
+      output[key] = value;
+    }
+    return output;
+  };
+
+  const numAbribus = getNumAbribusFilterValue(docData);
+  const currentFormId = norm(docData?.FORMID).toLowerCase();
+  const dateNow = sequencingNowLocalISO();
+  const dateIn60Days = getLocalISOInDays(60);
+
+  // 1. Retrieve abribus data and future interventions.
+
+  const abribusIds = await getDocumentIdsByFilters(
+    [
+      {
+        key: "FORMLAYOUTNAME",
+        operator: "EQUALS",
+        value: "ABRIBUS",
+        type: "TEXT",
+      },
+      {
+        key: "STATUS",
+        operator: "EQUALS",
+        value: "Actif",
+        type: "TEXT",
+      },
+      {
+        key: "NumAbribus",
+        operator: "IN",
+        value: numAbribus,
+        type: "TEXT",
+      },
+    ],
+    "Probleme pendant la recherche des formulaires abribus",
+  );
+
+  // Abribus inactif (ou introuvable) : aucune regle de sequencement,
+  // on ne cree pas d'intervention future et on laisse completer l'actuelle.
+  if (!abribusIds.length) {
+    console.log(
+      "[seq] Aucun abribus actif pour",
+      numAbribus,
+      "- sequencage ignore",
+    );
+    return {
+      abribusIds,
+      abribusDocuments: [],
+      futureInterventionIds: [],
+      futureInterventionDocuments: [],
+      document: null,
+      createdDocument: null,
+      hasExistingFuture: false,
+      hasMatchingSequence: false,
+      skippedInactiveAbribus: true,
+    };
+  }
+
+  const abribusDocuments = await getDocumentsByIds(abribusIds);
+
+  const matchingFutureInterventionIds = await getDocumentIdsByFilters(
+    [
+      {
+        key: "FORMLAYOUTNAME",
+        operator: "EQUALS",
+        value: "INTERVENTION",
+        type: "TEXT",
+      },
+      {
+        key: "STATUS",
+        operator: "IN",
+        value: "Problématique|À faire|Non-Assignée|Non-assignée",
+        type: "TEXT",
+      },
+      {
+        key: "TypeIntervention",
+        operator: "EQUALS",
+        value: "Entretien",
+        type: "TEXT",
+      },
+      {
+        key: "DateDue",
+        operator: "BETWEEN",
+        value: `${dateNow}|${dateIn60Days}`,
+        type: "DATETIME",
+      },
+      {
+        key: "NumAbribus",
+        operator: "IN",
+        value: numAbribus,
+        type: "TEXT",
+      },
+    ],
+    "Probleme pendant la recherche des interventions futures",
+    {
+      sort: [{ key: "DateDue", direction: "ASC" }],
+      limit: 1000,
+    },
+  );
+
+  console.log(
+    "[seq] currentFormId:",
+    currentFormId,
+    "ids:",
+    matchingFutureInterventionIds,
+  );
+
+  const futureInterventionIds = matchingFutureInterventionIds.filter(
+    (id) => !currentFormId || norm(id).toLowerCase() !== currentFormId,
+  );
+
+  const futureInterventionDocuments = await getDocumentsByIds(
+    futureInterventionIds,
+  );
+
+  // 2. Process the data and select the next intervention.
+  const interCompleted = [docData];
+  const abriDocs = abribusDocuments;
+  const futureDocs = futureInterventionDocuments;
+
+  const lastByNumCat = {};
+  for (const interventionDocument of interCompleted) {
+    const { dataObj, formLayoutId } = parseApiDoc(interventionDocument);
+    if (norm(dataObj.TypeIntervention) !== TYPE_INTERVENTION) continue;
+
+    const number = norm(dataObj.NumAbribus);
+    if (!number) continue;
+
+    const subCategory = norm(dataObj.SousCatégorie1);
+    const category =
+      subCategory === "Régulier - Supplémentaire" ? "suppl" : "reg";
+    const completedAt = toDate(dataObj.DateHeureComplete);
+    if (!completedAt) continue;
+
+    const key = `${number}||${category}`;
+    const current = lastByNumCat[key];
+    if (!current || completedAt > current.DateHeureComplete) {
+      lastByNumCat[key] = {
+        dataObj,
+        formLayoutId,
+        NumAbribus: number,
+        SousCatégorie1: subCategory,
+        DateHeureComplete: completedAt,
+        SLA_Last: dataObj.DélaiSLA || "24h",
+        Position_Last: dataObj.PositionTournee || "",
+      };
+    }
+  }
+
+  const sequencesByNum = {};
+  for (const abribusDocument of abriDocs) {
+    const { dataObj } = parseApiDoc(abribusDocument);
+    const number = norm(dataObj.NumAbribus);
+    if (!number) continue;
+
+    const rows = {};
+    for (const [key, value] of Object.entries(dataObj)) {
+      if (!key.startsWith("Seq|")) continue;
+
+      const parts = key.split("|");
+      if (parts.length !== 4) continue;
+
+      const rowNumber = parts[3];
+      const field = parts[2];
+      rows[rowNumber] = rows[rowNumber] || { rowNumber };
+      rows[rowNumber][field] = value;
+    }
+
+    const sequences = Object.values(rows)
+      .map((row) => ({
+        rowNumber: row.rowNumber,
+        Equipe: norm(row.Equipe),
+        Position: norm(row.Position),
+        Frequence: Number(norm(row.Frequence || "0")),
+        Periode: norm(row.Periode),
+        Type: norm(row.Type),
+        SousCategorie: norm(row.SousCategorie),
+        Delai: norm(row.Delai),
+      }))
+      .filter(
+        (sequence) =>
+          Number.isFinite(sequence.Frequence) && sequence.Frequence > 0,
+      );
+
+    if (sequences.length) sequencesByNum[number] = sequences;
+  }
+
+  const futureMinDueByNumCat = {};
+  for (const futureDocument of futureDocs) {
+    const { dataObj } = parseApiDoc(futureDocument);
+    if (norm(dataObj.TypeIntervention) !== TYPE_INTERVENTION) continue;
+
+    const number = norm(dataObj.NumAbribus);
+    if (!number) continue;
+
+    const subCategory = norm(dataObj.SousCatégorie1);
+    const category =
+      subCategory === "Régulier - Supplémentaire" ? "suppl" : "reg";
+    const dueDate = toDate(dataObj.DateDue);
+    if (!dueDate) continue;
+
+    const key = `${number}||${category}`;
+    if (!futureMinDueByNumCat[key] || dueDate < futureMinDueByNumCat[key]) {
+      futureMinDueByNumCat[key] = dueDate;
+    }
+  }
+
+  let chosen = null;
+  let hasExistingFuture = false;
+  let hasMatchingSequence = false;
+  const today = new Date();
+
+  for (const [key, source] of Object.entries(lastByNumCat)) {
+    const [number, category] = key.split("||");
+    const sourceType = norm(source.dataObj.TypeIntervention);
+    const sequences = (sequencesByNum[number] || []).filter((sequence) => {
+      const isSupplementary =
+        sequence.SousCategorie === "Régulier - Supplémentaire";
+      const matchesCategory =
+        category === "suppl" ? isSupplementary : !isSupplementary;
+      const matchesType = !sequence.Type || sequence.Type === sourceType;
+      return matchesCategory && matchesType;
+    });
+    if (!sequences.length) continue;
+    hasMatchingSequence = true;
+
+    const minimumFutureDue = futureMinDueByNumCat[key];
+    if (minimumFutureDue && source.DateHeureComplete < minimumFutureDue) {
+      hasExistingFuture = true;
+      continue;
+    }
+
+    for (const sequence of sequences) {
+      const newDate = addDays(source.DateHeureComplete, sequence.Frequence);
+      const [startValue, endValue] = (sequence.Periode || "").split("|");
+      const startDate = toLocalYMD(startValue) || toDate(startValue);
+      const endDate = toLocalYMD(endValue) || toDate(endValue);
+
+      if (endDate) endDate.setHours(23, 59, 59, 999);
+      if (startDate && newDate < startDate) continue;
+      if (endDate && newDate > endDate) continue;
+
+      const dueDate = applySLAFromLast(newDate, source.SLA_Last);
+      if (midnight(dueDate) < midnight(today)) continue;
+
+      if (!chosen || dueDate < chosen.DateDue) {
+        chosen = {
+          source,
+          sequence,
+          NewDate: newDate,
+          DateDue: dueDate,
+        };
+      }
+    }
+  }
+
+  let sequencingDocument = null;
+  if (chosen) {
+    const base = scrubClone(chosen.source.dataObj);
+
+    base.CommandDate = isoDate(chosen.NewDate);
+    base.DateDue = isoDateTime(chosen.DateDue);
+    base.DélaiSLA = chosen.sequence.Delai || "24h";
+    base.EquipeAbribus = chosen.sequence.Equipe || "";
+    base.SousCatégorie1 =
+      chosen.sequence.SousCategorie || chosen.source.SousCatégorie1 || "";
+    base.PositionTournee =
+      chosen.sequence.Position || chosen.source.Position_Last || "";
+    base.TypeIntervention = TYPE_INTERVENTION;
+    base.NumAbribus = chosen.source.NumAbribus;
+    base.FrequenceSequence = String(chosen.sequence.Frequence || "");
+    base.Sequence = String(chosen.sequence.rowNumber || "");
+    base.InterventionDateCreationValide = sequencingIsFutureDate(
+      base.CommandDate,
+    );
+
+    sequencingDocument = {
+      data: JSON.stringify(base),
+      status: STATUS_KEY,
+      active: true,
+      template: {
+        templateId: chosen.source.formLayoutId || INTERVENTION_TEMPLATE_ID,
+      },
+    };
+  }
+
+  // 3. Create the sequenced intervention.
+  let createdDocument = null;
+  if (sequencingDocument) {
+    const response = await API({ local: true }).post("document", {
+      document: sequencingDocument,
+    });
+
+    if (!response || response.status < 200 || response.status >= 300) {
+      throw new Error(
+        "Probleme pendant la creation de l'intervention sequencee",
+      );
+    }
+
+    createdDocument = response.data || null;
+  }
+
+  return {
+    abribusIds,
+    abribusDocuments,
+    futureInterventionIds,
+    futureInterventionDocuments,
+    document: sequencingDocument,
+    createdDocument,
+    hasExistingFuture,
+    hasMatchingSequence,
+  };
+};
+
+// -------------------- TRAITEMENT PAR STATUT --------------------
+// Chaque traitement reprend la fonction du bouton du formulaire ; il renvoie un avertissement ou null.
+const completeIntervention = async (intervention) => {
+  const dateHeureComplete = isMissing(intervention.data.DateHeureComplete)
+    ? nowLocalISO()
+    : intervention.data.DateHeureComplete;
+  const completionData = {
+    DateHeureComplete: dateHeureComplete,
+    ...getDateCompletionAndYear(dateHeureComplete),
+    InterventionDateCreationValide: getCreationDateValidity(intervention.data),
+  };
+
+  const sequencing = await mainSequencing2(api, {
+    ...intervention.data,
+    ...completionData,
+  });
+  if (
+    sequencing?.hasMatchingSequence &&
+    !sequencing?.document &&
+    !sequencing?.hasExistingFuture
+  ) {
+    throw new Error("l'intervention future n'a pas pu être créée");
+  }
+
+  await putIntervention(
+    intervention.formId,
+    completionData,
+    STATUTS.COMPLETE,
+    "FULL",
+  );
+
+  const payload = { ids: [intervention.formId] };
+  const notifications = await Promise.all([
+    postJSON(URLS.N8N.NOTIF_EMAIL, payload),
+    postJSON(URLS.N8N.NOTIF_INSTALL_UNINSTALL, payload),
+  ]);
+  if (notifications.some((result) => !result.ok))
+    return "complétée, mais une notification n'a pas pu être envoyée";
+  return null;
+};
+
+const cancelIntervention = async (intervention) => {
+  const cancelData = {
+    DateHeureAnnulee: isMissing(intervention.data.DateHeureAnnulee)
+      ? nowLocalISO()
+      : intervention.data.DateHeureAnnulee,
+    InterventionDateCreationValide: getCreationDateValidity(intervention.data),
+  };
+  await putIntervention(
+    intervention.formId,
+    cancelData,
+    STATUTS.ANNULEE,
+    "FULL",
+  );
+  return null;
+};
+
+const setToDo = async (intervention) => {
+  const toDoData = {
+    InterventionDateCreationValide: getCreationDateValidity(intervention.data),
+  };
+  await putIntervention(intervention.formId, toDoData, STATUTS.A_FAIRE);
+
+  if (intervention.status === STATUTS.A_FAIRE) return null;
+  const notification = await postJSON(URLS.N8N.NOTIF_EMAIL, {
+    ids: [intervention.formId],
+  });
+  if (!notification.ok)
+    return "passée à « À faire », mais la notification n'a pas pu être envoyée";
+  return null;
+};
+
+const setStatusOnly = (status) => async (intervention) => {
+  await putIntervention(intervention.formId, {}, status);
+  return null;
+};
+
+const STATUS_HANDLERS = {
+  [STATUTS.COMPLETE]: completeIntervention,
+  [STATUTS.ANNULEE]: cancelIntervention,
+  [STATUTS.A_FAIRE]: setToDo,
+  [STATUTS.A_REFAIRE]: setStatusOnly(STATUTS.A_REFAIRE),
+  [STATUTS.NON_ASSIGNEE]: setStatusOnly(STATUTS.NON_ASSIGNEE),
+};
+
+// Une à une : le séquençage dépend de chaque abribus.
+const applyStatus = async (interventions, handler) => {
+  const problems = [];
+  for (const intervention of interventions) {
+    try {
+      const warning = await handler(intervention);
+      if (warning)
+        problems.push(`Intervention ${intervention.number} : ${warning}`);
+    } catch (error) {
+      console.error(
+        `Function 256 : intervention ${intervention.number}`,
+        error,
+      );
+      problems.push(
+        `Intervention ${intervention.number} : ${error?.message || "erreur inconnue"}`,
+      );
+    }
+  }
+  return problems;
+};
+
+const showErrorBanner = (message) =>
+  showBanner("errorBanner", message, "red", "&#x26A0;");
+
+const reloadPage = (delay) => setTimeout(() => window.location.reload(), delay);
+
+// -------------------- MAIN --------------------
+const main = async () => {
+  try {
+    const { ids, edits } = getSelection();
+    const targetStatus = edits[STATUS_FIELD_KEY];
+    const handler = STATUS_HANDLERS[targetStatus];
+    if (!ids.length)
+      return showErrorBanner("Aucune intervention sélectionnée.");
+    if (!handler) return showErrorBanner("Choisissez un statut.");
+
+    showPopupLoading("Vérification des interventions…");
+    const interventions = await getInterventions(ids);
+    const blocked = getBlockedInterventions(interventions, targetStatus);
+    if (blocked.length) {
+      hidePopupLoading();
+      await showMessagePopup(
+        "Aucune intervention n'a été modifiée",
+        getBlockedMessageLines(blocked),
+      );
+      return;
+    }
+
+    showPopupLoading(`Passage au statut « ${targetStatus} » en cours…`);
+    const problems = await applyStatus(interventions, handler);
+    hidePopupLoading();
+
+    if (problems.length) {
+      await showMessagePopup(
+        "Certaines interventions n'ont pas été traitées correctement",
+        problems,
+      );
+      reloadPage(0);
+      return;
+    }
+    showSuccessBanner(
+      `${interventions.length} intervention(s) passée(s) au statut « ${targetStatus} ».`,
+    );
+    reloadPage(1500);
+  } catch (error) {
+    console.error("Function 256 :", error);
+    showErrorBanner(
+      "Le changement de statut n'a pas pu être fait. Réessayez ou contactez le support.",
+    );
+  } finally {
+    hidePopupLoading();
+  }
+};
+
+main();
