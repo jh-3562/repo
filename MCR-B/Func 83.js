@@ -418,9 +418,9 @@ const createPDF = async (listOfMissions, profilInfo) => {
       /*HERE WE GET AND PUSH ALLER/ALLER-RETOUR */
       const isChecked = mission.CC_Retour;
       const isRDVPec = mission?.TypeTransport;
-      if (isRDVPec === "RDV au lieu de prise en charge") {
+      if (isRDVPec === "Retour") {
         trajetInfo.push("Retour");
-        vehicule.push(`Véhicule : ${vehiculeRetour}`);
+        vehicule.push(`Véhicule : ${vehiculeAller}`);
       } else if (isChecked === "true") {
         trajetInfo.push("Aller-Retour");
         if (vehiculeAller !== vehiculeRetour) {
@@ -511,7 +511,11 @@ const createPDF = async (listOfMissions, profilInfo) => {
         let debutRDV =
           mission[`CC_Destinations|400|Début de RDV|${j}`] || "...";
         let finRDV = mission[`CC_Destinations|600|Fin de RDV|${j}`];
-        if (finRDV) {
+        if (isRDVPec === "Retour") {
+          tableDataHours[clientIndex].rows.push([
+            `Hr d'arrivée : ${mission[`CC_Destinations|300|Arrivée|${j}`] || "..."}`,
+          ]);
+        } else if (finRDV) {
           tableDataHours[clientIndex].rows.push([
             `Hr rendez-vous : ${debutRDV || ""} - Hr reprise client estimée : ${
               finRDV || "..."
@@ -749,9 +753,9 @@ const createPDFIndividuel = async (mission, profilInfo) => {
     /*HERE WE GET AND PUSH ALLER/ALLER-RETOUR */
     const isChecked = mission.CC_Retour;
     const isRDVPec = mission?.TypeTransport;
-    if (isRDVPec === "RDV au lieu de prise en charge") {
+    if (isRDVPec === "Retour") {
       trajetInfo.push("Retour");
-      vehicule.push(`Véhicule : ${vehiculeRetour}`);
+      vehicule.push(`Véhicule : ${vehiculeAller}`);
     } else if (isChecked === "true") {
       trajetInfo.push("Aller-Retour");
       if (vehiculeAller !== vehiculeRetour) {
@@ -840,7 +844,11 @@ const createPDFIndividuel = async (mission, profilInfo) => {
       console.log("mission", mission);
       let debutRDV = mission[`CC_Destinations|400|Début de RDV|${j}`] || "...";
       let finRDV = mission[`CC_Destinations|600|Fin de RDV|${j}`];
-      if (finRDV) {
+      if (isRDVPec === "Retour") {
+        tableDataHours[clientIndex].rows.push([
+          `Hr d'arrivée : ${mission[`CC_Destinations|300|Arrivée|${j}`] || "..."}`,
+        ]);
+      } else if (finRDV) {
         tableDataHours[clientIndex].rows.push([
           `Hr rendez-vous : ${debutRDV || ""} - Hr reprise client estimée : ${
             finRDV || "..."
