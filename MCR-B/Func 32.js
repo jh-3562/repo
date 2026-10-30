@@ -446,7 +446,7 @@ const createPDF = async (listeTotale) => {
           Catégorie,
         } = mission;
         const isRDVPec =
-          mission?.TypeTransport === "RDV au lieu de prise en charge"
+          mission?.TypeTransport === "Retour"
             ? true
             : false;
         const deno = mission.Dénomination ? ` - ${mission.Dénomination}` : "";
@@ -501,9 +501,9 @@ const createPDF = async (listeTotale) => {
         } else {
           InformationsPourLeChauffeur
             ? detailsForDriver.push(
-                `Aller  ${detailsToAdd} \n${InformationsPourLeChauffeur}`,
+                `${isRDVPec ? retour : "Aller"}  ${detailsToAdd} \n${InformationsPourLeChauffeur}`,
               )
-            : detailsForDriver.push(`Aller  ${detailsToAdd}`);
+            : detailsForDriver.push(`${isRDVPec ? retour : "Aller"}  ${detailsToAdd}`);
         }
 
         // starting place of mission
@@ -697,7 +697,7 @@ const createPDF = async (listeTotale) => {
             Catégorie,
           } = missionRetour;
           const isRDVPec =
-            missionRetour?.TypeTransport === "RDV au lieu de prise en charge"
+            missionRetour?.TypeTransport === "Retour"
               ? true
               : false;
           const deno = missionRetour.Dénomination
@@ -1271,7 +1271,7 @@ const createPDFIndividual = async (mission) => {
         Catégorie,
       } = mission;
       const isRDVPec =
-        mission?.TypeTransport === "RDV au lieu de prise en charge"
+        mission?.TypeTransport === "Retour"
           ? true
           : false;
       const deno = mission.Dénomination ? ` - ${mission.Dénomination}` : "";
@@ -1326,9 +1326,9 @@ const createPDFIndividual = async (mission) => {
       } else {
         InformationsPourLeChauffeur
           ? detailsForDriver.push(
-              `Aller  ${detailsToAdd} \n${InformationsPourLeChauffeur}`,
+              `${isRDVPec ? retour : "Aller"}  ${detailsToAdd} \n${InformationsPourLeChauffeur}`,
             )
-          : detailsForDriver.push(`Aller  ${detailsToAdd}`);
+          : detailsForDriver.push(`${isRDVPec ? retour : "Aller"}  ${detailsToAdd}`);
       }
 
       // starting place of mission
@@ -1510,7 +1510,7 @@ const createPDFIndividual = async (mission) => {
           Catégorie,
         } = missionRetour;
         const isRDVPec =
-          missionRetour?.TypeTransport === "RDV au lieu de prise en charge"
+          missionRetour?.TypeTransport === "Retour"
             ? true
             : false;
         const deno = missionRetour.Dénomination
