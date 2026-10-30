@@ -11,7 +11,7 @@ if (isChecked === "true") {
   };
 } else if (
   (isChecked === "false" || !isChecked) &&
-  docData.TypeTransport === "RDV à la destination"
+  docData.TypeTransport === "Aller ou aller-retour"
 ) {
   return {
     "CC_Destinations|300|Arrivée": true,

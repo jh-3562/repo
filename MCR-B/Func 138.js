@@ -637,7 +637,8 @@ const createPDF = async (
     const destinations = listeDestination.join("\n");
     /* here we get right description details*/
     const forfait = CalculPrixBis_TarifAppliqué;
-    const trajetInfo = CC_Retour ? "Aller-Retour" : "Aller";
+    let trajetInfo = CC_Retour ? "Aller-Retour" : "Aller";
+    if (mission.TypeTransport === "Retour") trajetInfo = "Retour";
 
     /***************** HERE IS WHERE WE PUSH INFO IN LISTS DEPENDING ON CASES *******************/
     /*** if km is garage to garage *******/

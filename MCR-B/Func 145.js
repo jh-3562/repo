@@ -1,7 +1,7 @@
 console.log("Function145", context);
 
 const rdvPec =
-  docData?.TypeTransport === "RDV au lieu de prise en charge" ? true : false;
+  docData?.TypeTransport === "Retour" ? true : false;
 
 if (
   docData.EntrerHeuresManuellement === "false" ||
