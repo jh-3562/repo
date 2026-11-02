@@ -246,6 +246,13 @@ const main = async () => {
 
   const formLayoutId = "0e44171d-1616-4a50-9b36-aff4d998c4a5";
   const status = docData.STATUS;
+  // Already on a purchase order, invoiced or cancelled: keep as is, otherwise the new recurrence would recreate it as "Acceptée"
+  const KEPT_OCCURRENCE_STATUSES = [
+    "À facturer",
+    "Facturation en cours",
+    "Facturée",
+    "Annulée",
+  ];
 
   const d = new Date(startModificationDate);
   d.setDate(d.getDate() - 1);
@@ -314,8 +321,9 @@ const main = async () => {
   const newMissions = missions.filter((mission) => {
     const data = JSON.parse(mission.data);
     const isAfter = data.Planification_Date >= startModificationDate;
+    const isKept = KEPT_OCCURRENCE_STATUSES.includes(mission.status);
 
-    if (mission.status === "Facturée") {
+    if (isKept) {
       createData = {
         ...createData,
         Exception_Récurrence: createData.Exception_Récurrence
@@ -323,8 +331,27 @@ const main = async () => {
           : data.Planification_Date,
       };
     }
-    return isAfter && mission.status !== "Facturée";
+    return isAfter && !isKept;
   });
+
+  const recreatedDates = newMissions
+    .filter((mission) => mission.status !== "Supprimé(e)")
+    .map((mission) => JSON.parse(mission.data).Planification_Date);
+  // Dates excluded by previous sources stay excluded, except the deleted missions that must be recreated with the modification
+  const inheritedExceptions = (docData.Exception_Récurrence || "")
+    .split("|")
+    .filter(
+      (date) =>
+        date >= startModificationDate && !recreatedDates.includes(date),
+    );
+  const newExceptions = [
+    ...inheritedExceptions,
+    ...(createData.Exception_Récurrence || "").split("|"),
+  ].filter(Boolean);
+  createData = {
+    ...createData,
+    Exception_Récurrence: [...new Set(newExceptions)].join("|"),
+  };
 
   const updateResponse = await updateForm(
     updateID,
