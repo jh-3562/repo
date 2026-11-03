@@ -1,9 +1,9 @@
 console.log("Fonction 50", context);
 
 const sessionToken = new google.maps.places.AutocompleteSessionToken();
-const bounds = new google.maps.LatLngBounds(
-  new google.maps.LatLng(40.3413, -80.4409),
-  new google.maps.LatLng(50.8722, -70.9471),
+const abitibiBounds = new google.maps.LatLngBounds(
+  new google.maps.LatLng(47.0, -79.5),
+  new google.maps.LatLng(49.5, -76.0),
 );
 const addressInput = inputKey;
 const addressValue = docData[inputKey] ? docData[inputKey].toString() : "";
@@ -110,76 +110,100 @@ const getCityValue = (addressComponents, formattedAddress) => {
 };
 
 // Interroge l'API Places et retourne toujours un tableau (meme en cas d'erreur).
-const getGoogleAutocompleteSuggestions = async (input) =>
-  new Promise((resolve) => {
-    google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
-      input,
-      includedRegionCodes: ["ca"],
-      sessionToken,
-      locationRestriction: bounds,
+const fetchSuggestions = async (input, zoneOptions) => {
+  try {
+    const { suggestions } =
+      await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(
+        {
+          input,
+          includedRegionCodes: ["ca"],
+          sessionToken,
+          ...zoneOptions,
+        },
+      );
+    return suggestions || [];
+  } catch (err) {
+    console.error("Autocomplete error:", err);
+    return [];
+  }
+};
+
+const MAX_SUGGESTIONS = 5;
+
+// Adresses de l'Abitibi en premier, complétées par celles d'ailleurs jusqu'à 5 (sans doublons).
+const getGoogleAutocompleteSuggestions = async (input) => {
+  const [abitibiSuggestions, otherSuggestions] = await Promise.all([
+    fetchSuggestions(input, { locationRestriction: abitibiBounds }),
+    fetchSuggestions(input, {}),
+  ]);
+
+  const seenPlaceIds = new Set();
+  return [...abitibiSuggestions, ...otherSuggestions]
+    .filter((suggestion) => {
+      const placeId = suggestion.placePrediction?.placeId;
+      if (!placeId || seenPlaceIds.has(placeId)) {
+        return false;
+      }
+      seenPlaceIds.add(placeId);
+      return true;
     })
-      .then(({ suggestions }) => {
-        resolve(suggestions || []);
-      })
-      .catch((err) => {
-        console.error("Autocomplete error:", err);
-        resolve([]);
-      });
-  });
+    .slice(0, MAX_SUGGESTIONS);
+};
 
 const formatSuggestions = async (suggestions) => {
-  const formattedSuggestions = [];
+  const formattedSuggestions = await Promise.all(
+    suggestions.map(formatSuggestion),
+  );
+  return formattedSuggestions.filter(Boolean);
+};
 
-  for (const suggestion of suggestions) {
-    const placePrediction = suggestion.placePrediction;
-    if (!placePrediction) {
-      continue;
-    }
-
-    const place = placePrediction.toPlace();
-
-    await place.fetchFields({
-      fields: [
-        "formattedAddress",
-        "displayName",
-        "location",
-        "addressComponents",
-      ],
-    });
-
-    // Evite de dupliquer le displayName s'il est deja dans formattedAddress.
-    const title = place.formattedAddress.includes(place.displayName)
-      ? place.formattedAddress
-      : place.displayName + ", " + place.formattedAddress;
-
-    formattedSuggestions.push({
-      title,
-      fields: [
-        {
-          key: "AdressesFrequentes_Latitude",
-          name: "Latitude",
-          value: place.location ? place.location.lat().toString() : "",
-        },
-        {
-          key: "AdressesFrequentes_Longitude",
-          name: "Longitude",
-          value: place.location ? place.location.lng().toString() : "",
-        },
-        {
-          key: "Adresses_VilleLocation",
-          name: "Ville",
-          value: getCityValue(place.addressComponents, place.formattedAddress),
-        },
-        {
-          key: "Adresses_CodePostal",
-          name: "Code postal",
-          value: getComponent(place.addressComponents, "postal_code"),
-        },
-      ],
-    });
+const formatSuggestion = async (suggestion) => {
+  const placePrediction = suggestion.placePrediction;
+  if (!placePrediction) {
+    return null;
   }
 
-  return formattedSuggestions;
+  const place = placePrediction.toPlace();
+
+  await place.fetchFields({
+    fields: [
+      "formattedAddress",
+      "displayName",
+      "location",
+      "addressComponents",
+    ],
+  });
+
+  // Evite de dupliquer le displayName s'il est deja dans formattedAddress.
+  const title = place.formattedAddress.includes(place.displayName)
+    ? place.formattedAddress
+    : place.displayName + ", " + place.formattedAddress;
+
+  return {
+    title,
+    fields: [
+      {
+        key: "AdressesFrequentes_Latitude",
+        name: "Latitude",
+        value: place.location ? place.location.lat().toString() : "",
+      },
+      {
+        key: "AdressesFrequentes_Longitude",
+        name: "Longitude",
+        value: place.location ? place.location.lng().toString() : "",
+      },
+      {
+        key: "Adresses_VilleLocation",
+        name: "Ville",
+        value: getCityValue(place.addressComponents, place.formattedAddress),
+      },
+      {
+        key: "Adresses_CodePostal",
+        name: "Code postal",
+        value: getComponent(place.addressComponents, "postal_code"),
+      },
+    ],
+  };
 };
 
 const main = async () => {
@@ -196,34 +220,30 @@ const main = async () => {
       await getGoogleAutocompleteSuggestions(addressValue);
     suggestions = await formatSuggestions(googleSuggestions);
 
-    if (suggestions[0]) {
-      const firstFields = suggestions[0].fields || [];
-      const typedAddress = addressValue.trim().toLowerCase();
-      const selectedAddress = (suggestions[0].title || "").trim().toLowerCase();
+    const typedAddress = addressValue.trim().toLowerCase();
+    // L'adresse choisie n'est pas forcément la première : on la cherche par son titre.
+    const selectedSuggestion = suggestions.find(
+      (suggestion) =>
+        (suggestion.title || "").trim().toLowerCase() === typedAddress,
+    );
 
-      // Remplit les champs uniquement si la valeur tapee correspond exactement a la suggestion choisie.
-      if (typedAddress === selectedAddress) {
-        data.AdressesFrequentes_Latitude =
-          firstFields.find(
-            (field) => field.key === "AdressesFrequentes_Latitude",
-          )?.value || "";
-        data.AdressesFrequentes_Longitude =
-          firstFields.find(
-            (field) => field.key === "AdressesFrequentes_Longitude",
-          )?.value || "";
-        data.Adresses_VilleLocation =
-          firstFields.find((field) => field.key === "Adresses_VilleLocation")
-            ?.value || "";
-        data.Adresses_CodePostal =
-          firstFields.find((field) => field.key === "Adresses_CodePostal")
-            ?.value || "";
-      } else {
-        // Si l'utilisateur modifie l'adresse, on vide les champs derives.
-        data.AdressesFrequentes_Latitude = "";
-        data.AdressesFrequentes_Longitude = "";
-        data.Adresses_VilleLocation = "";
-        data.Adresses_CodePostal = "";
-      }
+    // Remplit les champs uniquement si la valeur tapee correspond exactement a une suggestion.
+    if (selectedSuggestion) {
+      const selectedFields = selectedSuggestion.fields || [];
+      data.AdressesFrequentes_Latitude =
+        selectedFields.find(
+          (field) => field.key === "AdressesFrequentes_Latitude",
+        )?.value || "";
+      data.AdressesFrequentes_Longitude =
+        selectedFields.find(
+          (field) => field.key === "AdressesFrequentes_Longitude",
+        )?.value || "";
+      data.Adresses_VilleLocation =
+        selectedFields.find((field) => field.key === "Adresses_VilleLocation")
+          ?.value || "";
+      data.Adresses_CodePostal =
+        selectedFields.find((field) => field.key === "Adresses_CodePostal")
+          ?.value || "";
     }
   }
 
