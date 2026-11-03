@@ -231,6 +231,11 @@ async function main() {
   docData.Usager_NomComplet =
     `${docData["Utilisateur_Prenom"]} ${docData["Utilisateur_Nom"]}`.trim();
 
+  // Le champ caché garde sa valeur si le rôle a changé après la saisie
+  if (role !== "TRANSPORTEUR" && role !== "CHAUFFEUR") {
+    docData["NomTransporteurSearch"] = "";
+  }
+
   let invalidFields = [];
 
   if (isCreate && !passwordForEmail) {

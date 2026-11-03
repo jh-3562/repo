@@ -566,8 +566,23 @@ const createDemande = async (data) => {
   );
 
   if (_baseDate && _heure) {
-    data.TransportSysteme_DateDebut =
-      `${_baseDate}T${_heure}:00`;
+    const dateHeureDepart = `${_baseDate}T${_heure}:00`;
+    const dateDepart = new Date(dateHeureDepart);
+
+    if (Number.isNaN(dateDepart.getTime())) {
+      console.error(
+        "Date et heure de début invalides :",
+        dateHeureDepart,
+      );
+    } else {
+      data.TransportSysteme_DateDebut = dateHeureDepart;
+      data.JOUR_ECART = Number(
+        (
+          Math.abs(dateDepart.getTime() - Date.now()) /
+          (1000 * 60 * 60 * 24)
+        ).toFixed(6),
+      );
+    }
   }
   // [FIN FIX DateDebut]
 

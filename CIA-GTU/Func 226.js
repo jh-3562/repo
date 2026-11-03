@@ -2,7 +2,7 @@ console.log('Fonction 226', context);
 
 return {
   NomTransporteurSearch:
-    docData['Utilisateur_Role'] === 'Transporteur' || docData['Utilisateur_Role'] === 'Chauffeur' || docData['Utilisateur_Role'] === 'Répartiteur'
+    docData['Utilisateur_Role'] === 'Transporteur' || docData['Utilisateur_Role'] === 'Chauffeur'
       ? true
       : null,
   Demande_TransportIdentificationDemandeurCourrielDemandeur:
