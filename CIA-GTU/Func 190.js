@@ -65,26 +65,16 @@ const showCustomPopup = (params) => {
         }
 
         inputEl = document.createElement("input");
-        inputEl.type = "search";
+        // "text" sans datalist et sans autocomplete : pas de liste noire ni d'historique du navigateur
+        inputEl.type = "text";
+        inputEl.autocomplete = "off";
         inputEl.name = key;
         inputEl.id = key;
         if (style2) inputEl.style = style2;
         if (required) inputEl.required = true;
         if (defaultValue) inputEl.value = defaultValue;
 
-        const listId = `${key}-list`;
-        const dataList = document.createElement("datalist");
-        dataList.id = listId;
-
-        inputEl.setAttribute("list", listId);
-
         let suggestions = (options && options.suggestions) || [];
-
-        suggestions.forEach((item) => {
-          const opt = document.createElement("option");
-          opt.value = item;
-          dataList.appendChild(opt);
-        });
 
         const dropdown = document.createElement("div");
         dropdown.className = "popup-search-dropdown";
@@ -138,7 +128,7 @@ const showCustomPopup = (params) => {
           }
         });
 
-        wrapper.append(fieldTitle, inputEl, dataList, dropdown);
+        wrapper.append(fieldTitle, inputEl, dropdown);
         break;
       case "checkbox":
         inputEl = document.createElement("input");
@@ -425,7 +415,9 @@ const showCustomPopup = (params) => {
       if (button.backgroundColor)
         btn.style.backgroundColor = button.backgroundColor;
       if (button.color) btn.style.color = button.color;
-      btn.onclick = () => {
+      // type "button" : sinon le clic soumet le formulaire et recharge la page pendant l'attente
+      btn.type = "button";
+      btn.onclick = async () => {
         const form = document.getElementById("customPopup");
         if (button.preset != "cancel" && !form.reportValidity()) {
           const fields2 = form.querySelectorAll(
@@ -437,13 +429,20 @@ const showCustomPopup = (params) => {
           });
           return;
         }
-        button.onClick(getValues());
+        const keepOpen = (await button.onClick(getValues())) === false;
+        if (keepOpen) {
+          Object.values(fieldElements)
+            .filter((el) => el.required)
+            .forEach((el) => el.parentElement.classList.add("invalid"));
+          return;
+        }
         document.body.removeChild(overlay);
       };
       buttonRow.appendChild(btn);
     }
   }
   popup.appendChild(buttonRow);
+  popup.addEventListener("submit", (e) => e.preventDefault());
   overlay.appendChild(popup);
   document.body.appendChild(overlay);
 };
@@ -676,23 +675,31 @@ const buildBillingData = async (transporteur) => {
   };
 };
 
+// Renvoie le nom exact d'un transporteur actif, ou null si le nom saisi n'existe pas
+const findTransporteurName = async (value) => {
+  const searched = String(value ?? "").trim().toLowerCase();
+  if (!searched) return null;
+
+  const names = await getTransporteurSuggestions(value);
+  return names.find((name) => name.toLowerCase() === searched) || null;
+};
+
+// Renvoie false pour garder le popup ouvert
 const submitStatusSoumise = async (transporteurSaisi) => {
   try {
-    const selectedTransporteur =
-      transporteurSaisi ||
-      store?.pageContentStore?.processData?.[0]?.edits
-        ?.Répartition_Transporteur;
+    const selectedTransporteur = await findTransporteurName(transporteurSaisi);
+    if (!selectedTransporteur) {
+      showErrorBanner("Veuillez sélectionner une option valide dans la liste.");
+      return false;
+    }
 
+    showPopupLoading("Planification en cours");
     const billingData = await buildBillingData(selectedTransporteur);
 
     const dataToSend = {
       ...docData,
-      ...(selectedTransporteur
-        ? {
-            Répartition_Transporteur: selectedTransporteur,
-            NomTransporteurSearch: selectedTransporteur,
-          }
-        : {}),
+      Répartition_Transporteur: selectedTransporteur,
+      NomTransporteurSearch: selectedTransporteur,
       ...billingData,
     };
     const formattedData = formatDataAPI(dataToSend);
@@ -706,15 +713,20 @@ const submitStatusSoumise = async (transporteurSaisi) => {
     };
 
     const updated = await updateDocument(documentToUpdate);
-
-    if (updated) {
-      // Reload current URL to stay on same page
-      window.location.reload();
-    } else {
+    if (!updated) {
       showErrorBanner("Erreur lors de la mise à jour du document");
+      return false;
     }
+
+    // Reload current URL to stay on same page
+    window.location.reload();
+    return true;
   } catch (e) {
+    console.error("Erreur lors de la planification :", e);
     showErrorBanner("Erreur lors de la mise à jour du document");
+    return false;
+  } finally {
+    hidePopupLoading();
   }
 };
 const main = async () => {
