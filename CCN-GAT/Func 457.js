@@ -1,0 +1,1 @@
+return {'LienAidesTechniquesusager': 'https://ciussscnattest.r03.rtss.qc.ca/public/dashboard/5fc50962-b272-46aa-806e-af3bbee824ee?dossier='+docData['NoDossier'] };

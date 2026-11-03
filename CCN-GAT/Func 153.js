@@ -1,0 +1,1 @@
+return { '8_NumInv': docData['7_Add'] === 'FALSE' ? null : true };

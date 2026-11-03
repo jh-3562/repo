@@ -1,0 +1,1 @@
+return { '5L_Statut': docData['4L_Add'] === 'FALSE' ? null : true };

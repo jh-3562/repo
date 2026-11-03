@@ -1,0 +1,4164 @@
+FunctionID	Description	ActionNK	Type	Data	FasterClientID
+1	NULL	FILL	FIELD	return {'Empty init': '' };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+2	NULL	FILL	FIELD	return {'Value init': 'Fastercom' };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+3	NULL	SHOW	FIELD	return {'Show init': true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+6	NULL	FILL	FIELD	return docData['When value is 1'] === '1'?{'My value will be 2': '2'}: undefined;	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+9	NULL	SHOW	FIELD	return { 'I will be hidden': docData['When value is 4'] === '4' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+12	NULL	FILL	FIELD	return docData['When value is 3'] === '3'?{'Empty init': 'Fastercom'}: undefined;	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+13	NULL	SHOW	SECTION	return { 'Autocomplete': docData['When value is 5'] === '5' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+14	NULL	SHOW	FIELD	return { 'Hide init': docData['When value is 6'] === '6' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+18	NULL	SHOW	POPUP	return { 'Test': True };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+20	NULL	SHOW	FIELD	return { 'Hide category 1': docData['When value is 7'] === '7' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+25	NULL	SHOW	FIELD	return { 'Show/Hide categories A/B/C': docData['When value is A/B/C'] === 'A' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+26	NULL	SHOW	FIELD	return { 'Show/Hide categories A/B/C': docData['When value is A/B/C'] === 'B' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+27	NULL	SHOW	FIELD	return { 'Show/Hide categories A/B/C': docData['When value is A/B/C'] === 'C' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+29	NULL	SHOW	FIELD	return { 'ToRepare': docData['Reparation'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+34	NULL	SHOW	FIELD	return { '2_NumInv': docData['1_AddEquipement'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+35	NULL	SHOW	FIELD	return { '2_Quantity': docData['1_AddEquipement'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+36	NULL	SHOW	FIELD	return { '2_Name': docData['1_AddEquipement'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+37	NULL	SHOW	FIELD	return { '2_Statut': docData['1_AddEquipement'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+42	NULL	SHOW	FIELD	return { '3_NumInv': docData['2_AddEquipement'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+43	NULL	SHOW	FIELD	return { '3_Quantity': docData['2_AddEquipement'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+44	NULL	SHOW	FIELD	return { '3_Name': docData['2_AddEquipement'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+45	NULL	SHOW	FIELD	return { '3_Statut': docData['2_AddEquipement'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+47	NULL	SHOW	FIELD	return { '2_AddEquipement': docData['1_AddEquipement'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+55	NULL	SHOW	FIELD	return { '2L_NumInv': docData['1L_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+56	NULL	SHOW	FIELD	return { '2L_Quantity': docData['1L_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+57	NULL	SHOW	FIELD	return { '2L_Priority': docData['1L_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+58	NULL	SHOW	FIELD	return { '2L_Name': docData['1L_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+59	NULL	SHOW	FIELD	return { '2L_Statut': docData['1L_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+60	NULL	SHOW	FIELD	return { '2L_Add': docData['1L_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+66	NULL	SHOW	FIELD	return { '3L_NumInv': docData['2L_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+67	NULL	SHOW	FIELD	return { '3L_Quantity': docData['2L_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+68	NULL	SHOW	FIELD	return { '3L_Priority': docData['2L_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+69	NULL	SHOW	FIELD	return { '3L_Name': docData['2L_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+70	NULL	SHOW	FIELD	return { '3L_Statut': docData['2L_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+76	NULL	SHOW	FIELD	return { '4_NumInv': docData['3_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+77	NULL	SHOW	FIELD	return { '4_Quantity': docData['3_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+78	NULL	SHOW	FIELD	return { '4_Name': docData['3_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+79	NULL	SHOW	FIELD	return { '4_Statut': docData['3_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+80	NULL	SHOW	FIELD	return { '4_Add': docData['3_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+85	NULL	SHOW	FIELD	return { '5_NumInv': docData['4_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+86	NULL	SHOW	FIELD	return { '5_Quantity': docData['4_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+87	NULL	SHOW	FIELD	return { '5_Name': docData['4_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+88	NULL	SHOW	FIELD	return { '5_Statut': docData['4_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+90	NULL	SHOW	FIELD	return { '3_Add': docData['2_AddEquipement'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+92	NULL	SHOW	FIELD	return { '3L_Add': docData['2L_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+99	NULL	SHOW	FIELD	return { '4L_Num': docData['3L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+100	NULL	SHOW	FIELD	return { '4L_Quantity': docData['3L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+101	NULL	SHOW	FIELD	return { '4L_Priority': docData['3L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+102	NULL	SHOW	FIELD	return { '4L_Name': docData['3L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+103	NULL	SHOW	FIELD	return { '4L_Statut': docData['3L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+104	NULL	SHOW	FIELD	return { '4L_Add': docData['3L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+111	NULL	SHOW	FIELD	return { '5L_Num': docData['4L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+112	NULL	SHOW	FIELD	return { '5L_Quantity': docData['4L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+113	NULL	SHOW	FIELD	return { '5L_Priority': docData['4L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+114	NULL	SHOW	FIELD	return { '5L_Name': docData['4L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+115	NULL	SHOW	FIELD	return { '5L_Statut': docData['4L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+116	NULL	SHOW	FIELD	return { '5L_Add': docData['4L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+123	NULL	SHOW	FIELD	return { '6L_Num': docData['5L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+124	NULL	SHOW	FIELD	return { '6L_Quantity': docData['5L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+125	NULL	SHOW	FIELD	return { '6L_Priority': docData['5L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+126	NULL	SHOW	FIELD	return { '6L_Name': docData['5L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+127	NULL	SHOW	FIELD	return { '6L_Statut': docData['5L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+129	NULL	SHOW	FIELD	return { '5_Add': docData['4_Add'] === 'False' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+131	NULL	SHOW	FIELD	return { '6_NumInv': docData['5_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+134	NULL	SHOW	FIELD	return { '6_Quantity': docData['5_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+136	NULL	SHOW	FIELD	return { '6_Name': docData['5_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+139	NULL	SHOW	FIELD	return { '6_Statut': docData['5_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+141	NULL	SHOW	FIELD	return { '6_Add': docData['5_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+143	NULL	SHOW	FIELD	return { '7_NumInv': docData['6_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+145	NULL	SHOW	FIELD	return { '7_Quantity': docData['6_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+147	NULL	SHOW	FIELD	return { '7_Name': docData['6_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+149	NULL	SHOW	FIELD	return { '7_Statut': docData['6_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+151	NULL	SHOW	FIELD	return { '7_Add': docData['6_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+153	NULL	SHOW	FIELD	return { '8_NumInv': docData['7_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+155	NULL	SHOW	FIELD	return { '8_Quantity': docData['7_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+157	NULL	SHOW	FIELD	return { '8_Name': docData['7_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+159	NULL	SHOW	FIELD	return { '8_Statut': docData['7_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+161	NULL	SHOW	FIELD	return { '8_Add': docData['7_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+163	NULL	SHOW	FIELD	return { '9_NumInv': docData['8_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+165	NULL	SHOW	FIELD	return { '9_Quantity': docData['8_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+167	NULL	SHOW	FIELD	return { '9_Name': docData['8_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+169	NULL	SHOW	FIELD	return { '9_Statut': docData['8_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+171	NULL	SHOW	FIELD	return { '9_Add': docData['8_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+173	NULL	SHOW	FIELD	return { '10_NumInv': docData['9_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+176	NULL	SHOW	FIELD	return { '10_Quantity': docData['9_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+178	NULL	SHOW	FIELD	return { '10_Name': docData['9_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+180	NULL	SHOW	FIELD	return { '10_Statut': docData['9_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+182	NULL	SHOW	FIELD	return { '6L_Add': docData['5L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+184	NULL	SHOW	FIELD	return { '7L_NumInv': docData['6L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+186	NULL	SHOW	FIELD	return { '7L_Quantity': docData['6L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+188	NULL	SHOW	FIELD	return { '7L_Priority': docData['6L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+190	NULL	SHOW	FIELD	return { '7L_Name': docData['6L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+192	NULL	SHOW	FIELD	return { '7L_Statut': docData['6L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+194	NULL	SHOW	FIELD	return { '7L_Add': docData['6L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+196	NULL	SHOW	FIELD	return { '8L_NumInv': docData['7L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+198	NULL	SHOW	FIELD	return { '8L_Quantity': docData['7L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+200	NULL	SHOW	FIELD	return { '8L_Priority': docData['7L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+202	NULL	SHOW	FIELD	return { '8L_Name': docData['7L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+204	NULL	SHOW	FIELD	return { '8L_Statut': docData['7L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+206	NULL	SHOW	FIELD	return { '8L_Add': docData['7L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+208	NULL	SHOW	FIELD	return { '9L_NumInv': docData['8L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+210	NULL	SHOW	FIELD	return { '9L_Quantity': docData['8L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+212	NULL	SHOW	FIELD	return { '9L_Priority': docData['8L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+214	NULL	SHOW	FIELD	return { '9L_Name': docData['8L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+216	NULL	SHOW	FIELD	return { '9L_Statut': docData['8L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+218	NULL	SHOW	FIELD	return { '9L_add': docData['8L_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+220	NULL	SHOW	FIELD	return { '10L_NumInv': docData['9L_add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+222	NULL	SHOW	FIELD	return { '10L_Quantityt': docData['9L_add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+224	NULL	SHOW	FIELD	return { '10L_Priority': docData['9L_add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+226	NULL	SHOW	FIELD	return { '10L_Name': docData['9L_add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+228	NULL	SHOW	FIELD	return { '10L_Statut': docData['9L_add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+230	NULL	SHOW	SECTION	return { 'S2_FL1_V2_2': docData['1_AddEquipement'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+232	NULL	SHOW	SECTION	return { 'S2_FL2_V2_3': docData['2_AddEquipement'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+234	NULL	SHOW	SECTION	return { 'S2_FL2_V2_4': docData['3_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+236	NULL	SHOW	SECTION	return { 'S2_FL2_V2_5': docData['4_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+238	NULL	SHOW	SECTION	return { 'S2_FL2_V2_6': docData['5_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+240	NULL	SHOW	SECTION	return { 'S2_FL1_V2_7': docData['6_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+242	NULL	SHOW	SECTION	return { 'S2_FL1_V2_8': docData['7_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+244	NULL	SHOW	SECTION	return { 'S2_FL1_V2_9': docData['8_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+246	NULL	SHOW	SECTION	return { 'S2_FL1_V2_10': docData['9_Add'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+248	NULL	SHOW	SECTION	return { 'S2_FL1_V3_2': docData['1L_Add'] === 'true'? true:null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+250	NULL	SHOW	SECTION	return { 'S2_FL1_V3_3': docData['2L_Add'] === 'true' ? true:null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+252	NULL	SHOW	SECTION	return { 'S2_FL1_V3_4': docData['3L_Add'] === 'true' ? true:null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+254	NULL	SHOW	SECTION	return { 'S2_FL1_V3_5': docData['4L_Add'] === 'true' ? true:null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+256	NULL	SHOW	SECTION	return { 'S2_FL1_V3_6': docData['5L_Add'] === 'true'? true:null};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+258	NULL	SHOW	SECTION	return { 'S2_FL1_V3_7': docData['6L_Add'] === 'true' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+260	NULL	SHOW	SECTION	return { 'S2_FL1_V3_8': docData['7L_Add'] === 'true' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+262	NULL	SHOW	SECTION	return { 'S2_FL1_V3_9': docData['8L_Add'] === 'true' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+264	NULL	SHOW	SECTION	return { 'S2_FL1_V3_10': docData['9L_add'] === 'true' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+285	NULL	SHOW	FIELD	return { '1L_NomCh1': docData['1L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+289	NULL	SHOW	FIELD	return { '1L_NumCh2': docData['1L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+295	NULL	FILL	FIELD	return docData['Deficience'] === 'DI/DP/TSA'?{'PretType': 'AVQ/AVD'}: undefined;	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+297	NULL	FILL	FIELD	return docData['Deficience'] === 'DP'?{'PretType': 'AVQ/AVD'}: undefined;	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+299	NULL	FILL	FIELD	return docData['Deficience'] === 'TSA'?{'PretType': 'AVQ/AVD'}: undefined;	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+301	NULL	FILL	FIELD	return docData['Deficience'] === 'SAPA'?{'PretType': 'AVQ/AVD'}: undefined;	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+303	NULL	FILL	FIELD	return docData['Deficience'] === 'OM'?{'PretType': 'AVQ/AVD'}: undefined;	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+305	NULL	FILL	FIELD	return docData['Deficience'] === 'SOINS PALLIATIFS'?{'PretType': 'Moyen Terme'}: undefined;	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+307	NULL	FILL	FIELD	return docData['Deficience'] === 'SANTE PHYSIQUE'?{'PretType': 'Court Terme'}: undefined;	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+309	NULL	SHOW	FIELD	return { '2L_NumCh1': docData['2L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+311	NULL	SHOW	FIELD	return { '2L_NomCh1': docData['2L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+313	NULL	SHOW	FIELD	return { '2L_ValidCh1': docData['2L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+315	NULL	SHOW	FIELD	return { '2L_NumCh2': docData['2L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+317	NULL	SHOW	FIELD	return { '2L_NomCh2': docData['2L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+319	NULL	SHOW	FIELD	return { '2L_ValidCh2': docData['2L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+321	NULL	SHOW	FIELD	return { '3L_NumCh1': docData['3L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+324	NULL	SHOW	FIELD	return { '3L_NomCh1': docData['3L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+326	NULL	SHOW	FIELD	return { '3L_ValidCh1': docData['3L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+328	NULL	SHOW	FIELD	return { '3L_NumCh2': docData['3L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+330	NULL	SHOW	FIELD	return { '3L_NomCh2': docData['3L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+332	NULL	SHOW	FIELD	return { '3L_ValidCh2': docData['3L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+334	NULL	SHOW	FIELD	return { '4L_NumCh1': docData['4L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+336	NULL	SHOW	FIELD	return { '4L_NomCh1': docData['4L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+338	NULL	SHOW	FIELD	return { '4L_ValidCh1': docData['4L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+340	NULL	SHOW	FIELD	return { '4L_NumCh2': docData['4L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+342	NULL	SHOW	FIELD	return { '4L_NomCh2': docData['4L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+344	NULL	SHOW	FIELD	return { '4L_ValidCh2': docData['4L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+346	NULL	SHOW	FIELD	return { '5L_NumCh1': docData['5L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+348	NULL	SHOW	FIELD	return { '5L_NomCh1': docData['5L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+351	NULL	SHOW	FIELD	return { '5L_ValidCh1': docData['5L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+353	NULL	SHOW	FIELD	return { '5L_NumCh2': docData['5L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+355	NULL	SHOW	FIELD	return { '5L_NomCh2': docData['5L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+357	NULL	SHOW	FIELD	return { '5L_ValidCh2': docData['5L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+359	NULL	SHOW	FIELD	return { '6L_NumCh1': docData['6L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+361	NULL	SHOW	FIELD	return { '6L_NomCh1': docData['6L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+363	NULL	SHOW	FIELD	return { '6L_ValidCh1': docData['6L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+365	NULL	SHOW	FIELD	return { '6L_NumCh2': docData['6L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+367	NULL	SHOW	FIELD	return { '6L_NomCh2': docData['6L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+369	NULL	SHOW	FIELD	return { '6L_ValidCh2': docData['6L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+371	NULL	SHOW	FIELD	return { '7L_NumCh1': docData['7L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+373	NULL	SHOW	FIELD	return { '7L_NomCh1': docData['7L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+375	NULL	SHOW	FIELD	return { '7L_ValidCh1': docData['7L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+377	NULL	SHOW	FIELD	return { '7L_NumCh2': docData['7L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+379	NULL	SHOW	FIELD	return { '7L_NomCh2': docData['7L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+381	NULL	SHOW	FIELD	return { '7L_ValidCh2': docData['7L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+383	NULL	SHOW	FIELD	return { '8L_NumCh1': docData['8L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+385	NULL	SHOW	FIELD	return { '8L_NomCh1': docData['8L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+387	NULL	SHOW	FIELD	return { '8L_ValidCh1': docData['8L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+389	NULL	SHOW	FIELD	return { '8L_NumCh2': docData['8L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+391	NULL	SHOW	FIELD	return { '8L_NomCh2': docData['8L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+393	NULL	SHOW	FIELD	return { '8L_ValidCh2': docData['8L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+395	NULL	SHOW	FIELD	return { '9L_NumCh1': docData['9L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+397	NULL	SHOW	FIELD	return { '9L_NomCh1': docData['9L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+399	NULL	SHOW	FIELD	return { '9L_ValidCh1': docData['9L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+401	NULL	SHOW	FIELD	return { '9L_NumCh2': docData['9L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+403	NULL	SHOW	FIELD	return { '9L_NomCh2': docData['9L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+405	NULL	SHOW	FIELD	return { '9L_ValidCh2': docData['9L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+407	NULL	SHOW	FIELD	return { '10L_NumCh1': docData['10L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+409	NULL	SHOW	FIELD	return { '10L_NomCh1': docData['10L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+411	NULL	SHOW	FIELD	return { '10L_ValidCh1': docData['10L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+413	NULL	SHOW	FIELD	return { '10L_NumCh2': docData['10L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+415	NULL	SHOW	FIELD	return { '10L_NomCh2': docData['10L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+417	NULL	SHOW	FIELD	return { '10L_ValidCh2': docData['10L_Alternative'] === 'FALSE' ? null : true };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+419	NULL	SHOW	SECTION	return { 'S2_FL1_GENE': docData['STATUS'] === 'Validée' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+421	NULL	SHOW	SECTION	return { 'S2_FL1_GENE': docData['STATUS'] === 'Planifiée' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+423	NULL	SHOW	SECTION	return { 'S2_FL1_GENE': docData['STATUS'] === 'Complétée' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+425	NULL	SHOW	SECTION	return { 'S2_FL1_GENE': docData['STATUS'] === 'Validée' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+427	NULL	SHOW	SECTION	return { 'S2_FL1_GENE': docData['STATUS'] === 'Planifiée' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+429	NULL	SHOW	SECTION	return { 'S2_FL1_GENE': docData['STATUS'] === 'Complétée' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+431	NULL	SHOW	SECTION	return { 'S2_FL1_GENE': docData['STATUS'] === 'En attente' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+433	NULL	SHOW	FIELD	return { 'TruckSize': docData['TypeTransport'] === 'Transporteur Parc' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+435	NULL	SHOW	FIELD	return { 'TruckSize': docData['TypeTransport'] === 'Transporteur Parc' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+437	NULL	SHOW	SECTION	return { 'S2_FL1_V3': docData['AddFirstEquipment'] === 'true' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+439	NULL	SHOW	FIELD	return { 'TéléphoneCPE': docData['NotificationCPE'] === 'SMS' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+441	NULL	SHOW	FIELD	return { 'CourrielCPE': docData['NotificationCPE'] === 'Courriel' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+443	NULL	SHOW	FIELD	return { 'TéléphoneCPE': docData['NotificationCPE'] === 'SMS et courriel' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+444	NULL	SHOW	FIELD	return { 'CourrielCPE': docData['NotificationCPE'] === 'SMS et courriel' ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+448	NULL	FILL	FIELD	return {'NomProduit1CPE': 'TEST DE DÉPISTAGE' };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+449	NULL	FILL	FIELD	return {'DescriptionProduit1CPE': 'Boîte de 5' };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+451	NULL	SEARCH	FIELD	NULL	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+452	NULL	SHOW	FIELD	return {'Description_Autocomplete': null}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+454	NULL	FILL	FIELD	return {'Description_Autocomplete' : docData['Description_AideTechnique'].substring(0,254)}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+455	Autocomplete inventaire choix 1	SEARCH	FIELD	console.log("Fonction 455", context);
+
+const mapping = [
+  { from: "StatutInventaire", to: "1L_Statut" },
+  { from: "NoUniqueInventaire", to: "1L_NumFinal" },
+  { from: "Description_Autocomplete", to: "1L_Description" },
+  { from: "IDAideTechnique", to: "1L_Name" },
+  { from: "BIN", to: "1L_BIN" },
+];
+const filters = [
+  {
+    key: "StatutInventaire",
+    operator: "IN",
+    value: "DISPONIBLE",
+    type: "SELECT",
+  },
+  { key: "STATUS", operator: "EQUALS", value: "ACTIF", type: "TEXT" },
+];
+if (docData["1L_Description"]) {
+  api({ local: true })
+    .post(
+      `suggestion?fieldID=${"af269bee-019f-445d-8ae1-e9b3549a0a65"}&fieldValue=${docData["1L_Description"]}`,
+      { filters },
+    )
+    .then((res) => {
+      if (res?.data?.suggestions?.length > 0) {
+        // Sort suggestions: no stars first, then 1 star, then 2 stars (**)
+        const sorted = res.data?.suggestions.sort((a, b) => {
+          const aNum =
+            a?.autoFill?.find((af) => af.key === "NoUniqueInventaire")?.value ||
+            "";
+          const bNum =
+            b?.autoFill?.find((af) => af.key === "NoUniqueInventaire")?.value ||
+            "";
+          const aStars = (aNum.match(/\*+$/) || [""])[0].length;
+          const bStars = (bNum.match(/\*+$/) || [""])[0].length;
+          return aStars - bStars; // 0 stars first, then 1, then 2
+        });
+        callback({
+          suggestions: {
+            "1L_Description": sorted.map((s) => ({
+              title: s?.value,
+              fields: s?.autoFill
+                ?.filter((a) => mapping.map((m) => m.from).includes(a.key))
+                .map((a) => ({
+                  ...a,
+                  value: a.value || "",
+                  key: mapping.find((m) => m.from === a.key).to,
+                })),
+            })),
+          },
+          data: { "1L_StatutFinal": "Attribué" },
+        });
+      } else {
+        callback({ suggestions: { "1L_Description": [] } });
+      }
+    });
+} else {
+  callback([]);
+}
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+456	NULL	EVALUATE	FIELD	return docData['NoDossier']||''	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+457	Anciennes demandes liées à l'usager	FILL	FIELD	return {'LienAidesTechniquesusager': 'https://ciussscnattest.r03.rtss.qc.ca/public/dashboard/5fc50962-b272-46aa-806e-af3bbee824ee?dossier='+docData['NoDossier'] };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+458	Anciennes demandes usager demande	FILL	FIELD	return {'LienAidesTechniquesusager': 'https://ciussscnattest.r03.rtss.qc.ca/public/dashboard/5fc50962-b272-46aa-806e-af3bbee824ee?dossier='+docData['NoDossier'] };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+459	deuxiemedemande	SHOW	FIELD	return { 'descriptionAideTechnique': docData['jeNeTrouvePas'] === 'true' && (!docData['jeNeTrouvePasNonPlus'] || docData['jeNeTrouvePasNonPlus'] === 'false')  ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+460	premierchamdescription	SHOW	FIELD	return { '1L_Description': docData['jeNeTrouvePas'] === 'true' ? null : true};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+461	show popup	SHOW	POPUP	return { 'RemarqueLivraison': docData['jeNeTrouvePasNonPlus'] === 'true' ? true : null};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+462	je ne trouve pas non plus	SHOW	FIELD	return { 'jeNeTrouvePasNonPlus': docData['jeNeTrouvePas'] === 'true' ? true: null};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+464	adresseFact identique à adresseLiv	FILL	FIELD	return docData['AdresseIdentique'] === 'true'?{'Adresse': docData['AdresseUsager'], 'Complement': docData['ComplementAdresseUsager'], 'CodePostal':docData['CPUsager'], 'Ville':docData['VilleUsager']}: {'Adresse': '','Complement': '','CodePostal':'','Ville':''}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+465	soumission afficher 1	SHOW	FIELD	return { 'soumissionAideTechnique': docData['jeNeTrouvePasNonPlus'] === 'true' ? true : null};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+466	deuxiemedemandechoix2	SHOW	FIELD	return { 'descriptionAideTechnique_Ch2': docData['jeNeTrouvePas_Ch2'] === 'true' && (!docData['jeNeTrouvePasNonPlus_Ch2'] || docData['jeNeTrouvePasNonPlus_Ch2'] === 'false')  ? true : null };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+467	premierchampdescriptionchoix2	SHOW	FIELD	return { '1L_Description_Ch2': docData['jeNeTrouvePas_Ch2'] === 'true' ? null : true};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+468	show popup remarque choix 2	SHOW	POPUP	return { 'RemarqueLivraison_Ch2': docData['jeNeTrouvePasNonPlus_Ch2'] === 'true' ? true : null};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+469	je ne trouve pas non plus choix 2	SHOW	FIELD	return { 'jeNeTrouvePasNonPlus_Ch2': docData['jeNeTrouvePas_Ch2'] === 'true' ? true: null};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+471	Autocomplete inventaire choix 2	SEARCH	FIELD	const mapping = [
+    { from: 'StatutInventaire', to: '1L_Statut_Ch2' },
+    { from: 'NoUniqueInventaire', to: '1L_NumCh1' },
+    { from: 'Description_Autocomplete', to: '1L_Description_Ch2' },
+    {from:'IDAideTechnique',to:'1L_NomCh2'}
+];
+const filters = [
+    { key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT' },
+    { key: 'STATUS', operator: 'EQUALS', value: 'ACTIF', type: 'TEXT' }
+];
+if (docData['1L_Description_Ch2']) {
+    api({ local: true })
+        .post(
+            `suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'}&fieldValue=${docData['1L_Description_Ch2']
+            }`
+            , { filters })
+        .then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '1L_Description_Ch2': res.data?.suggestions.map(s => ({
+                    title: s?.value,
+                    fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a,
+                        value: a.value || '',
+                        key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        })
+        );
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+472	Autocomplete aide technique choix 1	SEARCH	FIELD	const mapping = [
+    { from: 'Description_Autocomplete', to: 'descriptionAideTechnique' },
+    {from:'IDAideTechnique',to:'1L_Name'}
+];
+const filters = [{key:'STATUS',operator:'EQUALS',value:'Actif',type:'TEXT'}
+];
+if (docData['descriptionAideTechnique']) {
+    api({ local: true })
+        .post(
+            `suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'}&fieldValue=${docData['descriptionAideTechnique']
+            }`
+            , { filters })
+        .then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                'descriptionAideTechnique': res.data?.suggestions.map(s => ({
+                    title: s?.value,
+                    fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a,
+                        value: a.value || '',
+                        key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        })
+        );
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+474	FILL AUTOCOMPLETE AIDE TECHNIQUE	FILL	FIELD	return  {'DescriptionAideTechniqueAutocomplete':docData['Description_AideTechnique'].substring(0,255)};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+475	Autocomplete aide technique choix 2	SEARCH	FIELD	const mapping = [
+    { from: 'Description_Autocomplete', to: 'descriptionAideTechnique_Ch2' },
+    {from:'IDAideTechnique',to:'1L_NomCh2'}
+];
+const filters = [
+];
+if (docData['descriptionAideTechnique_Ch2']) {
+    api({ local: true })
+        .post(
+            `suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'}&fieldValue=${docData['descriptionAideTechnique_Ch2']
+            }`
+            , { filters })
+        .then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                'descriptionAideTechnique_Ch2': res.data?.suggestions.map(s => ({
+                    title: s?.value,
+                    fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a,
+                        value: a.value || '',
+                        key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        })
+        );
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+477	SHOW Section1 Choix 1 demande	SHOW	FIELD	if (docData['jeNeTrouvePasNonPlus']==='true'){
+  return {'1L_Description':null,'descriptionAideTechnique':null,'jeNeTrouvePas':null,'1L_NumInv':null,'1L_Name':null,'soumissionAideTechnique':true,'jeNeTrouvePasNonPlus':true}
+}
+else if (docData['jeNeTrouvePas']==='true'){
+  return {'1L_Description':null,'descriptionAideTechnique':true,'1L_NumInv':null,'jeNeTrouvePas':true,'soumissionAideTechnique':null,'jeNeTrouvePasNonPlus':true,'1L_Name':true}
+}
+else {
+  return{'1L_Description':true,'descriptionAideTechnique':null,'1L_NumInv':true,'1L_Statut':true,'jeNeTrouvePas':true,'soumissionAideTechnique':null,'jeNeTrouvePasNonPlus':null,'1L_Name':true}
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+478	SECTION 1 DEMANDE choix 2 	SHOW	FIELD	if (docData['jeNeTrouvePasNonPlus_Ch2']==='true'){
+  return {'1L_Description_Ch2':null,'descriptionAideTechnique_Ch2':null,'jeNeTrouvePas_Ch2':null,'1L_NumCh1':null,'1L_NomCh2':null,'soumissionAideTechnique_Ch2':true,'jeNeTrouvePasNonPlus_Ch2':true}
+}
+else if (docData['jeNeTrouvePas_Ch2']==='true'){
+  return {'1L_Description_Ch2':null,'descriptionAideTechnique_Ch2':true,'1L_NumCh1':null,'jeNeTrouvePas_Ch2':true,'soumissionAideTechnique_Ch2':null,'jeNeTrouvePasNonPlus_Ch2':true,'1L_NomCh2':true}
+}
+else {
+  return{'1L_Description_Ch2':true,'descriptionAideTechnique_Ch2':null,'1L_NumCh1':true,'1L_Statut_Ch2':true,'jeNeTrouvePas_Ch2':true,'soumissionAideTechnique_Ch2':null,'jeNeTrouvePasNonPlus_Ch2':null,'1L_NomCh2':true}
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+479	NULL	SHOW	FIELD	 return {
+        'AdresseIdentique':null,'Adresse':null,'CodePostal':null,'Complement':null,'Ville':null
+    }	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+481	NULL	SHOW	FIELD	return {'NoDossier':docData['STATUS']==='Draft' ? null:true}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+482	2L_Autocomplete inventaire choix 1	SEARCH	FIELD	const mapping = [
+    { from: 'StatutInventaire', to: '2L_Statut' },
+    { from: 'NoUniqueInventaire', to: '2L_NumFinal' },
+    { from: 'Description_Autocomplete', to: '2L_Description' },
+    { from: 'IDAideTechnique', to: '2L_Name' },
+    { from: 'BIN', to: '2L_BIN' }
+];
+const filters = [
+    { key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT' },
+    { key: 'STATUS', operator: 'EQUALS', value: 'ACTIF', type: 'TEXT' }
+];
+if (docData['2L_Description']) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['2L_Description']}`, { filters }).then(res => {
+            if (res?.data?.suggestions?.length > 0) {
+                callback({
+                    suggestions: {
+                        '2L_Description': res.data?.suggestions.map(s => ({
+                            title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                                ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                            }))
+                        }))
+                    },
+                    data: { '2L_StatutFinal': 'Attribué' }
+                })
+            }
+            else { callback({ suggestions: { '2L_Description': [] } }) }
+        });
+} else {
+    callback({ suggestions: { '2L_Description': [] } });
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+483	2L_Autocomplete inventaire choix 2	SEARCH	FIELD	const mapping = [
+    {
+        from: 'StatutInventaire', to: '2L_Statut_Ch2'
+    },
+    {
+        from: 'NoUniqueInventaire', to: '2L_NumCh1'
+    },
+    {
+        from: 'Description_Autocomplete', to: '2L_Description_Ch2'
+    },
+    {
+        from: 'IDAideTechnique', to: '2L_NomCh2'
+    }
+]; const filters = [
+    {
+        key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT'
+    },
+    {
+        key:'STATUS',operator:'EQUALS',value:'ACTIF',type:'TEXT'
+    }
+]; if (docData['2L_Description_Ch2'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['2L_Description_Ch2'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '2L_Description_Ch2': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+484	2L_Autocomplete aide technique choix 1	SEARCH	FIELD	const mapping = [
+    {
+        from: 'Description_Autocomplete', to: '2L_descriptionAideTechnique'
+    },
+    {
+        from: 'IDAideTechnique', to: '2L_Name'
+    }
+]; const filters = [{key:'STATUS',operator:'EQUALS',value:'Actif',type:'TEXT'}]; if (docData['2L_descriptionAideTechnique'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+        }&fieldValue=${docData['2L_descriptionAideTechnique'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '2L_descriptionAideTechnique': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};
+
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+485	2L_Autocomplete aide technique choix 2	SEARCH	FIELD	const mapping = [
+    { from: 'Description_Autocomplete', to: '2L_descriptionAideTechnique_Ch2'
+    },
+    {from:'IDAideTechnique',to:'2L_NomCh2'
+    }
+];  const filters = [];  if (docData['2L_descriptionAideTechnique_Ch2'
+]) {      api({ local: true
+    })          .post(              `suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+    }&fieldValue=${docData['2L_descriptionAideTechnique_Ch2'
+        ]
+    }`              ,
+    { filters
+    })          .then(res => res?.data?.suggestions?.length > 0 && callback({              suggestions: {                  '2L_descriptionAideTechnique_Ch2': res.data?.suggestions.map(s => ({                      title: s?.value,                      fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({                          ...a,                          value: a.value || '',                          key: mapping.find(m => m.from === a.key).to,
+                }))
+            }))
+        }
+    })          );
+} else {      callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+486	2L_SHOW Section1 Choix 1 demande	SHOW	FIELD	if (docData['2L_jeNeTrouvePasNonPlus'] === 'true') {
+    return {
+        '2L_Description': null, '2L_descriptionAideTechnique': null, '2L_jeNeTrouvePas': null, '2L_NumInv': null, '2L_Name': null, '2L_soumissionAideTechnique': true, '2L_jeNeTrouvePasNonPlus': true
+    }
+}
+else if (docData['2L_jeNeTrouvePas'] === 'true') {
+    return {
+        '2L_Description': null, '2L_descriptionAideTechnique': true, '2L_NumInv': null,'2L_jeNeTrouvePas': true, '2L_soumissionAideTechnique': null, '2L_jeNeTrouvePasNonPlus': true, '2L_Name': true
+    }
+}
+else {
+    return {
+        '2L_Description': true, '2L_descriptionAideTechnique': null, '2L_NumInv': true, '2L_Statut': true, '2L_jeNeTrouvePas': true, '2L_soumissionAideTechnique': null, '2L_jeNeTrouvePasNonPlus': null, '2L_Name': true
+    }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+488	2L_SECTION 1 DEMANDE choix 2 	SHOW	FIELD	if (docData['2L_jeNeTrouvePasNonPlus_Ch2'] === 'true') {
+    return { '2L_Description_Ch2': null, '2L_descriptionAideTechnique_Ch2': null, '2L_jeNeTrouvePas_Ch2': null, '2L_NumCh1': null, '2L_NomCh2': null,  '2L_soumissionAideTechnique_Ch2': true, '2L_jeNeTrouvePasNonPlus_Ch2': true }
+}
+else if (docData['2L_jeNeTrouvePas_Ch2'] === 'true') {
+    return { '2L_Description_Ch2': null, '2L_descriptionAideTechnique_Ch2': true, '2L_NumCh1': null, '2L_jeNeTrouvePas_Ch2': true, '2L_soumissionAideTechnique_Ch2': null, '2L_jeNeTrouvePasNonPlus_Ch2': true, '2L_NomCh2': true }
+}
+else {
+    return { '2L_Description_Ch2': true, '2L_descriptionAideTechnique_Ch2': null, '2L_NumCh1': true, '2L_Statut_Ch2': true, '2L_jeNeTrouvePas_Ch2': true, '2L_soumissionAideTechnique_Ch2': null, '2L_jeNeTrouvePasNonPlus_Ch2': null, '2L_NomCh2': true }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+489	3L_Autocomplete inventaire choix 1	SEARCH	FIELD	const mapping = [
+    { from: 'StatutInventaire', to: '3L_Statut' },
+    { from: 'NoUniqueInventaire', to: '3L_NumFinal' },
+    { from: 'Description_Autocomplete', to: '3L_Description' },
+    { from: 'IDAideTechnique', to: '3L_Name' },
+    { from: 'BIN', to: '3L_BIN' }
+];
+const filters = [
+    { key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT' },
+    { key: 'STATUS', operator: 'EQUALS', value: 'ACTIF', type: 'TEXT' }
+];
+if (docData['3L_Description']) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['3L_Description']}`, { filters }).then(res => {
+            if (res?.data?.suggestions?.length > 0) {
+                callback({
+                    suggestions: {
+                        '3L_Description': res.data?.suggestions.map(s => ({
+                            title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                                ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                            }))
+                        }))
+                    },
+                    data: { '3L_StatutFinal': 'Attribué' }
+                })
+            }
+            else { callback({ suggestions: { '3L_Description': [] } }) }
+        });
+} else {
+    callback({ suggestions: { '3L_Description': [] } });
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+490	3L_Autocomplete inventaire choix 2	SEARCH	FIELD	const mapping = [
+    {
+        from: 'StatutInventaire', to: '3L_Statut_Ch2'
+    },
+    {
+        from: 'NoUniqueInventaire', to: '3L_NumCh1'
+    },
+    {
+        from: 'Description_Autocomplete', to: '3L_Description_Ch2'
+    },
+    {
+        from: 'IDAideTechnique', to: '3L_NomCh2'
+    }
+]; const filters = [
+    {
+        key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT'
+    },
+    {
+        key:'STATUS',operator:'EQUALS',value:'ACTIF',type:'TEXT'
+    }
+]; if (docData['3L_Description_Ch2'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['3L_Description_Ch2'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '3L_Description_Ch2': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+491	3L_Autocomplete aide technique choix 1	SEARCH	FIELD	const mapping = [
+    {
+        from: 'Description_Autocomplete', to: '3L_descriptionAideTechnique'
+    },
+    {
+        from: 'IDAideTechnique', to: '3L_Name'
+    }
+]; const filters = [{key:'STATUS',operator:'EQUALS',value:'Actif',type:'TEXT'}]; if (docData['3L_descriptionAideTechnique'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+        }&fieldValue=${docData['3L_descriptionAideTechnique'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '3L_descriptionAideTechnique': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+492	3L_Autocomplete aide technique choix 2	SEARCH	FIELD	const mapping = [
+    { from: 'Description_Autocomplete', to: '3L_descriptionAideTechnique_Ch2'
+    },
+    {from:'IDAideTechnique',to:'3L_NomCh2'
+    }
+];  const filters = [];  if (docData['3L_descriptionAideTechnique_Ch2'
+]) {      api({ local: true
+    })          .post(              `suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+    }&fieldValue=${docData['3L_descriptionAideTechnique_Ch2'
+        ]
+    }`              ,
+    { filters
+    })          .then(res => res?.data?.suggestions?.length > 0 && callback({              suggestions: {                  '3L_descriptionAideTechnique_Ch2': res.data?.suggestions.map(s => ({                      title: s?.value,                      fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({                          ...a,                          value: a.value || '',                          key: mapping.find(m => m.from === a.key).to,
+                }))
+            }))
+        }
+    })          );
+} else {      callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+493	3L_SHOW Section1 Choix 1 demande	SHOW	FIELD	if (docData['3L_jeNeTrouvePasNonPlus'] === 'true') {
+    return {
+        '3L_Description': null, '3L_descriptionAideTechnique': null, '3L_jeNeTrouvePas': null, '3L_NumInv': null, '3L_Name': null, '3L_soumissionAideTechnique': true, '3L_jeNeTrouvePasNonPlus': true
+    }
+}
+else if (docData['3L_jeNeTrouvePas'] === 'true') {
+    return {
+        '3L_Description': null, '3L_descriptionAideTechnique': true, '3L_NumInv': null, '3L_jeNeTrouvePas': true, '3L_soumissionAideTechnique': null, '3L_jeNeTrouvePasNonPlus': true, '3L_Name': true
+    }
+}
+else {
+    return {
+        '3L_Description': true, '3L_descriptionAideTechnique': null, '3L_NumInv': true, '3L_Statut': true, '3L_jeNeTrouvePas': true, '3L_soumissionAideTechnique': null, '3L_jeNeTrouvePasNonPlus': null, '3L_Name': true
+    }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+494	3L_SECTION 1 DEMANDE choix 2 	SHOW	FIELD	if (docData['3L_jeNeTrouvePasNonPlus_Ch2'] === 'true') {
+    return { '3L_Description_Ch2': null, '3L_descriptionAideTechnique_Ch2': null, '3L_jeNeTrouvePas_Ch2': null, '3L_NumCh1': null, '3L_NomCh2': null, '3L_soumissionAideTechnique_Ch2': true, '3L_jeNeTrouvePasNonPlus_Ch2': true }
+}
+else if (docData['3L_jeNeTrouvePas_Ch2'] === 'true') {
+    return { '3L_Description_Ch2': null, '3L_descriptionAideTechnique_Ch2': true, '3L_NumCh1': null, '3L_jeNeTrouvePas_Ch2': true, '3L_soumissionAideTechnique_Ch2': null, '3L_jeNeTrouvePasNonPlus_Ch2': true, '3L_NomCh2': true }
+}
+else {
+    return { '3L_Description_Ch2': true, '3L_descriptionAideTechnique_Ch2': null, '3L_NumCh1': true, '3L_Statut_Ch2': true, '3L_jeNeTrouvePas_Ch2': true, '3L_soumissionAideTechnique_Ch2': null, '3L_jeNeTrouvePasNonPlus_Ch2': null, '3L_NomCh2': true }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+495	4L_Autocomplete inventaire choix 1	SEARCH	FIELD	const mapping = [
+    { from: 'StatutInventaire', to: '4L_Statut' },
+    { from: 'NoUniqueInventaire', to: '4L_NumFinal' },
+    { from: 'Description_Autocomplete', to: '4L_Description' },
+    { from: 'IDAideTechnique', to: '4L_Name' },
+    { from: 'BIN', to: '4L_BIN' }
+];
+const filters = [
+    { key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT' },
+    { key: 'STATUS', operator: 'EQUALS', value: 'ACTIF', type: 'TEXT' }
+];
+if (docData['4L_Description']) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['4L_Description']}`, { filters }).then(res => {
+            if (res?.data?.suggestions?.length > 0) {
+                callback({
+                    suggestions: {
+                        '4L_Description': res.data?.suggestions.map(s => ({
+                            title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                                ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                            }))
+                        }))
+                    },
+                    data: { '4L_StatutFinal': 'Attribué' }
+                })
+            }
+            else { callback({ suggestions: { '4L_Description': [] } }) }
+        });
+} else {
+    callback({ suggestions: { '4L_Description': [] } });
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+496	4L_Autocomplete inventaire choix 2	SEARCH	FIELD	const mapping = [
+    {
+        from: 'StatutInventaire', to: '4L_Statut_Ch2'
+    },
+    {
+        from: 'NoUniqueInventaire', to: '4L_NumCh1'
+    },
+    {
+        from: 'Description_Autocomplete', to: '4L_Description_Ch2'
+    },
+    {
+        from: 'IDAideTechnique', to: '4L_NomCh2'
+    }
+]; const filters = [
+    {
+        key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT'
+    },
+    {
+        key:'STATUS',operator:'EQUALS',value:'ACTIF',type:'TEXT'
+    }
+]; if (docData['4L_Description_Ch2'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['4L_Description_Ch2'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '4L_Description_Ch2': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+497	4L_Autocomplete aide technique choix 1	SEARCH	FIELD	const mapping = [
+    {
+        from: 'Description_Autocomplete', to: '4L_descriptionAideTechnique'
+    },
+    {
+        from: 'IDAideTechnique', to: '4L_Name'
+    }
+]; const filters = [{key:'STATUS',operator:'EQUALS',value:'Actif',type:'TEXT'}]; if (docData['4L_descriptionAideTechnique'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+        }&fieldValue=${docData['4L_descriptionAideTechnique'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '4L_descriptionAideTechnique': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+498	4L_Autocomplete aide technique choix 2	SEARCH	FIELD	const mapping = [
+    { from: 'Description_Autocomplete', to: '4L_descriptionAideTechnique_Ch2'
+    },
+    {from:'IDAideTechnique',to:'4L_NomCh2'
+    }
+];  const filters = [];  if (docData['4L_descriptionAideTechnique_Ch2'
+]) {      api({ local: true
+    })          .post(              `suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+    }&fieldValue=${docData['4L_descriptionAideTechnique_Ch2'
+        ]
+    }`              ,
+    { filters
+    })          .then(res => res?.data?.suggestions?.length > 0 && callback({              suggestions: {                  '4L_descriptionAideTechnique_Ch2': res.data?.suggestions.map(s => ({                      title: s?.value,                      fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({                          ...a,                          value: a.value || '',                          key: mapping.find(m => m.from === a.key).to,
+                }))
+            }))
+        }
+    })          );
+} else {      callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+499	4L_SHOW Section1 Choix 1 demande	SHOW	FIELD	if (docData['4L_jeNeTrouvePasNonPlus'] === 'true') {
+    return {
+        '4L_Description': null, '4L_descriptionAideTechnique': null, '4L_jeNeTrouvePas': null, '4L_NumInv': null, '4L_Name': null,  '4L_soumissionAideTechnique': true, '4L_jeNeTrouvePasNonPlus': true
+    }
+}
+else if (docData['4L_jeNeTrouvePas'] === 'true') {
+    return {
+        '4L_Description': null, '4L_descriptionAideTechnique': true, '4L_NumInv': null,'4L_jeNeTrouvePas': true, '4L_soumissionAideTechnique': null, '4L_jeNeTrouvePasNonPlus': true, '4L_Name': true
+    }
+}
+else {
+    return {
+        '4L_Description': true, '4L_descriptionAideTechnique': null, '4L_NumInv': true, '4L_Statut': true, '4L_jeNeTrouvePas': true, '4L_soumissionAideTechnique': null, '4L_jeNeTrouvePasNonPlus': null, '4L_Name': true
+    }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+500	4L_SECTION 1 DEMANDE choix 2 	SHOW	FIELD	if (docData['4L_jeNeTrouvePasNonPlus_Ch2'] === 'true') {
+    return { '4L_Description_Ch2': null, '4L_descriptionAideTechnique_Ch2': null, '4L_jeNeTrouvePas_Ch2': null, '4L_NumCh1': null, '4L_NomCh2': null, '4L_soumissionAideTechnique_Ch2': true, '4L_jeNeTrouvePasNonPlus_Ch2': true }
+}
+else if (docData['4L_jeNeTrouvePas_Ch2'] === 'true') {
+    return { '4L_Description_Ch2': null, '4L_descriptionAideTechnique_Ch2': true, '4L_NumCh1': null, '4L_jeNeTrouvePas_Ch2': true, '4L_soumissionAideTechnique_Ch2': null, '4L_jeNeTrouvePasNonPlus_Ch2': true, '4L_NomCh2': true }
+}
+else {
+    return { '4L_Description_Ch2': true, '4L_descriptionAideTechnique_Ch2': null, '4L_NumCh1': true, '4L_Statut_Ch2': true, '4L_jeNeTrouvePas_Ch2': true, '4L_soumissionAideTechnique_Ch2': null, '4L_jeNeTrouvePasNonPlus_Ch2': null, '4L_NomCh2': true }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+501	5L_Autocomplete inventaire choix 1	SEARCH	FIELD	const mapping = [
+    { from: 'StatutInventaire', to: '5L_Statut' },
+    { from: 'NoUniqueInventaire', to: '5L_NumFinal' },
+    { from: 'Description_Autocomplete', to: '5L_Description' },
+    { from: 'IDAideTechnique', to: '5L_Name' },
+    { from: 'BIN', to: '5L_BIN' }
+];
+const filters = [
+    { key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT' },
+    { key: 'STATUS', operator: 'EQUALS', value: 'ACTIF', type: 'TEXT' }
+];
+if (docData['5L_Description']) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['5L_Description']}`, { filters }).then(res => {
+            if (res?.data?.suggestions?.length > 0) {
+                callback({
+                    suggestions: {
+                        '5L_Description': res.data?.suggestions.map(s => ({
+                            title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                                ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                            }))
+                        }))
+                    },
+                    data: { '5L_StatutFinal': 'Attribué' }
+                })
+            }
+            else { callback({ suggestions: { '5L_Description': [] } }) }
+        });
+} else {
+    callback({ suggestions: { '5L_Description': [] } });
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+502	5L_Autocomplete inventaire choix 2	SEARCH	FIELD	const mapping = [
+    {
+        from: 'StatutInventaire', to: '5L_Statut_Ch2'
+    },
+    {
+        from: 'NoUniqueInventaire', to: '5L_NumCh1'
+    },
+    {
+        from: 'Description_Autocomplete', to: '5L_Description_Ch2'
+    },
+    {
+        from: 'IDAideTechnique', to: '5L_NomCh2'
+    }
+]; const filters = [
+    {
+        key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT'
+    },
+    {
+        key:'STATUS',operator:'EQUALS',value:'ACTIF',type:'TEXT'
+    }
+]; if (docData['5L_Description_Ch2'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['5L_Description_Ch2'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '5L_Description_Ch2': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+503	5L_Autocomplete aide technique choix 1	SEARCH	FIELD	const mapping = [
+    {
+        from: 'Description_Autocomplete', to: '5L_descriptionAideTechnique'
+    },
+    {
+        from: 'IDAideTechnique', to: '5L_Name'
+    }
+]; const filters = [{key:'STATUS',operator:'EQUALS',value:'Actif',type:'TEXT'}]; if (docData['5L_descriptionAideTechnique'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+        }&fieldValue=${docData['5L_descriptionAideTechnique'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '5L_descriptionAideTechnique': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+504	5L_Autocomplete aide technique choix 2	SEARCH	FIELD	const mapping = [
+    { from: 'Description_Autocomplete', to: '5L_descriptionAideTechnique_Ch2'
+    },
+    {from:'IDAideTechnique',to:'5L_NomCh2'
+    }
+];  const filters = [];  if (docData['5L_descriptionAideTechnique_Ch2'
+]) {      api({ local: true
+    })          .post(              `suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+    }&fieldValue=${docData['5L_descriptionAideTechnique_Ch2'
+        ]
+    }`              ,
+    { filters
+    })          .then(res => res?.data?.suggestions?.length > 0 && callback({              suggestions: {                  '5L_descriptionAideTechnique_Ch2': res.data?.suggestions.map(s => ({                      title: s?.value,                      fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({                          ...a,                          value: a.value || '',                          key: mapping.find(m => m.from === a.key).to,
+                }))
+            }))
+        }
+    })          );
+} else {      callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+505	5L_SHOW Section1 Choix 1 demande	SHOW	FIELD	if (docData['5L_jeNeTrouvePasNonPlus'] === 'true') {
+    return {
+        '5L_Description': null, '5L_descriptionAideTechnique': null, '5L_jeNeTrouvePas': null, '5L_NumInv': null, '5L_Name': null,  '5L_soumissionAideTechnique': true, '5L_jeNeTrouvePasNonPlus': true
+    }
+}
+else if (docData['5L_jeNeTrouvePas'] === 'true') {
+    return {
+        '5L_Description': null, '5L_descriptionAideTechnique': true, '5L_NumInv': null,  '5L_jeNeTrouvePas': true, '5L_soumissionAideTechnique': null, '5L_jeNeTrouvePasNonPlus': true, '5L_Name': true
+    }
+}
+else {
+    return {
+        '5L_Description': true, '5L_descriptionAideTechnique': null, '5L_NumInv': true, '5L_Statut': true, '5L_jeNeTrouvePas': true, '5L_soumissionAideTechnique': null, '5L_jeNeTrouvePasNonPlus': null, '5L_Name': true
+    }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+506	5L_SECTION 1 DEMANDE choix 2 	SHOW	FIELD	if (docData['5L_jeNeTrouvePasNonPlus_Ch2'] === 'true') {
+    return { '5L_Description_Ch2': null, '5L_descriptionAideTechnique_Ch2': null, '5L_jeNeTrouvePas_Ch2': null, '5L_NumCh1': null, '5L_NomCh2': null, '5L_soumissionAideTechnique_Ch2': true, '5L_jeNeTrouvePasNonPlus_Ch2': true }
+}
+else if (docData['5L_jeNeTrouvePas_Ch2'] === 'true') {
+    return { '5L_Description_Ch2': null, '5L_descriptionAideTechnique_Ch2': true, '5L_NumCh1': null, '5L_jeNeTrouvePas_Ch2': true, '5L_soumissionAideTechnique_Ch2': null, '5L_jeNeTrouvePasNonPlus_Ch2': true, '5L_NomCh2': true }
+}
+else {
+    return { '5L_Description_Ch2': true, '5L_descriptionAideTechnique_Ch2': null, '5L_NumCh1': true, '5L_Statut_Ch2': true, '5L_jeNeTrouvePas_Ch2': true, '5L_soumissionAideTechnique_Ch2': null, '5L_jeNeTrouvePasNonPlus_Ch2': null, '5L_NomCh2': true }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+507	6L_Autocomplete inventaire choix 1	SEARCH	FIELD	const mapping = [
+    { from: 'StatutInventaire', to: '6L_Statut' },
+    { from: 'NoUniqueInventaire', to: '6L_NumFinal' },
+    { from: 'Description_Autocomplete', to: '6L_Description' },
+    { from: 'IDAideTechnique', to: '6L_Name' },
+    { from: 'BIN', to: '6L_BIN' }
+];
+const filters = [
+    { key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT' },
+    { key: 'STATUS', operator: 'EQUALS', value: 'ACTIF', type: 'TEXT' }
+];
+if (docData['6L_Description']) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['6L_Description']}`, { filters }).then(res => {
+            if (res?.data?.suggestions?.length > 0) {
+                callback({
+                    suggestions: {
+                        '6L_Description': res.data?.suggestions.map(s => ({
+                            title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                                ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                            }))
+                        }))
+                    },
+                    data: { '6L_StatutFinal': 'Attribué' }
+                })
+            }
+            else { callback({ suggestions: { '6L_Description': [] } }) }
+        });
+} else {
+    callback({ suggestions: { '6L_Description': [] } });
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+508	6L_Autocomplete inventaire choix 2	SEARCH	FIELD	const mapping = [
+    {
+        from: 'StatutInventaire', to: '6L_Statut_Ch2'
+    },
+    {
+        from: 'NoUniqueInventaire', to: '6L_NumCh1'
+    },
+    {
+        from: 'Description_Autocomplete', to: '6L_Description_Ch2'
+    },
+    {
+        from: 'IDAideTechnique', to: '6L_NomCh2'
+    }
+]; const filters = [
+    {
+        key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT'
+    },
+    {
+        key:'STATUS',operator:'EQUALS',value:'ACTIF',type:'TEXT'
+    }
+]; if (docData['6L_Description_Ch2'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['6L_Description_Ch2'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '6L_Description_Ch2': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+509	6L_Autocomplete aide technique choix 1	SEARCH	FIELD	const mapping = [
+    {
+        from: 'Description_Autocomplete', to: '6L_descriptionAideTechnique'
+    },
+    {
+        from: 'IDAideTechnique', to: '6L_Name'
+    }
+]; const filters = [{key:'STATUS',operator:'EQUALS',value:'Actif',type:'TEXT'}]; if (docData['6L_descriptionAideTechnique'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+        }&fieldValue=${docData['6L_descriptionAideTechnique'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '6L_descriptionAideTechnique': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+510	6L_Autocomplete aide technique choix 2	SEARCH	FIELD	const mapping = [
+    { from: 'Description_Autocomplete', to: '6L_descriptionAideTechnique_Ch2'
+    },
+    {from:'IDAideTechnique',to:'6L_NomCh2'
+    }
+];  const filters = [];  if (docData['6L_descriptionAideTechnique_Ch2'
+]) {      api({ local: true
+    })          .post(              `suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+    }&fieldValue=${docData['6L_descriptionAideTechnique_Ch2'
+        ]
+    }`              ,
+    { filters
+    })          .then(res => res?.data?.suggestions?.length > 0 && callback({              suggestions: {                  '6L_descriptionAideTechnique_Ch2': res.data?.suggestions.map(s => ({                      title: s?.value,                      fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({                          ...a,                          value: a.value || '',                          key: mapping.find(m => m.from === a.key).to,
+                }))
+            }))
+        }
+    })          );
+} else {      callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+511	6L_SHOW Section1 Choix 1 demande	SHOW	FIELD	if (docData['6L_jeNeTrouvePasNonPlus'] === 'true') {
+    return {
+        '6L_Description': null, '6L_descriptionAideTechnique': null, '6L_jeNeTrouvePas': null, '6L_NumInv': null, '6L_Name': null,  '6L_soumissionAideTechnique': true, '6L_jeNeTrouvePasNonPlus': true
+    }
+}
+else if (docData['6L_jeNeTrouvePas'] === 'true') {
+    return {
+        '6L_Description': null, '6L_descriptionAideTechnique': true, '6L_NumInv': null, '6L_jeNeTrouvePas': true, '6L_soumissionAideTechnique': null, '6L_jeNeTrouvePasNonPlus': true, '6L_Name': true
+    }
+}
+else {
+    return {
+        '6L_Description': true, '6L_descriptionAideTechnique': null, '6L_NumInv': true, '6L_Statut': true, '6L_jeNeTrouvePas': true, '6L_soumissionAideTechnique': null, '6L_jeNeTrouvePasNonPlus': null, '6L_Name': true
+    }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+512	6L_SECTION 1 DEMANDE choix 2 	SHOW	FIELD	if (docData['6L_jeNeTrouvePasNonPlus_Ch2'] === 'true') {
+    return { '6L_Description_Ch2': null, '6L_descriptionAideTechnique_Ch2': null, '6L_jeNeTrouvePas_Ch2': null, '6L_NumCh1': null, '6L_NomCh2': null, '6L_soumissionAideTechnique_Ch2': true, '6L_jeNeTrouvePasNonPlus_Ch2': true }
+}
+else if (docData['6L_jeNeTrouvePas_Ch2'] === 'true') {
+    return { '6L_Description_Ch2': null, '6L_descriptionAideTechnique_Ch2': true, '6L_NumCh1': null, '6L_jeNeTrouvePas_Ch2': true, '6L_soumissionAideTechnique_Ch2': null, '6L_jeNeTrouvePasNonPlus_Ch2': true, '6L_NomCh2': true }
+}
+else {
+    return { '6L_Description_Ch2': true, '6L_descriptionAideTechnique_Ch2': null, '6L_NumCh1': true, '6L_Statut_Ch2': true, '6L_jeNeTrouvePas_Ch2': true, '6L_soumissionAideTechnique_Ch2': null, '6L_jeNeTrouvePasNonPlus_Ch2': null, '6L_NomCh2': true }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+513	7L_Autocomplete inventaire choix 1	SEARCH	FIELD	const mapping = [
+    { from: 'StatutInventaire', to: '7L_Statut' },
+    { from: 'NoUniqueInventaire', to: '7L_NumFinal' },
+    { from: 'Description_Autocomplete', to: '7L_Description' },
+    { from: 'IDAideTechnique', to: '7L_Name' },
+    { from: 'BIN', to: '7L_BIN' }
+];
+const filters = [
+    { key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT' },
+    { key: 'STATUS', operator: 'EQUALS', value: 'ACTIF', type: 'TEXT' }
+];
+if (docData['7L_Description']) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['7L_Description']}`, { filters }).then(res => {
+            if (res?.data?.suggestions?.length > 0) {
+                callback({
+                    suggestions: {
+                        '7L_Description': res.data?.suggestions.map(s => ({
+                            title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                                ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                            }))
+                        }))
+                    },
+                    data: { '7L_StatutFinal': 'Attribué' }
+                })
+            }
+            else { callback({ suggestions: { '7L_Description': [] } }) }
+        });
+} else {
+    callback({ suggestions: { '7L_Description': [] } });
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+514	7L_Autocomplete inventaire choix 2	SEARCH	FIELD	const mapping = [
+    {
+        from: 'StatutInventaire', to: '7L_Statut_Ch2'
+    },
+    {
+        from: 'NoUniqueInventaire', to: '7L_NumCh1'
+    },
+    {
+        from: 'Description_Autocomplete', to: '7L_Description_Ch2'
+    },
+    {
+        from: 'IDAideTechnique', to: '7L_NomCh2'
+    }
+]; const filters = [
+    {
+        key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT'
+    },
+    {
+        key:'STATUS',operator:'EQUALS',value:'ACTIF',type:'TEXT'
+    }
+]; if (docData['7L_Description_Ch2'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['7L_Description_Ch2'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '7L_Description_Ch2': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+515	7L_Autocomplete aide technique choix 1	SEARCH	FIELD	const mapping = [
+    {
+        from: 'Description_Autocomplete', to: '7L_descriptionAideTechnique'
+    },
+    {
+        from: 'IDAideTechnique', to: '7L_Name'
+    }
+]; const filters = [{key:'STATUS',operator:'EQUALS',value:'Actif',type:'TEXT'}]; if (docData['7L_descriptionAideTechnique'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+        }&fieldValue=${docData['7L_descriptionAideTechnique'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '7L_descriptionAideTechnique': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+516	7L_Autocomplete aide technique choix 2	SEARCH	FIELD	const mapping = [
+    { from: 'Description_Autocomplete', to: '7L_descriptionAideTechnique_Ch2'
+    },
+    {from:'IDAideTechnique',to:'7L_NomCh2'
+    }
+];  const filters = [];  if (docData['7L_descriptionAideTechnique_Ch2'
+]) {      api({ local: true
+    })          .post(              `suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+    }&fieldValue=${docData['7L_descriptionAideTechnique_Ch2'
+        ]
+    }`              ,
+    { filters
+    })          .then(res => res?.data?.suggestions?.length > 0 && callback({              suggestions: {                  '7L_descriptionAideTechnique_Ch2': res.data?.suggestions.map(s => ({                      title: s?.value,                      fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({                          ...a,                          value: a.value || '',                          key: mapping.find(m => m.from === a.key).to,
+                }))
+            }))
+        }
+    })          );
+} else {      callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+517	7L_SHOW Section1 Choix 1 demande	SHOW	FIELD	if (docData['7L_jeNeTrouvePasNonPlus'] === 'true') {
+    return {
+        '7L_Description': null, '7L_descriptionAideTechnique': null, '7L_jeNeTrouvePas': null, '7L_NumInv': null, '7L_Name': null, '7L_soumissionAideTechnique': true, '7L_jeNeTrouvePasNonPlus': true
+    }
+}
+else if (docData['7L_jeNeTrouvePas'] === 'true') {
+    return {
+        '7L_Description': null, '7L_descriptionAideTechnique': true, '7L_NumInv': null, '7L_jeNeTrouvePas': true, '7L_soumissionAideTechnique': null, '7L_jeNeTrouvePasNonPlus': true, '7L_Name': true
+    }
+}
+else {
+    return {
+        '7L_Description': true, '7L_descriptionAideTechnique': null, '7L_NumInv': true, '7L_Statut': true, '7L_jeNeTrouvePas': true, '7L_soumissionAideTechnique': null, '7L_jeNeTrouvePasNonPlus': null, '7L_Name': true
+    }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+518	7L_SECTION 1 DEMANDE choix 2 	SHOW	FIELD	if (docData['7L_jeNeTrouvePasNonPlus_Ch2'] === 'true') {
+    return { '7L_Description_Ch2': null, '7L_descriptionAideTechnique_Ch2': null, '7L_jeNeTrouvePas_Ch2': null, '7L_NumCh1': null, '7L_NomCh2': null, '7L_soumissionAideTechnique_Ch2': true, '7L_jeNeTrouvePasNonPlus_Ch2': true }
+}
+else if (docData['7L_jeNeTrouvePas_Ch2'] === 'true') {
+    return { '7L_Description_Ch2': null, '7L_descriptionAideTechnique_Ch2': true, '7L_NumCh1': null, '7L_jeNeTrouvePas_Ch2': true, '7L_soumissionAideTechnique_Ch2': null, '7L_jeNeTrouvePasNonPlus_Ch2': true, '7L_NomCh2': true }
+}
+else {
+    return { '7L_Description_Ch2': true, '7L_descriptionAideTechnique_Ch2': null, '7L_NumCh1': true, '7L_Statut_Ch2': true, '7L_jeNeTrouvePas_Ch2': true, '7L_soumissionAideTechnique_Ch2': null, '7L_jeNeTrouvePasNonPlus_Ch2': null, '7L_NomCh2': true }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+519	8L_Autocomplete inventaire choix 1	SEARCH	FIELD	const mapping = [
+    { from: 'StatutInventaire', to: '8L_Statut' },
+    { from: 'NoUniqueInventaire', to: '8L_NumFinal' },
+    { from: 'Description_Autocomplete', to: '8L_Description' },
+    { from: 'IDAideTechnique', to: '8L_Name' },
+    { from: 'BIN', to: '8L_BIN' }
+];
+const filters = [
+    { key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT' },
+    { key: 'STATUS', operator: 'EQUALS', value: 'ACTIF', type: 'TEXT' }
+];
+if (docData['8L_Description']) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['8L_Description']}`, { filters }).then(res => {
+            if (res?.data?.suggestions?.length > 0) {
+                callback({
+                    suggestions: {
+                        '8L_Description': res.data?.suggestions.map(s => ({
+                            title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                                ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                            }))
+                        }))
+                    },
+                    data: { '8L_StatutFinal': 'Attribué' }
+                })
+            }
+            else { callback({ suggestions: { '8L_Description': [] } }) }
+        });
+} else {
+    callback({ suggestions: { '8L_Description': [] } });
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+520	8L_Autocomplete inventaire choix 2	SEARCH	FIELD	const mapping = [
+    {
+        from: 'StatutInventaire', to: '8L_Statut_Ch2'
+    },
+    {
+        from: 'NoUniqueInventaire', to: '8L_NumCh1'
+    },
+    {
+        from: 'Description_Autocomplete', to: '8L_Description_Ch2'
+    },
+    {
+        from: 'IDAideTechnique', to: '8L_NomCh2'
+    }
+]; const filters = [
+    {
+        key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT'
+    },
+    {
+        key:'STATUS',operator:'EQUALS',value:'ACTIF',type:'TEXT'
+    }
+]; if (docData['8L_Description_Ch2'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['8L_Description_Ch2'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '8L_Description_Ch2': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+521	8L_Autocomplete aide technique choix 1	SEARCH	FIELD	const mapping = [
+    {
+        from: 'Description_Autocomplete', to: '8L_descriptionAideTechnique'
+    },
+    {
+        from: 'IDAideTechnique', to: '8L_Name'
+    }
+]; const filters = [{key:'STATUS',operator:'EQUALS',value:'Actif',type:'TEXT'}]; if (docData['8L_descriptionAideTechnique'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+        }&fieldValue=${docData['8L_descriptionAideTechnique'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '8L_descriptionAideTechnique': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+522	8L_Autocomplete aide technique choix 2	SEARCH	FIELD	const mapping = [
+    { from: 'Description_Autocomplete', to: '8L_descriptionAideTechnique_Ch2'
+    },
+    {from:'IDAideTechnique',to:'8L_NomCh2'
+    }
+];  const filters = [];  if (docData['8L_descriptionAideTechnique_Ch2'
+]) {      api({ local: true
+    })          .post(              `suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+    }&fieldValue=${docData['8L_descriptionAideTechnique_Ch2'
+        ]
+    }`              ,
+    { filters
+    })          .then(res => res?.data?.suggestions?.length > 0 && callback({              suggestions: {                  '8L_descriptionAideTechnique_Ch2': res.data?.suggestions.map(s => ({                      title: s?.value,                      fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({                          ...a,                          value: a.value || '',                          key: mapping.find(m => m.from === a.key).to,
+                }))
+            }))
+        }
+    })          );
+} else {      callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+523	8L_SHOW Section1 Choix 1 demande	SHOW	FIELD	if (docData['8L_jeNeTrouvePasNonPlus'] === 'true') {
+    return {
+        '8L_Description': null, '8L_descriptionAideTechnique': null, '8L_jeNeTrouvePas': null, '8L_NumInv': null, '8L_Name': null, '8L_soumissionAideTechnique': true, '8L_jeNeTrouvePasNonPlus': true
+    }
+}
+else if (docData['8L_jeNeTrouvePas'] === 'true') {
+    return {
+        '8L_Description': null, '8L_descriptionAideTechnique': true, '8L_NumInv': null, '8L_jeNeTrouvePas': true, '8L_soumissionAideTechnique': null, '8L_jeNeTrouvePasNonPlus': true, '8L_Name': true
+    }
+}
+else {
+    return {
+        '8L_Description': true, '8L_descriptionAideTechnique': null, '8L_NumInv': true, '8L_Statut': true, '8L_jeNeTrouvePas': true, '8L_soumissionAideTechnique': null, '8L_jeNeTrouvePasNonPlus': null, '8L_Name': true
+    }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+524	8L_SECTION 1 DEMANDE choix 2 	SHOW	FIELD	if (docData['8L_jeNeTrouvePasNonPlus_Ch2'] === 'true') {
+    return { '8L_Description_Ch2': null, '8L_descriptionAideTechnique_Ch2': null, '8L_jeNeTrouvePas_Ch2': null, '8L_NumCh1': null, '8L_NomCh2': null, '8L_soumissionAideTechnique_Ch2': true, '8L_jeNeTrouvePasNonPlus_Ch2': true }
+}
+else if (docData['8L_jeNeTrouvePas_Ch2'] === 'true') {
+    return { '8L_Description_Ch2': null, '8L_descriptionAideTechnique_Ch2': true, '8L_NumCh1': null,  '8L_jeNeTrouvePas_Ch2': true, '8L_soumissionAideTechnique_Ch2': null, '8L_jeNeTrouvePasNonPlus_Ch2': true, '8L_NomCh2': true }
+}
+else {
+    return { '8L_Description_Ch2': true, '8L_descriptionAideTechnique_Ch2': null, '8L_NumCh1': true, '8L_Statut_Ch2': true, '8L_jeNeTrouvePas_Ch2': true, '8L_soumissionAideTechnique_Ch2': null, '8L_jeNeTrouvePasNonPlus_Ch2': null, '8L_NomCh2': true }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+525	9L_Autocomplete inventaire choix 1	SEARCH	FIELD	const mapping = [
+    { from: 'StatutInventaire', to: '9L_Statut' },
+    { from: 'NoUniqueInventaire', to: '9L_NumFinal' },
+    { from: 'Description_Autocomplete', to: '9L_Description' },
+    { from: 'IDAideTechnique', to: '9L_Name' },
+    { from: 'BIN', to: '9L_BIN' }
+];
+const filters = [
+    { key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT' },
+    { key: 'STATUS', operator: 'EQUALS', value: 'ACTIF', type: 'TEXT' }
+];
+if (docData['9L_Description']) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['9L_Description']}`, { filters }).then(res => {
+            if (res?.data?.suggestions?.length > 0) {
+                callback({
+                    suggestions: {
+                        '9L_Description': res.data?.suggestions.map(s => ({
+                            title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                                ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                            }))
+                        }))
+                    },
+                    data: { '9L_StatutFinal': 'Attribué' }
+                })
+            }
+            else { callback({ suggestions: { '9L_Description': [] } }) }
+        });
+} else {
+    callback({ suggestions: { '9L_Description': [] } });
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+526	9L_Autocomplete inventaire choix 2	SEARCH	FIELD	const mapping = [
+    {
+        from: 'StatutInventaire', to: '9L_Statut_Ch2'
+    },
+    {
+        from: 'NoUniqueInventaire', to: '9L_NumCh1'
+    },
+    {
+        from: 'Description_Autocomplete', to: '9L_Description_Ch2'
+    },
+    {
+        from: 'IDAideTechnique', to: '9L_NomCh2'
+    }
+]; const filters = [
+    {
+        key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT'
+    },
+    {
+        key:'STATUS',operator:'EQUALS',value:'ACTIF',type:'TEXT'
+    }
+]; if (docData['9L_Description_Ch2'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['9L_Description_Ch2'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '9L_Description_Ch2': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+527	9L_Autocomplete aide technique choix 1	SEARCH	FIELD	const mapping = [
+    {
+        from: 'Description_Autocomplete', to: '9L_descriptionAideTechnique'
+    },
+    {
+        from: 'IDAideTechnique', to: '9L_Name'
+    }
+]; const filters = {key:'STATUS',operator:'EQUALS',value:'Actif',type:'TEXT'}]; if (docData['9L_descriptionAideTechnique'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+        }&fieldValue=${docData['9L_descriptionAideTechnique'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '9L_descriptionAideTechnique': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+528	9L_Autocomplete aide technique choix 2	SEARCH	FIELD	const mapping = [
+    { from: 'Description_Autocomplete', to: '9L_descriptionAideTechnique_Ch2'
+    },
+    {from:'IDAideTechnique',to:'9L_NomCh2'
+    }
+];  const filters = [];  if (docData['9L_descriptionAideTechnique_Ch2'
+]) {      api({ local: true
+    })          .post(              `suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+    }&fieldValue=${docData['9L_descriptionAideTechnique_Ch2'
+        ]
+    }`              ,
+    { filters
+    })          .then(res => res?.data?.suggestions?.length > 0 && callback({              suggestions: {                  '9L_descriptionAideTechnique_Ch2': res.data?.suggestions.map(s => ({                      title: s?.value,                      fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({                          ...a,                          value: a.value || '',                          key: mapping.find(m => m.from === a.key).to,
+                }))
+            }))
+        }
+    })          );
+} else {      callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+529	9L_SHOW Section1 Choix 1 demande	SHOW	FIELD	if (docData['9L_jeNeTrouvePasNonPlus'] === 'true') {
+    return {
+        '9L_Description': null, '9L_descriptionAideTechnique': null, '9L_jeNeTrouvePas': null, '9L_NumInv': null, '9L_Name': null, '9L_soumissionAideTechnique': true, '9L_jeNeTrouvePasNonPlus': true
+    }
+}
+else if (docData['9L_jeNeTrouvePas'] === 'true') {
+    return {
+        '9L_Description': null, '9L_descriptionAideTechnique': true, '9L_NumInv': null, '9L_jeNeTrouvePas': true, '9L_soumissionAideTechnique': null, '9L_jeNeTrouvePasNonPlus': true, '9L_Name': true
+    }
+}
+else {
+    return {
+        '9L_Description': true, '9L_descriptionAideTechnique': null, '9L_NumInv': true, '9L_Statut': true, '9L_jeNeTrouvePas': true, '9L_soumissionAideTechnique': null, '9L_jeNeTrouvePasNonPlus': null, '9L_Name': true
+    }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+530	9L_SECTION 1 DEMANDE choix 2 	SHOW	FIELD	if (docData['9L_jeNeTrouvePasNonPlus_Ch2'] === 'true') {
+    return { '9L_Description_Ch2': null, '9L_descriptionAideTechnique_Ch2': null, '9L_jeNeTrouvePas_Ch2': null, '9L_NumCh1': null, '9L_NomCh2': null, '9L_soumissionAideTechnique_Ch2': true, '9L_jeNeTrouvePasNonPlus_Ch2': true }
+}
+else if (docData['9L_jeNeTrouvePas_Ch2'] === 'true') {
+    return { '9L_Description_Ch2': null, '9L_descriptionAideTechnique_Ch2': true, '9L_NumCh1': null, '9L_jeNeTrouvePas_Ch2': true, '9L_soumissionAideTechnique_Ch2': null, '9L_jeNeTrouvePasNonPlus_Ch2': true, '9L_NomCh2': true }
+}
+else {
+    return { '9L_Description_Ch2': true, '9L_descriptionAideTechnique_Ch2': null, '9L_NumCh1': true, '9L_Statut_Ch2': true, '9L_jeNeTrouvePas_Ch2': true, '9L_soumissionAideTechnique_Ch2': null, '9L_jeNeTrouvePasNonPlus_Ch2': null, '9L_NomCh2': true }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+531	10L_Autocomplete inventaire choix 1	SEARCH	FIELD	console.log("Fonction 531", context);
+
+const mapping = [
+  { from: "StatutInventaire", to: "10L_Statut" },
+  { from: "NoUniqueInventaire", to: "10L_NumFinal" },
+  { from: "Description_Autocomplete", to: "10L_Description" },
+  { from: "IDAideTechnique", to: "10L_Name" },
+  { from: "BIN", to: "10L_BIN" },
+];
+const filters = [
+  {
+    key: "StatutInventaire",
+    operator: "IN",
+    value: "DISPONIBLE",
+    type: "SELECT",
+  },
+  { key: "STATUS", operator: "EQUALS", value: "ACTIF", type: "TEXT" },
+];
+if (docData["10L_Description"]) {
+  api({
+    local: true,
+  })
+    .post(
+      `suggestion?fieldID=${"af269bee-019f-445d-8ae1-e9b3549a0a65"}&fieldValue=${docData["10L_Description"]}`,
+      { filters },
+    )
+    .then((res) => {
+      if (res?.data?.suggestions?.length > 0) {
+        // Sort suggestions: no stars first, then 1 star, then 2 stars (**)
+        const sorted = res.data?.suggestions.sort((a, b) => {
+          const aNum =
+            a?.autoFill?.find((af) => af.key === "NoUniqueInventaire")?.value ||
+            "";
+          const bNum =
+            b?.autoFill?.find((af) => af.key === "NoUniqueInventaire")?.value ||
+            "";
+          const aStars = (aNum.match(/\*+$/) || [""])[0].length;
+          const bStars = (bNum.match(/\*+$/) || [""])[0].length;
+          return aStars - bStars; // 0 stars first, then 1, then 2
+        });
+        callback({
+          suggestions: {
+            "10L_Description": sorted.map((s) => ({
+              title: s?.value,
+              fields: s?.autoFill
+                ?.filter((a) => mapping.map((m) => m.from).includes(a.key))
+                .map((a) => ({
+                  ...a,
+                  value: a.value || "",
+                  key: mapping.find((m) => m.from === a.key).to,
+                })),
+            })),
+          },
+          data: { "10L_StatutFinal": "Attribué" },
+        });
+      } else {
+        callback({ suggestions: { "10L_Description": [] } });
+      }
+    });
+} else {
+  callback({ suggestions: { "10L_Description": [] } });
+}
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+532	10L_Autocomplete inventaire choix 2	SEARCH	FIELD	const mapping = [
+    {
+        from: 'StatutInventaire', to: '10L_Statut_Ch2'
+    },
+    {
+        from: 'NoUniqueInventaire', to: '10L_NumCh1'
+    },
+    {
+        from: 'Description_Autocomplete', to: '10L_Description_Ch2'
+    },
+    {
+        from: 'IDAideTechnique', to: '10L_NomCh2'
+    }
+]; const filters = [
+    {
+        key: 'StatutInventaire', operator: 'IN', value: 'DISPONIBLE', type: 'SELECT'
+    },
+    {
+        key:'STATUS',operator:'EQUALS',value:'ACTIF',type:'TEXT'
+    }
+]; if (docData['10L_Description_Ch2'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'
+        }&fieldValue=${docData['10L_Description_Ch2'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '10L_Description_Ch2': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+533	10L_Autocomplete aide technique choix 1	SEARCH	FIELD	const mapping = [
+    {
+        from: 'Description_Autocomplete', to: '10L_descriptionAideTechnique'
+    },
+    {
+        from: 'IDAideTechnique', to: '10L_Name'
+    }
+]; const filters = []; if (docData['10L_descriptionAideTechnique'
+]) {
+    api({
+        local: true
+    }).post(`suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+        }&fieldValue=${docData['10L_descriptionAideTechnique'
+        ]
+        }`,
+        {
+            filters
+        }).then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                '10L_descriptionAideTechnique': res.data?.suggestions.map(s => ({
+                    title: s?.value, fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a, value: a.value || '', key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};
+
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+534	10L_Autocomplete aide technique choix 2	SEARCH	FIELD	const mapping = [
+    { from: 'Description_Autocomplete', to: '10L_descriptionAideTechnique_Ch2'
+    },
+    {from:'IDAideTechnique',to:'10L_NomCh2'
+    }
+];  const filters = [];  if (docData['10L_descriptionAideTechnique_Ch2'
+]) {      api({ local: true
+    })          .post(              `suggestion?fieldID=${'be855355-23a4-4238-9cb5-a4412436622f'
+    }&fieldValue=${docData['10L_descriptionAideTechnique_Ch2'
+        ]
+    }`              ,
+    { filters
+    })          .then(res => res?.data?.suggestions?.length > 0 && callback({              suggestions: {                  '10L_descriptionAideTechnique_Ch2': res.data?.suggestions.map(s => ({                      title: s?.value,                      fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({                          ...a,                          value: a.value || '',                          key: mapping.find(m => m.from === a.key).to,
+                }))
+            }))
+        }
+    })          );
+} else {      callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+535	10L_SHOW Section1 Choix 1 demande	SHOW	FIELD	if (docData['10L_jeNeTrouvePasNonPlus'] === 'true') {
+    return {
+        '10L_Description': null, '10L_descriptionAideTechnique': null, '10L_jeNeTrouvePas': null, '10L_NumInv': null, '10L_Name': null, '10L_soumissionAideTechnique': true, '10L_jeNeTrouvePasNonPlus': true
+    }
+}
+else if (docData['10L_jeNeTrouvePas'] === 'true') {
+    return {
+        '10L_Description': null, '10L_descriptionAideTechnique': true, '10L_NumInv': null,'10L_jeNeTrouvePas': true, '10L_soumissionAideTechnique': null, '10L_jeNeTrouvePasNonPlus': true, '10L_Name': true
+    }
+}
+else {
+    return {
+        '10L_Description': true, '10L_descriptionAideTechnique': null, '10L_NumInv': true, '10L_Statut': true, '10L_jeNeTrouvePas': true, '10L_soumissionAideTechnique': null, '10L_jeNeTrouvePasNonPlus': null, '10L_Name': true
+    }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+536	10L_SECTION 1 DEMANDE choix 2 	SHOW	FIELD	if (docData['10L_jeNeTrouvePasNonPlus_Ch2'] === 'true') {
+    return { '10L_Description_Ch2': null, '10L_descriptionAideTechnique_Ch2': null, '10L_jeNeTrouvePas_Ch2': null, '10L_NumCh1': null, '10L_NomCh2': null, '10L_soumissionAideTechnique_Ch2': true, '10L_jeNeTrouvePasNonPlus_Ch2': true }
+}
+else if (docData['10L_jeNeTrouvePas_Ch2'] === 'true') {
+    return { '10L_Description_Ch2': null, '10L_descriptionAideTechnique_Ch2': true, '10L_NumCh1': null, '10L_jeNeTrouvePas_Ch2': true, '10L_soumissionAideTechnique_Ch2': null, '10L_jeNeTrouvePasNonPlus_Ch2': true, '10L_NomCh2': true }
+}
+else {
+    return { '10L_Description_Ch2': true, '10L_descriptionAideTechnique_Ch2': null, '10L_NumCh1': true, '10L_Statut_Ch2': true, '10L_jeNeTrouvePas_Ch2': true, '10L_soumissionAideTechnique_Ch2': null, '10L_jeNeTrouvePasNonPlus_Ch2': null, '10L_NomCh2': true }
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+537	2L_show popup	SHOW	POPUP	return {'2L_RemarqueLivraison':docData['2L_jeNeTrouvePasNonPlus']==='true' ? true:null}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+539	2L_ show popup remarque choix 2	SHOW 	POPUP	return { '2L_RemarqueLivraison_Ch2': docData['2L_jeNeTrouvePasNonPlus_Ch2'] === 'true' ? true : null};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+540	3L_show popup	SHOW	POPUP	return {'3L_RemarqueLivraison':docData['3L_jeNeTrouvePasNonPlus']==='true' ? true:null}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+541	3L_ show popup remarque choix 2	SHOW 	POPUP	return { '3L_RemarqueLivraison_Ch2': docData['3L_jeNeTrouvePasNonPlus_Ch2'] === 'true' ? true : null};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+542	4L_show popup	SHOW	POPUP	return {'4L_RemarqueLivraison':docData['4L_jeNeTrouvePasNonPlus']==='true' ? true:null}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+543	4L_ show popup remarque choix 2	SHOW 	POPUP	return { '4L_RemarqueLivraison_Ch2': docData['4L_jeNeTrouvePasNonPlus_Ch2'] === 'true' ? true : null};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+544	5L_show popup	SHOW	POPUP	return {'5L_RemarqueLivraison':docData['5L_jeNeTrouvePasNonPlus']==='true' ? true:null}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+545	5L_ show popup remarque choix 2	SHOW 	POPUP	return { '5L_RemarqueLivraison_Ch2': docData['5L_jeNeTrouvePasNonPlus_Ch2'] === 'true' ? true : null};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+546	6L_show popup	SHOW	POPUP	return {'6L_RemarqueLivraison':docData['6L_jeNeTrouvePasNonPlus']==='true' ? true:null}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+547	6L_ show popup remarque choix 2	SHOW 	POPUP	return { '6L_RemarqueLivraison_Ch2': docData['6L_jeNeTrouvePasNonPlus_Ch2'] === 'true' ? true : null};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+548	7L_show popup	SHOW	POPUP	return {'7L_RemarqueLivraison':docData['7L_jeNeTrouvePasNonPlus']==='true' ? true:null}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+549	7L_ show popup remarque choix 2	SHOW 	POPUP	return { '7L_RemarqueLivraison_Ch2': docData['7L_jeNeTrouvePasNonPlus_Ch2'] === 'true' ? true : null};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+550	8L_show popup	SHOW	POPUP	return {'8L_RemarqueLivraison':docData['8L_jeNeTrouvePasNonPlus']==='true' ? true:null}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+551	8L_ show popup remarque choix 2	SHOW 	POPUP	return { '8L_RemarqueLivraison_Ch2': docData['8L_jeNeTrouvePasNonPlus_Ch2'] === 'true' ? true : null};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+552	9L_show popup	SHOW	POPUP	return {'9L_RemarqueLivraison':docData['9L_jeNeTrouvePasNonPlus']==='true' ? true:null}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+553	9L_ show popup remarque choix 2	SHOW 	POPUP	return { '9L_RemarqueLivraison_Ch2': docData['9L_jeNeTrouvePasNonPlus_Ch2'] === 'true' ? true : null};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+554	10L_show popup	SHOW	POPUP	return {'10L_RemarqueLivraison':docData['10L_jeNeTrouvePasNonPlus']==='true' ? true:null}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+555	10L_ show popup remarque choix 2	SHOW 	POPUP	return { '10L_RemarqueLivraison_Ch2': docData['10L_jeNeTrouvePasNonPlus_Ch2'] === 'true' ? true : null};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+556	Collection_recuperation no inventaire	SEARCH	FIELD	const mapping = [
+    { from: 'Description_Autocomplete', to: 'Recuperation|2|Description' }
+];
+const filters = [];
+const collection = docData['Recuperation'];
+const currentRow = collection[indexItemChange];
+const searchField = 'Recuperation|1|NoInventaire';
+const searchValue = currentRow[searchField];
+if (searchValue) {
+    api({ local: true })
+        .post(
+            `suggestion?fieldID=${'e0f4c957-d51d-4a75-8dd6-18bf6256dbba'}&fieldValue=${searchValue}`, { filters })
+        .then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                [searchField]: res.data?.suggestions.map(s => ({
+                    title: s?.value,
+                    fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a,
+                        value: a.value || '',
+                        key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        })
+    )
+}
+else {
+    callback([]);
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+557	Collection_recuperation description	SEARCH	FIELD	const mapping = [
+    { from: 'NoUniqueInventaire', to: 'Recuperation|1|NoInventaire' }
+];
+const filters = [];
+const collection = docData['Recuperation'];
+const currentRow = collection[indexItemChange];
+const searchField = 'Recuperation|2|Description';
+const searchValue = currentRow[searchField];
+if (searchValue) {
+    api({ local: true })
+        .post(
+            `suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'}&fieldValue=${searchValue}`, { filters })
+        .then(res => res?.data?.suggestions?.length > 0 && callback({
+            suggestions: {
+                [searchField]: res.data?.suggestions.map(s => ({
+                    title: s?.value,
+                    fields: s?.autoFill?.filter(a => mapping.map(m => m.from).includes(a.key)).map(a => ({
+                        ...a,
+                        value: a.value || '',
+                        key: mapping.find(m => m.from === a.key).to,
+                    }))
+                }))
+            }
+        })
+    )
+}
+else {
+    callback([]);
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+558	1L_Autofill No et nom final	FILL	FIELD	if (docData["1L_Valid"]==="Confirmer"){
+    return{"1L_NomFinal":docData["1L_Description"],"1L_NumFinal":docData["1L_NumInv"],'1L_StatutFinal':docData["1L_Statut"]}}
+else if (docData["1L_ValidCh2"]==="Confirmer"){
+    return{"1L_NomFinal":docData["1L_Description_Ch2"],"1L_NumFinal":docData["1L_NumCh1"],'1L_StatutFinal':docData["1L_Statut_Ch2"]}}
+else {
+    return undefined}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+559	2L_Autofill No et nom final	FILL	FIELD	if (docData["2L_Valid"]==="Confirmer"){
+    return{"2L_NomFinal":docData["2L_Description"],"2L_NumFinal":docData["2L_NumInv"],'2L_StatutFinal':docData["2L_Statut"]}}
+else if (docData["2L_ValidCh2"]==="Confirmer"){
+    return{"2L_NomFinal":docData["2L_Description_Ch2"],"2L_NumFinal":docData["2L_NumCh1"],'2L_StatutFinal':docData["2L_Statut_Ch2"]}}
+else {
+    return undefined}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+560	3L_Autofill No et nom final	FILL	FIELD	if (docData["3L_Valid"]==="Confirmer"){
+    return{"3L_NomFinal":docData["3L_Description"],"3L_NumFinal":docData["3L_NumInv"],'3L_StatutFinal':docData["3L_Statut"]}}
+else if (docData["3L_ValidCh2"]==="Confirmer"){
+    return{"3L_NomFinal":docData["3L_Description_Ch2"],"3L_NumFinal":docData["3L_NumCh1"],'3L_StatutFinal':docData["3L_Statut_Ch2"]}}
+else {
+    return undefined}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+561	4L_Autofill No et nom final	FILL	FIELD	if (docData["4L_Valid"]==="Confirmer"){
+    return{"4L_NomFinal":docData["4L_Description"],"4L_NumFinal":docData["4L_NumInv"],'4L_StatutFinal':docData["4L_Statut"]}}
+else if (docData["4L_ValidCh2"]==="Confirmer"){
+    return{"4L_NomFinal":docData["4L_Description_Ch2"],"4L_NumFinal":docData["4L_NumCh1"],'4L_StatutFinal':docData["4L_Statut_Ch2"]}}
+else {
+    return undefined}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+562	5L_Autofill No et nom final	FILL	FIELD	if (docData["5L_Valid"]==="Confirmer"){
+    return{"5L_NomFinal":docData["5L_Description"],"5L_NumFinal":docData["5L_NumInv"],'5L_StatutFinal':docData["5L_Statut"]}}
+else if (docData["5L_ValidCh2"]==="Confirmer"){
+    return{"5L_NomFinal":docData["5L_Description_Ch2"],"5L_NumFinal":docData["5L_NumCh1"],'5L_StatutFinal':docData["5L_Statut_Ch2"]}}
+else {
+    return undefined}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+563	6L_Autofill No et nom final	FILL	FIELD	if (docData["6L_Valid"]==="Confirmer"){
+    return{"6L_NomFinal":docData["6L_Description"],"6L_NumFinal":docData["6L_NumInv"],'6L_StatutFinal':docData["6L_Statut"]}}
+else if (docData["6L_ValidCh2"]==="Confirmer"){
+    return{"6L_NomFinal":docData["6L_Description_Ch2"],"6L_NumFinal":docData["6L_NumCh1"],'6L_StatutFinal':docData["6L_Statut_Ch2"]}}
+else {
+    return undefined}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+564	7L_Autofill No et nom final	FILL	FIELD	if (docData["7L_Valid"]==="Confirmer"){
+    return{"7L_NomFinal":docData["7L_Description"],"7L_NumFinal":docData["7L_NumInv"],'7L_StatutFinal':docData["7L_Statut"]}}
+else if (docData["7L_ValidCh2"]==="Confirmer"){
+    return{"7L_NomFinal":docData["7L_Description_Ch2"],"7L_NumFinal":docData["7L_NumCh1"],'7L_StatutFinal':docData["7L_Statut_Ch2"]}}
+else {
+    return undefined}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+565	8L_Autofill No et nom final	FILL	FIELD	if (docData["8L_Valid"]==="Confirmer"){
+    return{"8L_NomFinal":docData["8L_Description"],"8L_NumFinal":docData["8L_NumInv"],'8L_StatutFinal':docData["8L_Statut"]}}
+else if (docData["8L_ValidCh2"]==="Confirmer"){
+    return{"8L_NomFinal":docData["8L_Description_Ch2"],"8L_NumFinal":docData["8L_NumCh1"],'8L_StatutFinal':docData["8L_Statut_Ch2"]}}
+else {
+    return undefined}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+566	9L_Autofill No et nom final	FILL	FIELD	if (docData["9L_Valid"]==="Confirmer"){
+    return{"9L_NomFinal":docData["9L_Description"],"9L_NumFinal":docData["9L_NumInv"],'9L_StatutFinal':docData["9L_Statut"]}}
+else if (docData["9L_ValidCh2"]==="Confirmer"){
+    return{"9L_NomFinal":docData["9L_Description_Ch2"],"9L_NumFinal":docData["9L_NumCh1"],'9L_StatutFinal':docData["9L_Statut_Ch2"]}}
+else {
+    return undefined}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+567	10L_Autofill No et nom final	FILL	FIELD	if (docData["10L_Valid"]==="Confirmer"){
+    return{"10L_NomFinal":docData["10L_Description"],"10L_NumFinal":docData["10L_NumInv"],'10L_StatutFinal':docData["10L_Statut"]}}
+else if (docData["10L_ValidCh2"]==="Confirmer"){
+    return{"10L_NomFinal":docData["10L_Description_Ch2"],"10L_NumFinal":docData["10L_NumCh1"],'10L_StatutFinal':docData["10L_Statut_Ch2"]}}
+else {
+    return undefined}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+568	vider la date de livraison	FILL	FIELD	return docData['viderDate'] === 'true'?{'PretType': 'AVQ/AVD'}: undefined;	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+569	Markdown separation	FILL	FIELD	return {'MarkDownSeparation':'<hr style="height:10px;border-width:0;color:gray;background-color:gray">'}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+570	Fill renasys	FILL	FIELD	return {
+'Renasys1':"Est-ce que le produit n’a pas été aussi efficace que prévu? Si oui, veuillez spécifier:",
+'Renasys2':"Le problème signalé concerne-t-il un produit défectueux au déballage? (première utilisation d’une nouvelle pompe)",
+'Renasys3':"Le problème concernant le produit est-il survenu pendant une intervention?",
+'Renasys4':"Si le problème concernant le produit est survenu pendant une intervention, aviez-vous accès à un dispositif de secours?",
+'Renasys5':"Si le problème concernant le produit est survenu pendant une intervention, la chirurgie/le traitement ont-ils été retardés pendant plus de 30 minutes ou reportés?",
+'Renasys6':"Le problème concernant le produit a-t-il causé des torts au patient ou y a contribué, nécessité un traitement supplémentaire ou prolongé l’hospitalisation du patient?",
+'Renasys7':"Le problème concernant le produit a-t-il un lien avec une contamination ou une perte de stérilisation?",
+'Renasys8':"Le problème concernant le produit a-t-il un lien avec son emballage ou son étiquette, ou des composantes manquantes ou supplémentaires dans la boîte?",
+'Renasys9':"Le traitement ou la chirurgie étaient-ils des interventions de révision causées par un produit de S&N?"
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+571	SHOW renasys	SHOW	SECTION	return {'Renasys': docData["TypeLivraisonTPN"]==='Echange'? true:null}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+572	Show section inventaire	SHOW	SECTION	if (docData["TypeInventaire"]==='Aide technique'){ 
+    return {'S1_FL11':true,'S4_FL11':true,'InformationsInventaire':null} 
+}
+else if (docData["TypeInventaire"]) {return {'S1_FL11':null,'S4_FL11':null,'InformationsInventaire':true} 
+}
+else {return {'S1_FL11':null,'S4_FL11':null,'InformationsInventaire':null} }	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+573	Liste des pompes	SEARCH	FIELD	    api({ local: true })
+  .get(`https://ciussscnfwtest.r03.rtss.qc.ca/api/tabledata/InventaireGrid?&fields=StatutInventaire&values=DISPONIBLE&fields=TypeInventaire&values=Pompe&fields=NoUniqueInventaire&values=${docData['NumeroPompeSearch']||''}&orderByDesc=FORMID`)
+  .then(res => {
+    const rows = res?.data?.tableData?.rows;
+
+    if (!rows) return []; 
+
+    const Liste = rows
+      .flatMap(row => row.documentCells) 
+      .filter(documentCells => documentCells.key === 'NoUniqueInventaire')
+      .map(documentCells => ({
+        key: documentCells.value,
+        value: documentCells.value,
+        text: documentCells.value
+      }));
+    return Liste;
+  })
+  .then(list => {
+    callback({ options: { 'NumeroPompeSearch': list } });
+  })
+  .catch(err => {
+    console.error("Erreur fonction liste des pompes:", err);
+  });	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+574	NULL	SHOW	FIELD	if (docData['TypeLivraisonTPN']==='Livraison'){
+    return {'DateDebutTraitement':true,'DateFinTraitement':null}
+}
+else if (docData['TypeLivraisonTPN']==='Récupération') {
+    return {'DateDebutTraitement':null,'DateFinTraitement':true}
+}
+
+else {
+    return {'DateDebutTraitement':true,'DateFinTraitement':true}
+}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+575	Suggestions adresse usager	SEARCH	FIELD	if (docData['AdresseUsager']) {
+    new google.maps.places.AutocompleteService()
+        .getQueryPredictions({
+            input: docData['AdresseUsager'],
+            types: ["address"]
+        }, result => !console.log(result) && callback({
+            suggestions: {
+                'AdresseUsager': result.map(item => ({
+                    title: item.description
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+576	Suggestions adresse livraison	SEARCH	FIELD	if (docData['Adresse']) {
+    new google.maps.places.AutocompleteService()
+        .getQueryPredictions({
+            input: docData['Adresse'],
+            types: ["address"]
+        }, result => !console.log(result) && callback({
+            suggestions: {
+                'Adresse': result.map(item => ({
+                    title: item.description
+                }))
+            }
+        }));
+} else {
+    callback([]);
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+577	Autofill adresse livraison	SEARCH	FIELD	if (docData['Adresse']) {
+	console.log(docData['Adresse']);
+	console.log('adresse existe');
+	new google.maps.Geocoder()
+		.geocode({
+			address: docData['Adresse']
+		}, (result) => {
+			console.log(result);
+			const data = {};
+			const firstPartsRequest = result[0].address_components;
+			if (firstPartsRequest) {
+				firstPartsRequest.forEach((part) => {
+					if (part.types.includes("postal_code")) {
+						data["CodePostal"] = part.long_name;
+					}
+					if (part.types.includes("locality")) {
+						data["Ville"] = part.long_name;
+					}
+				})
+			}
+			console.log(data)
+			callback({
+				data
+			});
+		});
+}
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+580	Autofill adresse usagers	SEARCH	FIELD	if (docData['AdresseUsager']) {
+	console.log('adresse existe');
+	new google.maps.Geocoder()
+		.geocode({
+			address: docData['AdresseUsager']
+		}, (result) => {
+			console.log(result);
+			const data = {};
+			const firstPartsRequest = result[0].address_components;
+			if (firstPartsRequest) {
+				firstPartsRequest.forEach((part) => {
+					if (part.types.includes("postal_code")) {
+						data["CPUsager"] = part.long_name;
+					}
+					if (part.types.includes("locality")) {
+						data["VilleUsager"] = part.long_name;
+					}
+				})
+			}
+			console.log(data)
+			callback({
+				data
+			});
+		});
+}
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+581	Reserver pompe	SEARCH	FIELD	if (docData['NumeroPompeSearch']&&docData['NumeroPompeSearch']!=='') 
+api({ local: true })
+  .get(`https://ciussscnfwtest.r03.rtss.qc.ca/api/tabledata/InventaireGrid?&fields=StatutInventaire&values=DISPONIBLE&fields=TypeInventaire&values=Pompe&fields=NoUniqueInventaire&values=${docData['NumeroPompeSearch']}`)
+  .then(res => {
+    const rows = res?.data?.tableData?.rows;
+    const ID = rows?.[0]?.documentRowID;
+    const Statut=rows?.[0]?.status
+    const data={
+        StatutInventaire:"ATTRIBUÉ",
+        NumDernierecommandeInventaire:rows?.[0]?.number,
+        LivraisonOuRecuperation:docData['TypeLivraisonTPN'],
+        DateLivraisonInventaire:docData['TypeLivraisonTPN']==='Récupération'?undefined:docData["DateLivraison"],
+        DateRecuperation:docData['TypeLivraisonTPN']==='Récupération'?docData["DateLivraison"]:undefined,
+        StatutPrepa:'À faire',
+        LienVersLaCommandeInventaire:'/aidetechnique/'+docData["FORMID"]
+    }
+    for (let propName in data) {
+        if (!data[propName]) {
+            delete data[propName];
+        }
+    }
+   
+    
+return api({ local: true }).put("document", {
+    document: {
+        data: JSON.stringify(data),
+        status: Statut,
+        documentID : ID,
+        template: {
+            templateId: "774edbbf-b1f2-4d13-86ef-b72b5218fc52",  
+        }
+    },
+})  
+})	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+582	Mettre pompe dispo	SEARCH	FIELD	if (docData['NumeroPompeSearch']&&docData['NumeroPompeSearch']!=='') 
+api({ local: true })
+  .get(`https://ciussscnfwtest.r03.rtss.qc.ca/api/tabledata/InventaireGrid?&fields=TypeInventaire&values=Pompe&fields=NoUniqueInventaire&values=${docData['NumeroPompeSearch']}`)
+  .then(res => {
+    const rows = res?.data?.tableData?.rows;
+    const ID = rows?.[0]?.documentRowID;
+    const Statut=rows?.[0]?.status
+    const data={
+        StatutInventaire:"DISPONIBLE",
+        NumDernierecommandeInventaire:'',
+        LivraisonOuRecuperation:'',
+        DateLivraisonInventaire:'',
+        DateRecuperation:'',
+        StatutPrepa:'',
+        LienVersLaCommandeInventaire:''
+    }
+    for (let propName in data) {
+        if (!data[propName]) {
+            delete data[propName];
+        }
+    }
+   
+    
+return api({ local: true }).put("document", {
+    document: {
+        data: JSON.stringify(data),
+        status: Statut,
+        documentID : ID,
+        template: {
+            templateId: "774edbbf-b1f2-4d13-86ef-b72b5218fc52",  
+        }
+    },
+}).then(res=>callback({
+    data: {
+        'ValiderPompe':'',
+        'EchangerPompe':'',
+        'NumeroPompeSearch':''
+    }
+})
+    )  
+})
+  
+  
+  	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+586	NULL	READONLY	FIELD	if (docData['EchangerPompe']==='true') {
+    return {"NumeroPompeSearch":null}
+}
+
+else if (docData['ValiderPompe']==="true") {
+    return {"NumeroPompeSearch":true}
+}
+
+else {console.log('else')
+    return {"NumeroPompeSearch":null}}	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+588	CollectionSansNo	SEARCH	FIELD	const filters = [];
+const collectionKey = 'RecupSansNo';
+const searchField = `${collectionKey}|1|Description`;
+
+const collection = docData[collectionKey] || [];
+const currentRow = collection[indexItemChange] || {};
+
+const searchValue = currentRow[searchField];
+
+if (searchValue) {
+  api({ local: true })
+    .post(
+      `suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'}&fieldValue=${encodeURIComponent(searchValue)}`,
+      { filters }
+    )
+    .then(res => {
+      const suggestions = res?.data?.suggestions || [];
+      if (!suggestions.length) return;
+
+      callback({
+        suggestions: {
+          [searchField]: suggestions.map(s => ({
+            title: s?.value || '',
+            // Pas de récupération / remplissage du NoInventaire ici
+            fields: []
+          }))
+        }
+      });
+    });
+} else {
+  callback([]);
+}
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+589	RemplissageCOLLECTIONFinale	FILL	FIELD	let resultat = [];
+
+// --- Recuperation normale ---
+for (let i = 0; i < (docData.Recuperation?.length || 0); i++) {
+  let ligne = docData.Recuperation[i];
+  let noInv = ligne["Recuperation|1|NoInventaire"] || "";
+  let desc = ligne["Recuperation|2|Description"] || "";
+  let statut = ligne["Recuperation|3|Statut"] || "";
+
+  if (noInv || desc || statut) {
+    resultat.push({
+      "RecuperationFinale|1|NoInventaire": noInv,
+      "RecuperationFinale|2|Description": desc,
+      "RecuperationFinale|3|Statut": statut
+    });
+  }
+}
+
+// --- Recuperation sans numéro ---
+for (let i = 0; i < (docData.RecupSansNo?.length || 0); i++) {
+  let ligne = docData.RecupSansNo[i];
+  let noInv = "Aucun";
+  let desc = ligne["RecupSansNo|1|Description"] || "";
+  let statut = ligne["RecupSansNo|2|Statut"] || "";
+
+  if (noInv || desc || statut) {
+    resultat.push({
+      "RecuperationFinale|1|NoInventaire": noInv,
+      "RecuperationFinale|2|Description": desc,
+      "RecuperationFinale|3|Statut": statut
+    });
+  }
+}
+
+// --- Dons ---
+for (let i = 0; i < (docData.Dons?.length || 0); i++) {
+  let ligne = docData.Dons[i];
+  let noInv = "Don";
+  let desc = ligne["Dons|1|Description"] || "";
+  let statut = ligne["Dons|2|Remarque"] || "";
+
+  if (noInv || desc || statut) {
+    resultat.push({
+      "RecuperationFinale|1|NoInventaire": noInv,
+      "RecuperationFinale|2|Description": desc,
+      "RecuperationFinale|3|Statut": statut
+    });
+  }
+}
+
+return { RecuperationFinale: resultat };	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+590	Remplissage	FILL	FIELD	let resultat = [];
+
+for (let i = 0; i < docData.Recuperation.length; i++) {
+  let ligne = docData.RecupSansNo[i];
+  let noInv = "DON";
+  let desc = ligne["RecupSansNo|1|Description"] || "";
+  let statut = ligne["RecupSansNo|2|Statut"] || "";
+  if (noInv || desc || statut) {
+    resultat.push({
+      "RecuperationFinale|1|NoInventaire": noInv,
+      "RecuperationFinale|2|Description": desc,
+      "RecuperationFinale|3|Statut": statut
+    });
+  }
+}
+
+return { RecuperationFinale: resultat };
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+591	ReadOnlyDemandeEquipement	READONLY	FIELD	let showValue = {};
+const userRoles = context.store.moduleStore.user.roles;
+
+if (
+  docData.STATUS !== "Draft" &&
+  docData.STATUS !== "Soumise" &&
+  docData.STATUS !== "Demande particuliere" &&
+  !userRoles.includes("ADMIN") &&
+  !userRoles.includes("AGENTPARC")
+) {
+  showValue = {
+    AddFirstEquipment: true,
+
+    jeNeTrouvePas: true,
+    descriptionAideTechnique: true,
+    jeNeTrouvePasNonPlus: true,
+    "1L_Description": true,
+    "1L_RemarqueAgent": true,
+    soumissionAideTechnique: true,
+    "1L_NumInv": true,
+    "1L_Name": true,
+    "1L_Valid": true,
+    "1L_Priorite": true,
+    "1L_Envoi": true,
+    "1L_Statut": true,
+    "1L_NoRequisitionGRM": true,
+    "1L_NumFinal": true,
+    "1L_NomFinal": true,
+    "1L_StatutFinal": true,
+    "1L_BIN": true,
+    "1L_Add": true,
+
+    "2L_jeNeTrouvePas": true,
+    "2L_descriptionAideTechnique": true,
+    "2L_jeNeTrouvePasNonPlus": true,
+    "2L_Description": true,
+    "2L_RemarqueAgent": true,
+    "2L_soumissionAideTechnique": true,
+    "2L_NumInv": true,
+    "2L_Name": true,
+    "2L_Valid": true,
+    "2L_Priority": true,
+    "2L_Envoi": true,
+    "2L_Statut": true,
+    "2L_NoRequisitionGRM": true,
+    "2L_NumFinal": true,
+    "2L_NomFinal": true,
+    "2L_StatutFinal": true,
+    "2L_BIN": true,
+    "2L_Add": true,
+
+    "3L_jeNeTrouvePas": true,
+    "3L_descriptionAideTechnique": true,
+    "3L_jeNeTrouvePasNonPlus": true,
+    "3L_Description": true,
+    "3L_RemarqueAgent": true,
+    "3L_soumissionAideTechnique": true,
+    "3L_NumInv": true,
+    "3L_Name": true,
+    "3L_Valid": true,
+    "3L_Priority": true,
+    "3L_Envoi": true,
+    "3L_Statut": true,
+    "3L_NoRequisitionGRM": true,
+    "3L_NumFinal": true,
+    "3L_NomFinal": true,
+    "3L_StatutFinal": true,
+    "3L_BIN": true,
+    "3L_Add": true,
+
+    "4L_jeNeTrouvePas": true,
+    "4L_descriptionAideTechnique": true,
+    "4L_jeNeTrouvePasNonPlus": true,
+    "4L_Description": true,
+    "4L_RemarqueAgent": true,
+    "4L_soumissionAideTechnique": true,
+    "4L_NumInv": true,
+    "4L_Name": true,
+    "4L_Valid": true,
+    "4L_Priority": true,
+    "4L_Envoi": true,
+    "4L_Statut": true,
+    "4L_NoRequisitionGRM": true,
+    "4L_NumFinal": true,
+    "4L_NomFinal": true,
+    "4L_StatutFinal": true,
+    "4L_BIN": true,
+    "4L_Add": true,
+
+    "5L_jeNeTrouvePas": true,
+    "5L_descriptionAideTechnique": true,
+    "5L_jeNeTrouvePasNonPlus": true,
+    "5L_Description": true,
+    "5L_RemarqueAgent": true,
+    "5L_soumissionAideTechnique": true,
+    "5L_NumInv": true,
+    "5L_Name": true,
+    "5L_Valid": true,
+    "5L_Priority": true,
+    "5L_Envoi": true,
+    "5L_Statut": true,
+    "5L_NoRequisitionGRM": true,
+    "5L_NumFinal": true,
+    "5L_NomFinal": true,
+    "5L_StatutFinal": true,
+    "5L_BIN": true,
+    "5L_Add": true,
+
+    "6L_jeNeTrouvePas": true,
+    "6L_descriptionAideTechnique": true,
+    "6L_jeNeTrouvePasNonPlus": true,
+    "6L_Description": true,
+    "6L_RemarqueAgent": true,
+    "6L_soumissionAideTechnique": true,
+    "6L_NumInv": true,
+    "6L_Name": true,
+    "6L_Valid": true,
+    "6L_Priority": true,
+    "6L_Envoi": true,
+    "6L_Statut": true,
+    "6L_NoRequisitionGRM": true,
+    "6L_NumFinal": true,
+    "6L_NomFinal": true,
+    "6L_StatutFinal": true,
+    "6L_BIN": true,
+    "6L_Add": true,
+
+    "7L_jeNeTrouvePas": true,
+    "7L_descriptionAideTechnique": true,
+    "7L_jeNeTrouvePasNonPlus": true,
+    "7L_Description": true,
+    "7L_RemarqueAgent": true,
+    "7L_soumissionAideTechnique": true,
+    "7L_NumInv": true,
+    "7L_Name": true,
+    "7L_Valid": true,
+    "7L_Priority": true,
+    "7L_Envoi": true,
+    "7L_Statut": true,
+    "7L_NoRequisitionGRM": true,
+    "7L_NumFinal": true,
+    "7L_NomFinal": true,
+    "7L_StatutFinal": true,
+    "7L_BIN": true,
+    "7L_Add": true,
+
+    "8L_jeNeTrouvePas": true,
+    "8L_descriptionAideTechnique": true,
+    "8L_jeNeTrouvePasNonPlus": true,
+    "8L_Description": true,
+    "8L_RemarqueAgent": true,
+    "8L_soumissionAideTechnique": true,
+    "8L_NumInv": true,
+    "8L_Name": true,
+    "8L_Valid": true,
+    "8L_Priority": true,
+    "8L_Envoi": true,
+    "8L_Statut": true,
+    "8L_NoRequisitionGRM": true,
+    "8L_NumFinal": true,
+    "8L_NomFinal": true,
+    "8L_StatutFinal": true,
+    "8L_BIN": true,
+    "8L_Add": true,
+
+    "9L_jeNeTrouvePas": true,
+    "9L_descriptionAideTechnique": true,
+    "9L_jeNeTrouvePasNonPlus": true,
+    "9L_Description": true,
+    "9L_RemarqueAgent": true,
+    "9L_soumissionAideTechnique": true,
+    "9L_NumInv": true,
+    "9L_Name": true,
+    "9L_Valid": true,
+    "9L_Priority": true,
+    "9L_Envoi": true,
+    "9L_Statut": true,
+    "9L_NoRequisitionGRM": true,
+    "9L_NumFinal": true,
+    "9L_NomFinal": true,
+    "9L_StatutFinal": true,
+    "9L_BIN": true,
+    "9L_add": true,
+
+    "10L_jeNeTrouvePas": true,
+    "10L_descriptionAideTechnique": true,
+    "10L_jeNeTrouvePasNonPlus": true,
+    "10L_Description": true,
+    "10L_RemarqueAgent": true,
+    "10L_soumissionAideTechnique": true,
+    "10L_NumInv": true,
+    "10L_Name": true,
+    "10L_Valid": true,
+    "10L_Priority": true,
+    "10L_Envoi": true,
+    "10L_Statut": true,
+    "10L_NoRequisitionGRM": true,
+    "10L_NumFinal": true,
+    "10L_NomFinal": true,
+    "10L_StatutFinal": true,
+    "10L_BIN": true,
+  };
+}
+
+return showValue;
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+593	NULL	EVALUATE	NULL	console.log("Function 593", context);
+
+
+const UserRole = async (email, roles) => {
+    const autoSaveInfo = {
+        AutoSaveInfo: {
+            dtoName: "AutoSaveInfo",
+            id: email,
+            autoSaveEdits: [
+                {
+                    dtoName: "AutoSaveEdit",
+                    name: "Roles",
+                    value: roles,
+                },
+            ],
+        },
+    };
+
+    return api({ local: true }).put("authentication/AS", autoSaveInfo);
+};
+
+
+
+const addRoleToCurrentUser = async (roleToAdd) => {
+    const email = context?.store?.moduleStore?.user?.username;
+
+    if (!email) {
+        throw new Error("Email utilisateur introuvable dans moduleStore");
+    }
+
+    const existingRoles =
+        context?.store?.moduleStore?.user?.roles ?? [];
+
+    const roles = existingRoles.includes(roleToAdd)
+        ? existingRoles
+        : [...existingRoles, roleToAdd];
+
+    return await UserRole(email, roles);
+};
+
+
+
+(async () => {
+    try {
+        await addRoleToCurrentUser("Ergotherapeute");
+        console.log("Rôle ajouté avec succès");
+    } catch (err) {
+        console.error("Erreur ajout rôle", err);
+    }
+})();
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+594	Impression feuilles de livraison	SEARCH	FIELD	console.log("Fonction 594", context);
+
+const dateLivraison =
+  store.pageContentStore?.processData[0]?.edits?.DateLivraison || "";
+
+const filters = [
+  {
+    key: "TypeTransport",
+    operator: "EQUALS",
+    value: "Transporteur Parc",
+    type: "SELECT",
+  },
+  {
+    key: "STATUS",
+    operator: "IN",
+    value: "Planifiée|Complétée",
+    type: "SELECT",
+  },
+  {
+    key: "DateLivraison",
+    operator: "BETWEEN",
+    value: `${dateLivraison}|${dateLivraison}`,
+    type: "DATE",
+  },
+];
+
+const template = [
+  {
+    FormlayoutID: "1778ee45-49cb-4cd4-82b9-28079409c629",
+    templateName: "FeuilleDeLivraison",
+  },
+  {
+    FormlayoutID: "9533ec71-941c-4b82-8873-9d285b731e29",
+    typeLivraison: "LIVRAISON",
+    templateName: "Bon de livraison",
+  },
+  {
+    FormlayoutID: "9533ec71-941c-4b82-8873-9d285b731e29",
+    typeLivraison: "RÉCUPÉRATION",
+    templateName: "Bon de récupération",
+  },
+];
+
+const DEMANDE_TEMPLATE_ID = "1778ee45-49cb-4cd4-82b9-28079409c629";
+const LEGACY_TEMPLATE_NAME = "DEMANDE";
+const FILE_TYPE = "PDF";
+const LINE_BREAK_SEPARATOR = " | ";
+const REPARE_MAX_ROWS = 12;
+
+const safeParseJson = (raw) => {
+  try {
+    return JSON.parse(raw || "{}");
+  } catch (error) {
+    return {};
+  }
+};
+
+const escapeRegExp = (value) =>
+  String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const toStringValue = (value) => String(value ?? "").trim();
+
+const toTemplateBoolean = (value) => {
+  if (typeof value === "boolean") return value;
+
+  const normalized = toStringValue(value).toLowerCase();
+  if (["true", "1", "oui", "yes", "x"].includes(normalized)) return true;
+  if (["false", "0", "non", "no", ""].includes(normalized)) return false;
+
+  return null;
+};
+
+const normalizeKeyName = (value) =>
+  toStringValue(value)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .toLowerCase();
+
+const getFirstValueByKeyAliases = (source, aliases = []) => {
+  if (!source || typeof source !== "object") return "";
+
+  const normalizedAliases = aliases
+    .map((alias) => normalizeKeyName(alias))
+    .filter(Boolean);
+
+  if (normalizedAliases.length === 0) return "";
+
+  const entries = Object.entries(source);
+  for (const [key, rawValue] of entries) {
+    if (!normalizedAliases.includes(normalizeKeyName(key))) continue;
+    const normalizedValue = toStringValue(rawValue);
+    if (normalizedValue) return normalizedValue;
+  }
+
+  return "";
+};
+
+const resolveDemandeNumber = (...candidates) => {
+  for (const candidate of candidates) {
+    const normalized = toStringValue(candidate);
+    if (normalized) return normalized;
+  }
+  return "";
+};
+
+const resolveRefCommand = (...candidates) => {
+  for (const candidate of candidates) {
+    const normalized = toStringValue(candidate);
+    if (normalized) return normalized;
+  }
+  return "";
+};
+
+const resolveRefCommandFromSources = (...sources) => {
+  const aliases = [
+    "RefCommand",
+    "refCommand",
+    "RefCommande",
+    "refCommande",
+    "RefCommmande",
+    "ReferenceCommande",
+    "ReferenceCommand",
+    "NoCommande",
+    "NumeroCommande",
+    "NumeroDeCommande",
+  ];
+
+  for (const source of sources) {
+    const directValue = getFirstValueByKeyAliases(source, aliases);
+    if (directValue) return directValue;
+
+    const editsValue = getFirstValueByKeyAliases(source?.edits, aliases);
+    if (editsValue) return editsValue;
+  }
+
+  return "";
+};
+
+const extractFileUrl = (payload) => {
+  if (!payload) return "";
+
+  if (typeof payload === "string") {
+    if (/^https?:\/\//i.test(payload)) return payload;
+    if (payload.startsWith("/")) {
+      return `${window.location.origin}${payload}`;
+    }
+    return "";
+  }
+
+  const candidates = [
+    payload?.data?.fileUrl,
+    payload?.fileUrl,
+    payload?.data?.url,
+    payload?.url,
+    payload?.data?.downloadUrl,
+    payload?.downloadUrl,
+    payload?.data?.fileUrls?.[0],
+    payload?.fileUrls?.[0],
+    payload?.data?.urls?.[0],
+    payload?.urls?.[0],
+    payload?.data?.files?.[0]?.fileUrl,
+    payload?.data?.files?.[0]?.url,
+  ];
+
+  const found = candidates.find(
+    (value) =>
+      typeof value === "string" &&
+      (/^https?:\/\//i.test(value) || value.startsWith("/")),
+  );
+
+  if (!found) return "";
+  return found.startsWith("/") ? `${window.location.origin}${found}` : found;
+};
+
+const triggerDownload = (fileUrl, fileName = "Document.pdf") => {
+  const link = document.createElement("a");
+  link.href = fileUrl;
+  link.download = fileName;
+  link.target = "_blank";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+const getFileNameFromUrl = (path, fallback = "Document.pdf") => {
+  if (!path || typeof path !== "string") return fallback;
+
+  const cleanPath = path.split("?")[0].split("#")[0];
+  const fileName = cleanPath.split("/").pop();
+
+  return fileName || fallback;
+};
+
+const downloadAllFilesAsZip = async (fileList) => {
+  if (!Array.isArray(fileList) || fileList.length === 0) {
+    return;
+  }
+
+  if (typeof JSZip === "undefined") {
+    throw new Error("JSZip est indisponible dans cet environnement");
+  }
+
+  const zip = new JSZip();
+
+  for (const { path, filename } of fileList) {
+    try {
+      const response = await fetch(path);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      zip.file(filename, blob);
+    } catch (error) {
+      throw new Error(
+        `Erreur lors du telechargement de ${filename}: ${error?.message || error}`,
+      );
+    }
+  }
+
+  const date = Date.now();
+  const content = await zip.generateAsync({ type: "blob" });
+  const url = URL.createObjectURL(content);
+
+  const downloadLink = document.createElement("a");
+  downloadLink.href = url;
+  downloadLink.download = `ArchiveFeuilleDeLivraisonPDF_${date}.zip`;
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+
+  URL.revokeObjectURL(url);
+};
+
+const collectIndexedValues = (
+  dataObj,
+  keyPrefix,
+  rowArray,
+  fallbackFieldName,
+) => {
+  if (Array.isArray(rowArray) && rowArray.length > 0) {
+    const rowValues = rowArray
+      .map((row) => row?.[keyPrefix] ?? row?.[fallbackFieldName])
+      .filter(
+        (value) =>
+          value !== undefined && value !== null && String(value).trim() !== "",
+      )
+      .map((value) => String(value));
+
+    if (rowValues.length > 0) return rowValues;
+  }
+
+  const indexedRegex = new RegExp(`^${escapeRegExp(keyPrefix)}\\|(\\d+)$`);
+
+  return Object.keys(dataObj || {})
+    .map((key) => {
+      const match = key.match(indexedRegex);
+      if (!match) return null;
+      return { index: Number(match[1]), value: dataObj[key] };
+    })
+    .filter(
+      (item) =>
+        item &&
+        item.value !== undefined &&
+        item.value !== null &&
+        String(item.value).trim() !== "",
+    )
+    .sort((a, b) => a.index - b.index)
+    .map((item) => String(item.value));
+};
+
+const buildRepareText = (dataObj) => {
+  const rows = Array.isArray(dataObj?.Repare) ? dataObj.Repare : [];
+  const toRepareValues = collectIndexedValues(
+    dataObj,
+    "Repare|1|ToRepare",
+    rows,
+    "ToRepare",
+  );
+  const commentRepareValues = collectIndexedValues(
+    dataObj,
+    "Repare|2|CommentRepare",
+    rows,
+    "CommentRepare",
+  );
+
+  return [
+    toRepareValues
+      .map((value, index) => `*${index + 1}. ${value}`)
+      .join(LINE_BREAK_SEPARATOR),
+    commentRepareValues
+      .map((value, index) => `*${index + 1}. ${value}`)
+      .join(LINE_BREAK_SEPARATOR),
+  ]
+    .filter(Boolean)
+    .join(LINE_BREAK_SEPARATOR);
+};
+
+const buildRepareIndexedData = (dataObj = {}) => {
+  const rows = Array.isArray(dataObj?.Repare) ? dataObj.Repare : [];
+  const toRepareValues = collectIndexedValues(
+    dataObj,
+    "Repare|1|ToRepare",
+    rows,
+    "ToRepare",
+  );
+  const commentRepareValues = collectIndexedValues(
+    dataObj,
+    "Repare|2|CommentRepare",
+    rows,
+    "CommentRepare",
+  );
+
+  const output = {};
+  for (let index = 1; index <= REPARE_MAX_ROWS; index += 1) {
+    output[`Repare|1|ToRepare|${index}`] = toStringValue(
+      toRepareValues[index - 1] || "",
+    );
+    output[`Repare|2|CommentRepare|${index}`] = toStringValue(
+      commentRepareValues[index - 1] || "",
+    );
+  }
+
+  return {
+    indexedData: output,
+    toRepareValues,
+    commentRepareValues,
+  };
+};
+
+const buildRecuperationData = (source = {}) => {
+  const output = {};
+
+  for (let index = 1; index <= 10; index += 1) {
+    const sourceItem = Array.isArray(source?.Recuperation)
+      ? source.Recuperation[index - 1]
+      : Array.isArray(source)
+        ? source[index - 1]
+        : null;
+    const rootItem = source && typeof source === "object" ? source : {};
+    const noInventaire = toStringValue(
+      sourceItem?.["RecuperationFinale|1|NoInventaire"] ||
+        sourceItem?.["Recuperation|1|NoInventaire"] ||
+        sourceItem?.NumFinal ||
+        sourceItem?.NoInventaire ||
+        rootItem?.[`RecuperationFinale|1|NoInventaire|${index}`] ||
+        rootItem?.[`Recuperation|1|NoInventaire|${index}`] ||
+        rootItem?.[`RecuperationFinale|1|NoInventaire`] ||
+        rootItem?.[`Recuperation|1|NoInventaire`] ||
+        rootItem?.[`${index}L_NumFinal`] ||
+        rootItem?.NoInventaire,
+    );
+    const description = toStringValue(
+      sourceItem?.["RecuperationFinale|2|Description"] ||
+        sourceItem?.["Recuperation|2|Description"] ||
+        sourceItem?.NomFinal ||
+        sourceItem?.Description ||
+        rootItem?.[`RecuperationFinale|2|Description|${index}`] ||
+        rootItem?.[`Recuperation|2|Description|${index}`] ||
+        rootItem?.[`RecuperationFinale|2|Description`] ||
+        rootItem?.[`Recuperation|2|Description`] ||
+        rootItem?.[`${index}L_NomFinal`] ||
+        rootItem?.Description,
+    );
+    const statut = toStringValue(
+      sourceItem?.["RecuperationFinale|3|Statut"] ||
+        sourceItem?.["Recuperation|3|Statut"] ||
+        sourceItem?.StatutFinal ||
+        sourceItem?.Statut ||
+        rootItem?.[`RecuperationFinale|3|Statut|${index}`] ||
+        rootItem?.[`Recuperation|3|Statut|${index}`] ||
+        rootItem?.[`RecuperationFinale|3|Statut`] ||
+        rootItem?.[`Recuperation|3|Statut`] ||
+        rootItem?.[`${index}L_StatutFinal`] ||
+        rootItem?.Statut,
+    );
+
+    output[`RecuperationFinale|1|NoInventaire|${index}`] = noInventaire;
+    output[`RecuperationFinale|2|Description|${index}`] = description;
+    output[`RecuperationFinale|3|Statut|${index}`] = statut;
+
+    output[`Recuperation|1|NoInventaire|${index}`] = noInventaire;
+    output[`Recuperation|2|Description|${index}`] = description;
+    output[`Recuperation|3|Statut|${index}`] = statut;
+
+    // Compatibilite route legacy DEMANDE: cles plates sans separateur '|'.
+    output[`RecupNoInventaire${index}`] = noInventaire;
+    output[`RecupDescription${index}`] = description;
+    output[`RecupStatut${index}`] = statut;
+  }
+
+  return output;
+};
+
+const persistCalculatedFieldsForDocument = async (documentItem) => {
+  const parsed = safeParseJson(documentItem?.data);
+
+  const calculatedData = buildFeuilleDeLivraisonData(
+    parsed,
+    resolveDemandeNumber(
+      documentItem?.NUMBER,
+      documentItem?.number,
+      docData?.NUMBER,
+      docData?.number,
+      context?.NUMBER,
+      context?.number,
+    ),
+    resolveRefCommand(
+      documentItem?.RefCommand,
+      documentItem?.refCommand,
+      resolveRefCommandFromSources(documentItem),
+      resolveRefCommandFromSources(parsed),
+      docData?.RefCommand,
+      docData?.refCommand,
+      resolveRefCommandFromSources(docData),
+      context?.RefCommand,
+      context?.refCommand,
+      resolveRefCommandFromSources(context),
+      resolveRefCommandFromSources(
+        store?.pageContentStore?.processData?.[0],
+        store?.pageContentStore?.processData?.[0]?.edits,
+      ),
+    ),
+  );
+
+  const mergedData = { ...parsed, ...calculatedData };
+
+  const documentToUpdate = {
+    data: JSON.stringify(mergedData),
+    active: documentItem?.active ?? true,
+    template: {
+      templateId: documentItem?.template?.templateId || DEMANDE_TEMPLATE_ID,
+    },
+    documentID: documentItem?.documentID,
+  };
+
+  const currentStatus = toStringValue(
+    documentItem?.status || documentItem?.STATUS,
+  );
+
+  if (currentStatus) {
+    documentToUpdate.status = currentStatus;
+  }
+
+  await api({ local: true }).put("document/Many", {
+    documents: [documentToUpdate],
+  });
+};
+
+const buildIndexedLData = (source = {}) => {
+  const output = {};
+  const fields = ["NumFinal", "BIN", "NomFinal", "StatutFinal"];
+
+  for (let index = 1; index <= 10; index += 1) {
+    for (const fieldName of fields) {
+      output[`${index}L_${fieldName}`] = toStringValue(
+        source[`${index}L_${fieldName}`],
+      );
+    }
+  }
+
+  return output;
+};
+
+const buildFeuilleDeLivraisonData = (
+  parsed = {},
+  fallbackNumber = "",
+  fallbackRefCommand = "",
+) => {
+  const { indexedData, toRepareValues, commentRepareValues } =
+    buildRepareIndexedData(parsed);
+
+  const demandeNumber = resolveDemandeNumber(
+    parsed?.NUMBER,
+    parsed?.number,
+    parsed?.NoDemande,
+    fallbackNumber,
+  );
+
+  const refCommand = resolveRefCommand(
+    parsed?.RefCommand,
+    parsed?.refCommand,
+    parsed?.RefCommande,
+    parsed?.refCommande,
+    resolveRefCommandFromSources(parsed),
+    fallbackRefCommand,
+  );
+
+  const toRepareJoined = toRepareValues
+    .map((value, index) => `*${index + 1}. ${value}`)
+    .join(LINE_BREAK_SEPARATOR);
+  const commentRepareJoined = commentRepareValues
+    .map((value, index) => `*${index + 1}. ${value}`)
+    .join(LINE_BREAK_SEPARATOR);
+
+  const donBoolean = toTemplateBoolean(parsed.Don);
+  const closingFileBoolean = toTemplateBoolean(parsed.ClosingFile);
+  const punaisesBoolean = toTemplateBoolean(parsed.Punaises);
+  const essaiBoolean = toTemplateBoolean(parsed.Essai);
+  const demandeBoolean = toTemplateBoolean(parsed.Demande);
+  const reparationBoolean = toTemplateBoolean(parsed.Reparation);
+
+  const dataPdf = {
+    NUMBER: demandeNumber,
+    Prenom: toStringValue(parsed.Prenom),
+    Nom: toStringValue(parsed.Nom),
+    NoDossier: toStringValue(parsed.NoDossier),
+    DateBirth: toStringValue(parsed.DateBirth),
+    Sexe: toStringValue(parsed.Sexe),
+    Contact_Prenom: toStringValue(parsed.Contact_Prenom),
+    Adresse: toStringValue(parsed.Adresse),
+    Complement: toStringValue(parsed.Complement),
+    Contact_Name: toStringValue(parsed.Contact_Name),
+    Lien: toStringValue(parsed.Lien),
+    Ville: toStringValue(parsed.Ville),
+    CodePostal: toStringValue(parsed.CodePostal),
+    Contact_Phone: toStringValue(parsed.Contact_Phone),
+    Telephone: toStringValue(parsed.Telephone),
+    DateLivraison: toStringValue(parsed.DateLivraison),
+    Raison: toStringValue(parsed.Raison),
+    ClosingFile: closingFileBoolean ?? toStringValue(parsed.ClosingFile),
+    Deficience: toStringValue(parsed.Deficience),
+    Intervenant: toStringValue(parsed.Intervenant),
+    IntervenantFonction: toStringValue(parsed.IntervenantFonction),
+    CommandDate: toStringValue(parsed.CommandDate),
+    Installation: toStringValue(parsed.Installation),
+    Intervenant_Phone: toStringValue(parsed.Intervenant_Phone),
+    Poste: toStringValue(parsed.Poste),
+    Floor: toStringValue(parsed.Floor),
+    Elevator: toStringValue(parsed.Elevator),
+    Stairs: toStringValue(parsed.Stairs),
+    Punaises: punaisesBoolean ?? toStringValue(parsed.Punaises),
+    Infos: toStringValue(parsed.Infos),
+    Livraison_name: toStringValue(parsed.Livraison_name),
+    Livraison_Phone: toStringValue(parsed.Livraison_Phone),
+    RemarqueRecup: toStringValue(parsed.RemarqueRecup),
+    RemarqueLiv: toStringValue(parsed.RemarqueLiv),
+    Reparation: reparationBoolean ?? toStringValue(parsed.Reparation),
+    Remarques: toStringValue(parsed.Remarques),
+    TypeTransport: toStringValue(parsed.TypeTransport),
+    TruckSize: toStringValue(parsed.TruckSize),
+    RefCommand: refCommand,
+    refCommand: refCommand,
+    RefCommande: refCommand,
+    Don: donBoolean ?? toStringValue(parsed.Don),
+    Essai: essaiBoolean ?? toStringValue(parsed.Essai),
+    Demande: demandeBoolean ?? toStringValue(parsed.Demande),
+    Repare: buildRepareText(parsed),
+    ...indexedData,
+    ...buildRecuperationData(parsed),
+    ...buildIndexedLData(parsed),
+  };
+
+  dataPdf["Repare|1|ToRepare"] = toStringValue(
+    toRepareJoined || parsed["Repare|1|ToRepare"] || parsed.ToRepare,
+  );
+  dataPdf["Repare|2|CommentRepare"] = toStringValue(
+    commentRepareJoined ||
+      parsed["Repare|2|CommentRepare"] ||
+      parsed.CommentRepare,
+  );
+
+  return dataPdf;
+};
+
+const mapFormidsToTemplate = (templateItems, array) => {
+  const templateWithIds = templateItems.map((item) => ({ ...item, ids: [] }));
+
+  array.forEach((form) => {
+    templateWithIds.forEach((templateItem) => {
+      const isMatch =
+        templateItem.FormlayoutID === form.FormlayoutID &&
+        (!templateItem.typeLivraison ||
+          templateItem.typeLivraison === form.typeLivraison);
+
+      if (isMatch) {
+        templateItem.ids.push(form.Formid);
+      }
+    });
+  });
+
+  return templateWithIds;
+};
+
+const getFormIDFormlayout = (filtersToApply) => {
+  return api({ local: true })
+    .post("document/id/filter", { filters: filtersToApply })
+    .then((res) => {
+      if (!res) {
+        throw new Error("Erreur au filtre");
+      }
+
+      return api({ local: true })
+        .post("document/id", { ids: res?.data?.ids })
+        .then((final) => {
+          if (!final) {
+            throw new Error("Erreur fetch id");
+          }
+
+          const idArray = final?.data?.documents.map((doc) => {
+            const data = safeParseJson(doc?.data);
+            return {
+              Formid: doc.documentID,
+              FormlayoutID: doc?.template?.templateId || "",
+              typeLivraison: data?.TypeLivraisonTPN || "",
+              data,
+            };
+          });
+
+          console.log(idArray);
+          return mapFormidsToTemplate(template, idArray);
+        });
+    });
+};
+
+const downloadFeuilleDeLivraison = async (ids) => {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return;
+  }
+
+  const res = await api({ local: true }).post("document/id", { ids });
+  const documents = res?.data?.documents || [];
+
+  const demandeDocuments = documents.filter(
+    (doc) => doc?.template?.templateId === DEMANDE_TEMPLATE_ID,
+  );
+
+  if (demandeDocuments.length === 0) {
+    return;
+  }
+
+  const preparedDemandeDocuments = demandeDocuments;
+
+  // Multi-doc: un ODT unique par document puis archive ZIP.
+  if (preparedDemandeDocuments.length > 1) {
+    const fileList = [];
+
+    for (const doc of preparedDemandeDocuments) {
+      await persistCalculatedFieldsForDocument(doc);
+
+      const responseSingle = await api({ local: true }).post(
+        `document/download/${LEGACY_TEMPLATE_NAME}/${FILE_TYPE}?&fileNameBuildKeys=TruckSize&fileNameBuildKeys=NUMBER`,
+        { ids: [doc.documentID] },
+      );
+
+      const fileUrlSingle = extractFileUrl(responseSingle);
+
+      if (!fileUrlSingle) {
+        throw new Error(
+          `fileUrl introuvable pour FeuilleDeLivraison (document ${doc?.documentID || "inconnu"})`,
+        );
+      }
+
+      const parsed = safeParseJson(doc?.data);
+      const fallbackFileName = `FeuilleDeLivraison_${resolveDemandeNumber(parsed?.NUMBER, parsed?.number, doc?.NUMBER, doc?.number, doc?.documentID, "doc")}.pdf`;
+      fileList.push({
+        path: fileUrlSingle,
+        filename: getFileNameFromUrl(fileUrlSingle, fallbackFileName),
+      });
+    }
+
+    await downloadAllFilesAsZip(fileList);
+
+    return;
+  }
+
+  const doc = preparedDemandeDocuments[0];
+  await persistCalculatedFieldsForDocument(doc);
+
+  const response = await api({ local: true }).post(
+    `document/download/${LEGACY_TEMPLATE_NAME}/${FILE_TYPE}?&fileNameBuildKeys=TruckSize&fileNameBuildKeys=NUMBER`,
+    { ids: [doc.documentID] },
+  );
+
+  const fileUrl = extractFileUrl(response);
+
+  if (!fileUrl) {
+    throw new Error("fileUrl introuvable pour FeuilleDeLivraison");
+  }
+
+  window.open(fileUrl);
+};
+
+const batchPrint = async (ids, templateName) => {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return;
+  }
+
+  if (templateName === "FeuilleDeLivraison") {
+    return downloadFeuilleDeLivraison(ids);
+  }
+
+  return api({ local: true })
+    .post(
+      `document/download/${templateName}/PDF?&fileNameBuildKeys=TruckSize&fileNameBuildKeys=NUMBER`,
+      { ids },
+    )
+    .then((res) => {
+      if (!res) {
+        throw new Error("Erreur à l'impression");
+      }
+
+      window.open(res.data.fileUrl);
+    });
+};
+
+const popupLoading = (show, success, errorMessage, loadingMessage) => {
+  let loadingPopup = document.getElementById("loadingPopup");
+  let errorBanner = document.getElementById("errorBanner");
+
+  if (show) {
+    if (!loadingPopup) {
+      loadingPopup = document.createElement("div");
+      loadingPopup.id = "loadingPopup";
+      loadingPopup.style = `
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      `;
+      document.body.appendChild(loadingPopup);
+
+      if (!document.getElementById("spinnerStyle")) {
+        const style = document.createElement("style");
+        style.id = "spinnerStyle";
+        style.innerHTML = `
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+    }
+
+    loadingPopup.innerHTML = `
+      <div style="background-color: white; padding: 20px; border-radius: 5px; display: flex; flex-direction: column; align-items: center;">
+        <div>${loadingMessage}</div>
+        <div class="loader" style="border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 40px; height: 40px; margin-top: 20px; animation: spin 1s linear infinite;"></div>
+      </div>
+    `;
+    loadingPopup.style.display = "flex";
+    if (errorBanner) errorBanner.style.display = "none";
+    return;
+  }
+
+  if (loadingPopup) loadingPopup.style.display = "none";
+
+  if (success === false && errorMessage) {
+    if (!errorBanner) {
+      errorBanner = document.createElement("div");
+      errorBanner.id = "errorBanner";
+      errorBanner.style = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: auto;
+        min-width: 300px;
+        height: 50px;
+        background-color: white;
+        color: black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        border-radius: 5px;
+        padding: 0 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      `;
+      document.body.appendChild(errorBanner);
+    }
+
+    errorBanner.innerHTML = `
+      <div style="margin-right: 10px; color: red;">&#x26A0;</div><div>${errorMessage}</div>
+      <div id="errorBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: red; height: 5px; width: 0%;"></div>
+    `;
+    errorBanner.style.display = "flex";
+
+    const progressElement = document.getElementById("errorBannerProgress");
+    let width = 0;
+    const interval = setInterval(() => {
+      if (width >= 100) {
+        clearInterval(interval);
+        errorBanner.style.display = "none";
+      } else {
+        width++;
+        progressElement.style.width = `${width}%`;
+      }
+    }, 55);
+  }
+};
+
+popupLoading(true, null, "Erreur à l'impression", "Impression en cours");
+
+getFormIDFormlayout(filters)
+  .then(async (array) => {
+    const printPromises = array
+      .filter((res) => res.ids && res.ids.length > 0)
+      .map((element) => batchPrint(element.ids, element.templateName));
+
+    return Promise.all(printPromises);
+  })
+  .then(() => {
+    popupLoading(false, true, null, null);
+  })
+  .catch((error) => {
+    console.error(error);
+    popupLoading(false, false, error.message, null);
+  });
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+596	EmptyEquipement	FILL	FIELD	console.log("Function 596", context);
+const isChecked = docData[inputKey];
+let showValue = {};
+
+const getEquipementToClearIndex = (inputKey) => {
+  let index = 0;
+
+  if (inputKey === "AddFirstEquipment") {
+    index = 1;
+  } else {
+    index = Number(inputKey.match(/^(\d+)L_[aA]dd$/)[1]) + 1;
+  }
+  return index;
+};
+
+const clearEquipement = (index) => {
+  const fieldsToClear = [
+    "jeNeTrouvePas",
+    "descriptionAideTechnique",
+    "jeNeTrouvePasNonPlus",
+    "Description",
+    "RemarqueAgent",
+    "soumissionAideTechnique",
+    "NumInv",
+    "Name",
+    "Valid",
+    "Priority",
+    "Envoi",
+    "Statut",
+    "NoRequisitionGRM",
+    "NumFinal",
+    "NomFinal",
+    "StatutFinal",
+    "BIN",
+  ];
+  const nameExceptions = {
+    jeNeTrouvePas: { 1: "jeNeTrouvePas" },
+    descriptionAideTechnique: { 1: "descriptionAideTechnique" },
+    jeNeTrouvePasNonPlus: { 1: "jeNeTrouvePasNonPlus" },
+    soumissionAideTechnique: { 1: "soumissionAideTechnique" },
+    Priority: { 1: "1L_Priorite" },
+  };
+  let showValue = {};
+
+  if (index !== 0) {
+    fieldsToClear.forEach((fieldName) => {
+      if (nameExceptions[fieldName]?.[index]) {
+        Object.assign(showValue, { [nameExceptions[fieldName][index]]: "" });
+      } else {
+        Object.assign(showValue, { [`${index}L_${fieldName}`]: "" });
+      }
+    });
+  }
+  return showValue;
+};
+
+if (isChecked === "false") {
+  const index = getEquipementToClearIndex(inputKey);
+  showValue = clearEquipement(index);
+}
+
+return showValue;
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+597	ShowDefaultEquipement	SHOW	FIELD	console.log("Function 597", context);
+const isChecked = docData[inputKey];
+let showValue = {};
+
+const getEquipementToSetDefault = (inputKey) => {
+  let index = 0;
+
+  if (inputKey === "AddFirstEquipment") {
+    index = 1;
+  } else {
+    index = Number(inputKey.match(/^(\d+)L_[aA]dd$/)[1]) + 1;
+  }
+  return index;
+};
+
+const setDefaultEquipment = (index) => {
+  let showValue = {};
+
+  if (index !== 0) {
+    if (index === 1) {
+      showValue = {
+        jeNeTrouvePas: true,
+        descriptionAideTechnique: null,
+        jeNeTrouvePasNonPlus: null,
+        "1L_Description": true,
+        soumissionAideTechnique: null,
+        "1L_NumInv": true,
+        "1L_Name": true,
+        "1L_Statut": true,
+      };
+    } else {
+      showValue = {
+        [`${index}L_jeNeTrouvePas`]: true,
+        [`${index}L_descriptionAideTechnique`]: null,
+        [`${index}L_jeNeTrouvePasNonPlus`]: null,
+        [`${index}L_Description`]: true,
+        [`${index}L_soumissionAideTechnique`]: null,
+        [`${index}L_NumInv`]: true,
+        [`${index}L_Name`]: true,
+        [`${index}L_Statut`]: true,
+      };
+    }
+  }
+  console.log(showValue);
+  return showValue;
+};
+
+if (isChecked === "false") {
+  const index = getEquipementToSetDefault(inputKey);
+  showValue = setDefaultEquipment(index);
+}
+
+return showValue;
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+598	Affichage collec dons	SHOW	FIELD	return {
+  Dons: docData['Don'] === 'true' ? true : null
+};	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+603	NULL	SEARCH	FIELD	const filters = [];
+const collectionKey = 'Dons';
+const searchField = `${collectionKey}|1|Description`;
+
+const collection = docData[collectionKey] || [];
+const currentRow = collection[indexItemChange] || {};
+
+const searchValue = currentRow[searchField];
+
+if (searchValue) {
+  api({ local: true })
+    .post(
+      `suggestion?fieldID=${'af269bee-019f-445d-8ae1-e9b3549a0a65'}&fieldValue=${encodeURIComponent(searchValue)}`,
+      { filters }
+    )
+    .then(res => {
+      const suggestions = res?.data?.suggestions || [];
+      if (!suggestions.length) return;
+
+      callback({
+        suggestions: {
+          [searchField]: suggestions.map(s => ({
+            title: s?.value || '',
+            // Pas de récupération / remplissage du NoInventaire ici
+            fields: []
+          }))
+        }
+      });
+    });
+} else {
+  callback([]);
+}
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+605	NULL	FILL	FIELD	console.log("Fonction 605", context);
+
+// Check if fields are present in docData (not just if they're empty)
+const hasRecuperationField = "Recuperation" in docData;
+
+// Get the first item from Recuperation array (if it exists and is not empty)
+const recuperationItem =
+  hasRecuperationField &&
+  Array.isArray(docData.Recuperation) &&
+  docData.Recuperation.length > 0
+    ? docData.Recuperation[0]
+    : null;
+
+const noInventaireValue = recuperationItem
+  ? String(recuperationItem["Recuperation|1|NoInventaire"] || "").trim()
+  : "";
+
+// Check for AddFirstEquipment checkbox
+const addFirstEquipmentChecked =
+  docData["AddFirstEquipment"] === "true" ||
+  docData["AddFirstEquipment"] === true;
+
+// Check for any equipment checkboxes
+let hasAnyEquipmentAdded = addFirstEquipmentChecked;
+
+// Check all other equipment add checkboxes (1L_Add through 10L_Add)
+if (!hasAnyEquipmentAdded) {
+  for (let i = 1; i <= 10; i++) {
+    const equipmentAddKey = `${i}L_Add`;
+    const isEquipmentAdded =
+      docData[equipmentAddKey] === "true" || docData[equipmentAddKey] === true;
+    if (isEquipmentAdded) {
+      hasAnyEquipmentAdded = true;
+      break;
+    }
+  }
+}
+
+const hasNoInventaire =
+  noInventaireValue !== "" && noInventaireValue.toLowerCase() !== "undefined";
+const remarqueRecupValue = String(docData["RemarqueRecup"] || "").trim();
+const hasRemarqueRecup =
+  remarqueRecupValue !== "" && remarqueRecupValue.toLowerCase() !== "undefined";
+// Check RecupSansNo group (e.g. RecupSansNo|1|Description, RecupSansNo|2|Statut)
+const hasRecupSansNoField = "RecupSansNo" in docData;
+const recupSansNoItem =
+  hasRecupSansNoField &&
+  Array.isArray(docData.RecupSansNo) &&
+  docData.RecupSansNo.length > 0
+    ? docData.RecupSansNo[0]
+    : null;
+const recupSansNoDesc = recupSansNoItem
+  ? String(recupSansNoItem["RecupSansNo|1|Description"] || "").trim()
+  : "";
+const recupSansNoStatut = recupSansNoItem
+  ? String(recupSansNoItem["RecupSansNo|2|Statut"] || "").trim()
+  : "";
+const hasRecupSansNo =
+  (recupSansNoDesc !== "" && recupSansNoDesc.toLowerCase() !== "undefined") ||
+  (recupSansNoStatut !== "" && recupSansNoStatut.toLowerCase() !== "undefined");
+
+const hasRecuperation = hasNoInventaire || hasRemarqueRecup || hasRecupSansNo;
+const hasDescription = hasAnyEquipmentAdded;
+
+let typeDemande = null;
+
+if (hasRecuperation && hasDescription) {
+  typeDemande = "Livraison-Récupération";
+} else if (hasRecuperation) {
+  typeDemande = "Récupération";
+} else if (hasDescription) {
+  typeDemande = "Livraison";
+}
+
+return { TypedeDemande: typeDemande };
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+608	ReadOnlyDemandeLivraison	READONLY	FIELD	console.log("Fonction 608", context);
+
+let showValue = {};
+const userRoles = context.store.moduleStore.user.roles;
+
+if (!userRoles.includes("ADMIN") && !userRoles.includes("AGENTPARC")) {
+  showValue = {
+    PretType: true,
+  };
+}
+
+return showValue;
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+609	NULL	READONLY	FIELD	console.log("Fonction 609", context);
+
+return {
+  TypedeDemande: true,
+};
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+610	Impression une feuille de livraison	SEARCH	FIELD	console.log("Fonction 610", context);
+
+const DEMANDE_TEMPLATE_ID = "1778ee45-49cb-4cd4-82b9-28079409c629";
+const TEMPLATE_NAME = "DEMANDE";
+const FILE_TYPE = "PDF";
+const LINE_BREAK_SEPARATOR = " | ";
+const REPARE_MAX_ROWS = 12;
+
+const safeParseJson = (raw) => {
+  try {
+    return JSON.parse(raw || "{}");
+  } catch (error) {
+    return {};
+  }
+};
+
+const escapeRegExp = (value) =>
+  String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const toStringValue = (value) => String(value ?? "").trim();
+
+const toTemplateBoolean = (value) => {
+  if (typeof value === "boolean") return value;
+
+  const normalized = toStringValue(value).toLowerCase();
+  if (["true", "1", "oui", "yes", "x"].includes(normalized)) return true;
+  if (["false", "0", "non", "no", ""].includes(normalized)) return false;
+
+  return null;
+};
+
+const resolveDemandeNumber = (...candidates) => {
+  for (const candidate of candidates) {
+    const normalized = toStringValue(candidate);
+    if (normalized) return normalized;
+  }
+  return "";
+};
+
+const extractFileUrl = (payload) => {
+  if (!payload) return "";
+
+  if (typeof payload === "string") {
+    if (/^https?:\/\//i.test(payload)) return payload;
+    if (payload.startsWith("/")) {
+      return `${window.location.origin}${payload}`;
+    }
+    return "";
+  }
+
+  const candidates = [
+    payload?.data?.fileUrl,
+    payload?.fileUrl,
+    payload?.data?.url,
+    payload?.url,
+    payload?.data?.downloadUrl,
+    payload?.downloadUrl,
+    payload?.data?.fileUrls?.[0],
+    payload?.fileUrls?.[0],
+    payload?.data?.urls?.[0],
+    payload?.urls?.[0],
+    payload?.data?.files?.[0]?.fileUrl,
+    payload?.data?.files?.[0]?.url,
+  ];
+
+  const found = candidates.find(
+    (value) =>
+      typeof value === "string" &&
+      (/^https?:\/\//i.test(value) || value.startsWith("/")),
+  );
+
+  if (!found) return "";
+  return found.startsWith("/") ? `${window.location.origin}${found}` : found;
+};
+
+const collectIndexedValues = (
+  dataObj,
+  keyPrefix,
+  rowArray,
+  fallbackFieldName,
+) => {
+  if (Array.isArray(rowArray) && rowArray.length > 0) {
+    const rowValues = rowArray
+      .map((row) => row?.[keyPrefix] ?? row?.[fallbackFieldName])
+      .filter(
+        (value) =>
+          value !== undefined && value !== null && String(value).trim() !== "",
+      )
+      .map((value) => String(value));
+
+    if (rowValues.length > 0) return rowValues;
+  }
+
+  const indexedRegex = new RegExp(`^${escapeRegExp(keyPrefix)}\\|(\\d+)$`);
+
+  return Object.keys(dataObj || {})
+    .map((key) => {
+      const match = key.match(indexedRegex);
+      if (!match) return null;
+      return { index: Number(match[1]), value: dataObj[key] };
+    })
+    .filter(
+      (item) =>
+        item &&
+        item.value !== undefined &&
+        item.value !== null &&
+        String(item.value).trim() !== "",
+    )
+    .sort((a, b) => a.index - b.index)
+    .map((item) => String(item.value));
+};
+
+const buildRepareText = (dataObj) => {
+  const rows = Array.isArray(dataObj?.Repare) ? dataObj.Repare : [];
+  const toRepareValues = collectIndexedValues(
+    dataObj,
+    "Repare|1|ToRepare",
+    rows,
+    "ToRepare",
+  );
+  const commentRepareValues = collectIndexedValues(
+    dataObj,
+    "Repare|2|CommentRepare",
+    rows,
+    "CommentRepare",
+  );
+
+  return [
+    toRepareValues
+      .map((value, index) => `*${index + 1}. ${value}`)
+      .join(LINE_BREAK_SEPARATOR),
+    commentRepareValues
+      .map((value, index) => `*${index + 1}. ${value}`)
+      .join(LINE_BREAK_SEPARATOR),
+  ]
+    .filter(Boolean)
+    .join(LINE_BREAK_SEPARATOR);
+};
+
+const buildRepareIndexedData = (dataObj = {}) => {
+  const rows = Array.isArray(dataObj?.Repare) ? dataObj.Repare : [];
+  const toRepareValues = collectIndexedValues(
+    dataObj,
+    "Repare|1|ToRepare",
+    rows,
+    "ToRepare",
+  );
+  const commentRepareValues = collectIndexedValues(
+    dataObj,
+    "Repare|2|CommentRepare",
+    rows,
+    "CommentRepare",
+  );
+
+  const output = {};
+  for (let index = 1; index <= REPARE_MAX_ROWS; index += 1) {
+    output[`Repare|1|ToRepare|${index}`] = toStringValue(
+      toRepareValues[index - 1] || "",
+    );
+    output[`Repare|2|CommentRepare|${index}`] = toStringValue(
+      commentRepareValues[index - 1] || "",
+    );
+  }
+
+  return {
+    indexedData: output,
+    toRepareValues,
+    commentRepareValues,
+  };
+};
+
+const buildRecuperationData = (source = {}) => {
+  const output = {};
+
+  for (let index = 1; index <= 10; index += 1) {
+    const sourceItem = Array.isArray(source?.Recuperation)
+      ? source.Recuperation[index - 1]
+      : Array.isArray(source)
+        ? source[index - 1]
+        : null;
+    const rootItem = source && typeof source === "object" ? source : {};
+    const noInventaire = toStringValue(
+      sourceItem?.["RecuperationFinale|1|NoInventaire"] ||
+        sourceItem?.["Recuperation|1|NoInventaire"] ||
+        sourceItem?.NumFinal ||
+        sourceItem?.NoInventaire ||
+        rootItem?.[`RecuperationFinale|1|NoInventaire|${index}`] ||
+        rootItem?.[`Recuperation|1|NoInventaire|${index}`] ||
+        rootItem?.[`RecuperationFinale|1|NoInventaire`] ||
+        rootItem?.[`Recuperation|1|NoInventaire`] ||
+        rootItem?.[`${index}L_NumFinal`] ||
+        rootItem?.NoInventaire,
+    );
+    const description = toStringValue(
+      sourceItem?.["RecuperationFinale|2|Description"] ||
+        sourceItem?.["Recuperation|2|Description"] ||
+        sourceItem?.NomFinal ||
+        sourceItem?.Description ||
+        rootItem?.[`RecuperationFinale|2|Description|${index}`] ||
+        rootItem?.[`Recuperation|2|Description|${index}`] ||
+        rootItem?.[`RecuperationFinale|2|Description`] ||
+        rootItem?.[`Recuperation|2|Description`] ||
+        rootItem?.[`${index}L_NomFinal`] ||
+        rootItem?.Description,
+    );
+    const statut = toStringValue(
+      sourceItem?.["RecuperationFinale|3|Statut"] ||
+        sourceItem?.["Recuperation|3|Statut"] ||
+        sourceItem?.StatutFinal ||
+        sourceItem?.Statut ||
+        rootItem?.[`RecuperationFinale|3|Statut|${index}`] ||
+        rootItem?.[`Recuperation|3|Statut|${index}`] ||
+        rootItem?.[`RecuperationFinale|3|Statut`] ||
+        rootItem?.[`Recuperation|3|Statut`] ||
+        rootItem?.[`${index}L_StatutFinal`] ||
+        rootItem?.Statut,
+    );
+
+    output[`RecuperationFinale|1|NoInventaire|${index}`] = noInventaire;
+    output[`RecuperationFinale|2|Description|${index}`] = description;
+    output[`RecuperationFinale|3|Statut|${index}`] = statut;
+
+    // Compatibilite template: certains documents utilisent Recuperation au lieu de RecuperationFinale.
+    output[`Recuperation|1|NoInventaire|${index}`] = noInventaire;
+    output[`Recuperation|2|Description|${index}`] = description;
+    output[`Recuperation|3|Statut|${index}`] = statut;
+
+    // Compatibilite route legacy DEMANDE: cles plates sans separateur '|'.
+    output[`RecupNoInventaire${index}`] = noInventaire;
+    output[`RecupDescription${index}`] = description;
+    output[`RecupStatut${index}`] = statut;
+  }
+
+  return output;
+};
+
+const buildRecuperationTableData = (source = {}) => {
+  const headers = ["No d'inventaire", "Statut", "Description"];
+  const rows = [];
+  const normalized = buildRecuperationData(source);
+
+  for (let index = 1; index <= 10; index += 1) {
+    const noInventaire = toStringValue(
+      normalized[`RecuperationFinale|1|NoInventaire|${index}`],
+    );
+    const statut = toStringValue(
+      normalized[`RecuperationFinale|3|Statut|${index}`],
+    );
+    const description = toStringValue(
+      normalized[`RecuperationFinale|2|Description|${index}`],
+    );
+
+    if (noInventaire || statut || description) {
+      rows.push([noInventaire, statut, description]);
+    }
+  }
+
+  return { headers, rows };
+};
+
+const buildIndexedLData = (source = {}) => {
+  const output = {};
+  const fields = ["NumFinal", "BIN", "NomFinal", "StatutFinal"];
+
+  for (let index = 1; index <= 10; index += 1) {
+    for (const fieldName of fields) {
+      output[`${index}L_${fieldName}`] = toStringValue(
+        source[`${index}L_${fieldName}`],
+      );
+    }
+  }
+
+  return output;
+};
+
+const buildFeuilleDeLivraisonData = (parsed = {}, fallbackNumber = "") => {
+  const { indexedData, toRepareValues, commentRepareValues } =
+    buildRepareIndexedData(parsed);
+
+  const demandeNumber = resolveDemandeNumber(
+    parsed?.NUMBER,
+    parsed?.number,
+    parsed?.NoDemande,
+    fallbackNumber,
+  );
+
+  const toRepareJoined = toRepareValues
+    .map((value, index) => `*${index + 1}. ${value}`)
+    .join(LINE_BREAK_SEPARATOR);
+  const commentRepareJoined = commentRepareValues
+    .map((value, index) => `*${index + 1}. ${value}`)
+    .join(LINE_BREAK_SEPARATOR);
+
+  const donBoolean = toTemplateBoolean(parsed.Don);
+  const closingFileBoolean = toTemplateBoolean(parsed.ClosingFile);
+  const punaisesBoolean = toTemplateBoolean(parsed.Punaises);
+  const essaiBoolean = toTemplateBoolean(parsed.Essai);
+  const demandeBoolean = toTemplateBoolean(parsed.Demande);
+  const reparationBoolean = toTemplateBoolean(parsed.Reparation);
+
+  const dataPdf = {
+    NUMBER: demandeNumber,
+    Prenom: toStringValue(parsed.Prenom),
+    Nom: toStringValue(parsed.Nom),
+    NoDossier: toStringValue(parsed.NoDossier),
+    DateBirth: toStringValue(parsed.DateBirth),
+    Sexe: toStringValue(parsed.Sexe),
+    Contact_Prenom: toStringValue(parsed.Contact_Prenom),
+    Adresse: toStringValue(parsed.Adresse),
+    Complement: toStringValue(parsed.Complement),
+    Contact_Name: toStringValue(parsed.Contact_Name),
+    Lien: toStringValue(parsed.Lien),
+    Ville: toStringValue(parsed.Ville),
+    CodePostal: toStringValue(parsed.CodePostal),
+    Contact_Phone: toStringValue(parsed.Contact_Phone),
+    Telephone: toStringValue(parsed.Telephone),
+    DateLivraison: toStringValue(parsed.DateLivraison),
+    Raison: toStringValue(parsed.Raison),
+    ClosingFile: closingFileBoolean ?? toStringValue(parsed.ClosingFile),
+    Deficience: toStringValue(parsed.Deficience),
+    Intervenant: toStringValue(parsed.Intervenant),
+    IntervenantFonction: toStringValue(parsed.IntervenantFonction),
+    CommandDate: toStringValue(parsed.CommandDate),
+    Installation: toStringValue(parsed.Installation),
+    Intervenant_Phone: toStringValue(parsed.Intervenant_Phone),
+    Poste: toStringValue(parsed.Poste),
+    Floor: toStringValue(parsed.Floor),
+    Elevator: toStringValue(parsed.Elevator),
+    Stairs: toStringValue(parsed.Stairs),
+    Punaises: punaisesBoolean ?? toStringValue(parsed.Punaises),
+    Infos: toStringValue(parsed.Infos),
+    Livraison_name: toStringValue(parsed.Livraison_name),
+    Livraison_Phone: toStringValue(parsed.Livraison_Phone),
+    RemarqueRecup: toStringValue(parsed.RemarqueRecup),
+    RemarqueLiv: toStringValue(parsed.RemarqueLiv),
+    Reparation: reparationBoolean ?? toStringValue(parsed.Reparation),
+    Remarques: toStringValue(parsed.Remarques),
+    TypeTransport: toStringValue(parsed.TypeTransport),
+    TruckSize: toStringValue(parsed.TruckSize),
+    RefCommand: toStringValue(parsed.RefCommand),
+    Don: donBoolean ?? toStringValue(parsed.Don),
+    Essai: essaiBoolean ?? toStringValue(parsed.Essai),
+    Demande: demandeBoolean ?? toStringValue(parsed.Demande),
+    Repare: buildRepareText(parsed),
+    ...indexedData,
+    ...buildRecuperationData(parsed),
+    ...buildIndexedLData(parsed),
+  };
+
+  dataPdf["Repare|1|ToRepare"] = toStringValue(
+    toRepareJoined || parsed["Repare|1|ToRepare"] || parsed.ToRepare,
+  );
+  dataPdf["Repare|2|CommentRepare"] = toStringValue(
+    commentRepareJoined ||
+      parsed["Repare|2|CommentRepare"] ||
+      parsed.CommentRepare,
+  );
+
+  return dataPdf;
+};
+
+const popupLoading = (show, success, errorMessage, loadingMessage) => {
+  let loadingPopup = document.getElementById("loadingPopup");
+  let errorBanner = document.getElementById("errorBanner");
+
+  if (show) {
+    if (!loadingPopup) {
+      loadingPopup = document.createElement("div");
+      loadingPopup.id = "loadingPopup";
+      loadingPopup.style = `
+				position: fixed;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0,0,0,0.5);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				z-index: 9999;
+			`;
+      document.body.appendChild(loadingPopup);
+
+      if (!document.getElementById("spinnerStyle")) {
+        const style = document.createElement("style");
+        style.id = "spinnerStyle";
+        style.innerHTML = `
+					@keyframes spin {
+						0% { transform: rotate(0deg); }
+						100% { transform: rotate(360deg); }
+					}
+				`;
+        document.head.appendChild(style);
+      }
+    }
+
+    loadingPopup.innerHTML = `
+			<div style="background-color: white; padding: 20px; border-radius: 5px; display: flex; flex-direction: column; align-items: center;">
+				<div>${loadingMessage}</div>
+				<div class="loader" style="border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 40px; height: 40px; margin-top: 20px; animation: spin 1s linear infinite;"></div>
+			</div>
+		`;
+    loadingPopup.style.display = "flex";
+    if (errorBanner) errorBanner.style.display = "none";
+    return;
+  }
+
+  if (loadingPopup) loadingPopup.style.display = "none";
+
+  if (success === false && errorMessage) {
+    if (!errorBanner) {
+      errorBanner = document.createElement("div");
+      errorBanner.id = "errorBanner";
+      errorBanner.style = `
+				position: fixed;
+				top: 20px;
+				left: 50%;
+				transform: translateX(-50%);
+				width: auto;
+				min-width: 300px;
+				height: 50px;
+				background-color: white;
+				color: black;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				z-index: 9999;
+				border-radius: 5px;
+				padding: 0 20px;
+				box-shadow: 0 0 10px rgba(0,0,0,0.5);
+			`;
+      document.body.appendChild(errorBanner);
+    }
+
+    errorBanner.innerHTML = `
+			<div style="margin-right: 10px; color: red;">&#x26A0;</div><div>${errorMessage}</div>
+			<div id="errorBannerProgress" style="position: absolute; bottom: 0; left: 0; background-color: red; height: 5px; width: 0%;"></div>
+		`;
+    errorBanner.style.display = "flex";
+
+    const progressElement = document.getElementById("errorBannerProgress");
+    let width = 0;
+    const interval = setInterval(() => {
+      if (width >= 100) {
+        clearInterval(interval);
+        errorBanner.style.display = "none";
+      } else {
+        width += 1;
+        progressElement.style.width = `${width}%`;
+      }
+    }, 55);
+  }
+};
+
+const resolveCurrentFormId = () => {
+  return (
+    docData?.FORMID ||
+    docData?.formid ||
+    store?.pageContentStore?.processData?.[0]?.FORMID ||
+    store?.pageContentStore?.processData?.[0]?.formid ||
+    store?.pageContentStore?.processData?.[0]?.documentID ||
+    context?.FORMID ||
+    context?.formid ||
+    context?.documentID ||
+    ""
+  );
+};
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const verifyPersistedRecuperationFields = async (formId, maxAttempts = 3) => {
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const verifyRes = await api({ local: true }).post("document/id", {
+      ids: [formId],
+    });
+    const verifyDoc = verifyRes?.data?.documents?.[0];
+    const verifyData = safeParseJson(verifyDoc?.data);
+
+    const keyA = toStringValue(verifyData?.["Recuperation|1|NoInventaire|1"]);
+    const keyB = toStringValue(
+      verifyData?.["RecuperationFinale|1|NoInventaire|1"],
+    );
+
+    if (keyA || keyB) {
+      return true;
+    }
+
+    if (attempt < maxAttempts) {
+      await wait(300);
+    }
+  }
+
+  return false;
+};
+
+const persistCalculatedFieldsForCurrentDocument = async (formId) => {
+  const res = await api({ local: true }).post("document/id", { ids: [formId] });
+  const documentItem = res?.data?.documents?.[0];
+
+  if (!documentItem) {
+    throw new Error(`Document introuvable pour le FormID ${formId}`);
+  }
+
+  const parsed = safeParseJson(documentItem?.data);
+  const calculatedData = buildFeuilleDeLivraisonData(
+    parsed,
+    resolveDemandeNumber(
+      documentItem?.NUMBER,
+      documentItem?.number,
+      docData?.NUMBER,
+      docData?.number,
+      context?.NUMBER,
+      context?.number,
+    ),
+  );
+
+  const mergedData = { ...parsed, ...calculatedData };
+
+  const documentToUpdate = {
+    data: JSON.stringify(mergedData),
+    active: documentItem?.active ?? true,
+    template: {
+      templateId: documentItem?.template?.templateId || DEMANDE_TEMPLATE_ID,
+    },
+    documentID: documentItem?.documentID || formId,
+  };
+
+  const currentStatus = toStringValue(
+    documentItem?.status || documentItem?.STATUS,
+  );
+
+  if (currentStatus) {
+    documentToUpdate.status = currentStatus;
+  }
+
+  await api({ local: true }).put("document/Many", {
+    documents: [documentToUpdate],
+  });
+
+  const persisted = await verifyPersistedRecuperationFields(formId);
+  if (!persisted) {
+    console.warn(
+      "Recuperation non relue apres update: le PDF peut etre genere avec des donnees non a jour.",
+    );
+  }
+};
+
+const downloadCurrentFeuilleDeLivraison = async () => {
+  const formId = resolveCurrentFormId();
+  if (!formId) {
+    throw new Error("FormID courant introuvable");
+  }
+
+  // Ancienne API DEMANDE: le print lit les donnees du document.
+  // On persiste d'abord les champs calcules (Recuperation/RecuperationFinale) pour garantir leur presence.
+  await persistCalculatedFieldsForCurrentDocument(formId);
+
+  const downloadEndpoint = `document/download/${TEMPLATE_NAME}/${FILE_TYPE}?&fileNameBuildKeys=TruckSize&fileNameBuildKeys=NUMBER`;
+  const downloadPayload = { ids: [formId] };
+
+  const response = await api({ local: true }).post(
+    downloadEndpoint,
+    downloadPayload,
+  );
+
+  const fileUrl = extractFileUrl(response);
+  if (!fileUrl) {
+    throw new Error("fileUrl introuvable pour FeuilleDeLivraison");
+  }
+
+  window.open(fileUrl);
+};
+
+popupLoading(true, null, "Erreur a l'impression", "Impression en cours");
+
+downloadCurrentFeuilleDeLivraison()
+  .then(() => {
+    popupLoading(false, true, null, null);
+  })
+  .catch((error) => {
+    console.error(error);
+    popupLoading(false, false, error.message, null);
+  });
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+611	NULL	SHOW	SECTION	console.log("Fonction 611", context);
+
+let showValue = {};
+const userRoles = context.store.moduleStore.user.roles;
+const status = docData.STATUS;
+
+const allowedStatuses = [
+  "Complétée",
+  "Validée",
+  "Demande particulière",
+  "Soumise",
+  "Planifiée",
+  "Equipement manquant",
+];
+
+if (
+  !allowedStatuses.includes(status) ||
+  (status === "Demande particulière" && userRoles.includes("AGENTPARC"))
+) {
+  showValue = {
+    BatchImprimerSection: null,
+  };
+}
+
+return showValue;
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E
+612	NULL	SHOW	SECTION	console.log("Fonction 612", context);
+
+let showValue = {};
+const userRoles = context.store.moduleStore.user.roles;
+
+if (!userRoles.includes("ADMIN")) {
+  showValue = {
+    SectionCache: false,
+  };
+}
+
+return showValue;
+	1E1FDE07-E0A9-4E37-A24E-EF4CAC82846E

@@ -1,0 +1,1 @@
+return { 'CourrielCPE': docData['NotificationCPE'] === 'Courriel' ? true : null };

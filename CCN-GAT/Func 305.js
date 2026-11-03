@@ -1,0 +1,1 @@
+return docData['Deficience'] === 'SOINS PALLIATIFS'?{'PretType': 'Moyen Terme'}: undefined;

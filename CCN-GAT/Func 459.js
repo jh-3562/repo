@@ -1,0 +1,1 @@
+return { 'descriptionAideTechnique': docData['jeNeTrouvePas'] === 'true' && (!docData['jeNeTrouvePasNonPlus'] || docData['jeNeTrouvePasNonPlus'] === 'false')  ? true : null };

@@ -1,0 +1,1 @@
+return { 'descriptionAideTechnique_Ch2': docData['jeNeTrouvePas_Ch2'] === 'true' && (!docData['jeNeTrouvePasNonPlus_Ch2'] || docData['jeNeTrouvePasNonPlus_Ch2'] === 'false')  ? true : null };

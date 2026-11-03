@@ -1,0 +1,1 @@
+return { 'S2_FL1_GENE': docData['STATUS'] === 'Validée' ? true : null };

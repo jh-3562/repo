@@ -1,0 +1,1 @@
+return {'Renasys': docData["TypeLivraisonTPN"]==='Echange'? true:null}

@@ -1,0 +1,1 @@
+return {'NoDossier':docData['STATUS']==='Draft' ? null:true}

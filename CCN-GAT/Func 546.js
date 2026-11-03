@@ -1,0 +1,1 @@
+return {'6L_RemarqueLivraison':docData['6L_jeNeTrouvePasNonPlus']==='true' ? true:null}

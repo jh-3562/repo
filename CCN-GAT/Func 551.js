@@ -1,0 +1,1 @@
+return { '8L_RemarqueLivraison_Ch2': docData['8L_jeNeTrouvePasNonPlus_Ch2'] === 'true' ? true : null};

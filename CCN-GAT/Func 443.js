@@ -1,0 +1,1 @@
+return { 'TéléphoneCPE': docData['NotificationCPE'] === 'SMS et courriel' ? true : null };

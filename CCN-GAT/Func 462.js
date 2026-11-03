@@ -1,0 +1,1 @@
+return { 'jeNeTrouvePasNonPlus': docData['jeNeTrouvePas'] === 'true' ? true: null};

@@ -1,0 +1,1 @@
+return { 'jeNeTrouvePasNonPlus_Ch2': docData['jeNeTrouvePas_Ch2'] === 'true' ? true: null};

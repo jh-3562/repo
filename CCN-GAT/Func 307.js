@@ -1,0 +1,1 @@
+return docData['Deficience'] === 'SANTE PHYSIQUE'?{'PretType': 'Court Terme'}: undefined;

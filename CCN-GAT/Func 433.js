@@ -1,0 +1,1 @@
+return { 'TruckSize': docData['TypeTransport'] === 'Transporteur Parc' ? true : null };

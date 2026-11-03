@@ -1,0 +1,1 @@
+return { '3L_ValidCh2': docData['3L_Alternative'] === 'FALSE' ? null : true };

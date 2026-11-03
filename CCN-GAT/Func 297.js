@@ -1,0 +1,1 @@
+return docData['Deficience'] === 'DP'?{'PretType': 'AVQ/AVD'}: undefined;

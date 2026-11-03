@@ -1,0 +1,1 @@
+return  {'DescriptionAideTechniqueAutocomplete':docData['Description_AideTechnique'].substring(0,255)};

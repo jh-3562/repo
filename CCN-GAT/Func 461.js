@@ -1,0 +1,1 @@
+return { 'RemarqueLivraison': docData['jeNeTrouvePasNonPlus'] === 'true' ? true : null};

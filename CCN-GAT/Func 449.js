@@ -1,0 +1,1 @@
+return {'DescriptionProduit1CPE': 'Boîte de 5' };

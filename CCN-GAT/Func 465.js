@@ -1,0 +1,1 @@
+return { 'soumissionAideTechnique': docData['jeNeTrouvePasNonPlus'] === 'true' ? true : null};

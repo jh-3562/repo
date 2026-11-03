@@ -1,0 +1,1 @@
+return { 'S2_FL1_V3_6': docData['5L_Add'] === 'true'? true:null};

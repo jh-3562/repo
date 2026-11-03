@@ -1,0 +1,1 @@
+return docData['viderDate'] === 'true'?{'PretType': 'AVQ/AVD'}: undefined;

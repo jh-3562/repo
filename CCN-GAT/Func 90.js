@@ -1,0 +1,1 @@
+return { '3_Add': docData['2_AddEquipement'] === 'False' ? null : true };

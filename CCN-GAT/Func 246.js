@@ -1,0 +1,1 @@
+return { 'S2_FL1_V2_10': docData['9_Add'] === 'FALSE' ? null : true };

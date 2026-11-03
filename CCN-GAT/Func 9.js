@@ -1,0 +1,1 @@
+return { 'I will be hidden': docData['When value is 4'] === '4' ? null : true };

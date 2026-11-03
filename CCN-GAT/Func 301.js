@@ -1,0 +1,1 @@
+return docData['Deficience'] === 'SAPA'?{'PretType': 'AVQ/AVD'}: undefined;

@@ -1,0 +1,1 @@
+return { 'Hide init': docData['When value is 6'] === '6' ? true : null };

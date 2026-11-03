@@ -1,0 +1,1 @@
+return {'Empty init': '' };

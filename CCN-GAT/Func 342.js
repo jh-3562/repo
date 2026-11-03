@@ -1,0 +1,1 @@
+return { '4L_NomCh2': docData['4L_Alternative'] === 'FALSE' ? null : true };

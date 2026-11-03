@@ -1,0 +1,1 @@
+return docData['AdresseIdentique'] === 'true'?{'Adresse': docData['AdresseUsager'], 'Complement': docData['ComplementAdresseUsager'], 'CodePostal':docData['CPUsager'], 'Ville':docData['VilleUsager']}: {'Adresse': '','Complement': '','CodePostal':'','Ville':''}
