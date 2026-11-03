@@ -1,32 +1,57 @@
 console.log("Fonction 72", context);
 
-// Bounds for Abitibi region
+const MAX_SUGGESTIONS = 5;
+
+// Bounds for Abitibi region (limite ouest = frontière de l'Ontario)
 const getAbitibiBounds = async () => {
   const { LatLng, LatLngBounds } = await google.maps.importLibrary("core");
 
   return new LatLngBounds(
-    new LatLng(47.0, -80.5),
+    new LatLng(47.0, -79.5),
     new LatLng(49.5, -76.0),
   );
 };
 
-// Returns Google autocomplete suggestions for the given input
+// Interroge l'API Places et retourne toujours un tableau (meme en cas d'erreur).
+const fetchSuggestions = async (input, zoneOptions) => {
+  try {
+    const { AutocompleteSuggestion } =
+      await google.maps.importLibrary("places");
+
+    const { suggestions } =
+      await AutocompleteSuggestion.fetchAutocompleteSuggestions({
+        input,
+        includedRegionCodes: ["ca"],
+        ...zoneOptions,
+      });
+
+    return suggestions || [];
+  } catch (error) {
+    console.error("Erreur autocomplete Fonction 72:", error);
+    return [];
+  }
+};
+
+// Adresses de l'Abitibi en premier, complétées par celles d'ailleurs jusqu'à 5 (sans doublons).
 const getGoogleAutocompleteSuggestions = async (input) => {
-  const { AutocompleteSuggestion } =
-    await google.maps.importLibrary("places");
+  const abitibiBounds = await getAbitibiBounds();
 
-  const locationRestriction = await getAbitibiBounds();
+  const [abitibiSuggestions, otherSuggestions] = await Promise.all([
+    fetchSuggestions(input, { locationRestriction: abitibiBounds }),
+    fetchSuggestions(input, {}),
+  ]);
 
-  const request = {
-    input,
-    locationRestriction,
-    includedRegionCodes: ["ca"],
-  };
-
-  const { suggestions } =
-    await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
-
-  return suggestions || [];
+  const seenPlaceIds = new Set();
+  return [...abitibiSuggestions, ...otherSuggestions]
+    .filter((suggestion) => {
+      const placeId = suggestion.placePrediction?.placeId;
+      if (!placeId || seenPlaceIds.has(placeId)) {
+        return false;
+      }
+      seenPlaceIds.add(placeId);
+      return true;
+    })
+    .slice(0, MAX_SUGGESTIONS);
 };
 
 const getSuggestionTitle = (suggestion) => {
@@ -54,8 +79,6 @@ const main = async () => {
 
   try {
     let suggestions = await getGoogleAutocompleteSuggestions(inputValue);
-
-    console.log("suggestions", suggestions);
 
     suggestions = suggestions
       .map((suggestion) => {
