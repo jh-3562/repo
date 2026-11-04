@@ -401,21 +401,22 @@ const getRequiredFields = (targetStatus, intervention) => {
 };
 
 // -------------------- LECTURE --------------------
-// Bouton : étape de sélection puis popup. Clic droit : popup en premier, sur la ligne cliquée.
+// « Modifier le statut » : filtres puis popup ; clic droit (À faire) : popup sur la ligne cliquée ; « À refaire » (Complétées) : filtres seulement.
 const getSelection = () => {
   const rawProcessData = store?.pageContentStore?.processData || {};
   const processData = Object.keys(rawProcessData)
     .sort((a, b) => Number(a) - Number(b))
     .map((key) => rawProcessData[key]);
-  const popupIndex = processData.findIndex(
-    (step) => step?.edits && STATUS_FIELD_KEY in step.edits,
-  );
-  const edits = processData[popupIndex]?.edits || {};
+  const popupIndex = processData.findIndex((step) => STATUS_FIELD_KEY in (step?.edits || {}));
+  if (popupIndex === -1) {
+    return { ids: processData[0]?.result?.ids || [], targetStatus: STATUTS.A_REFAIRE };
+  }
+  const targetStatus = processData[popupIndex].edits[STATUS_FIELD_KEY];
   if (popupIndex > 0) {
-    return { ids: processData[popupIndex - 1]?.result?.ids || [], edits };
+    return { ids: processData[popupIndex - 1]?.result?.ids || [], targetStatus };
   }
   const clickedId = store?.pageContentStore?.active?.[0];
-  return { ids: clickedId ? [clickedId] : [], edits };
+  return { ids: clickedId ? [clickedId] : [], targetStatus };
 };
 
 const parseDocument = (doc) => {
@@ -1233,11 +1234,10 @@ const reloadPage = (delay) => setTimeout(() => window.location.reload(), delay);
 // -------------------- MAIN --------------------
 const main = async () => {
   try {
-    const { ids, edits } = getSelection();
-    const targetStatus = edits[STATUS_FIELD_KEY];
+    const { ids, targetStatus } = getSelection();
     const handler = STATUS_HANDLERS[targetStatus];
-    if (!ids.length)
-      return showErrorBanner("Aucune intervention sélectionnée.");
+    // La plateforme affiche déjà « 0 document(s) » : pas de deuxième message.
+    if (!ids.length) return;
     if (!handler) return showErrorBanner("Choisissez un statut.");
 
     showPopupLoading("Vérification des interventions…");
