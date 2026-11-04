@@ -148,6 +148,29 @@ const main = async () => {
         const current = JSON.parse(transportationDocument.data)
         const isGroup = current.FORMLAYOUTID === 'de3bc87f-64fd-409b-a7bb-fcd9a505650c'
 
+        const isGroupRoundTrip =
+          current['CollectionClientsTA|4|TypeTransportTA'] === 'ALLER/RETOUR'
+
+        // Groupe aller/retour : départ, destination puis retour, sans les arrêts intermédiaires pour l'instant
+        if (isGroup && isGroupRoundTrip) {
+          const startPos = stopPosition
+          const newData = {
+            startStopNumber: String(startPos),
+            endStopNumber: String(startPos + 1),
+            endStopNumberRetour: String(startPos + 2),
+            startStopNumberRetour: String(startPos + 3)
+          }
+          stopPosition += 4
+          documentsToUpdate.push({
+            data: JSON.stringify(newData),
+            status: transportationDocument.status,
+            active: true,
+            template: transportationDocument.template,
+            documentID: transportationDocument.documentID
+          })
+          continue
+        }
+
         if (isGroup) {
           let count = 0
           if (Array.isArray(current.StopoverLocations)) {

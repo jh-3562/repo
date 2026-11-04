@@ -163,6 +163,29 @@ const stop = {
     }
     console.log(formData)
     const result = []
+    const isGroup = formData.FORMLAYOUTID === strTransportDeGroupeFormLayoutID
+    const isGroupRoundTrip =
+      formData['CollectionClientsTA|4|TypeTransportTA'] === 'ALLER/RETOUR'
+
+    // Groupe aller/retour : départ, destination puis retour, sans les arrêts intermédiaires pour l'instant
+    if (isGroup && isGroupRoundTrip) {
+      const startLat = formData.startLatitude
+      const startLng = formData.startLongitude
+      const endLat = formData.endLatitude
+      const endLng = formData.endLongitude
+      const startPos = Number(formData.startStopNumber) || 1
+      const endPos = Number(formData.endStopNumber) || startPos + 1
+      const endReturnPos = Number(formData.endStopNumberRetour) || endPos + 1
+      const startReturnPos = Number(formData.startStopNumberRetour) || endReturnPos + 1
+      const hasStart = !fieldIsEmpty(startLat) && !fieldIsEmpty(startLng)
+      const hasEnd = !fieldIsEmpty(endLat) && !fieldIsEmpty(endLng)
+
+      if (hasStart) result.push(formatStop(form, startLat, startLng, String(startPos)))
+      if (hasEnd) result.push(formatStop(form, endLat, endLng, String(endPos)))
+      if (hasEnd) result.push(formatStop(form, endLat, endLng, String(endReturnPos)))
+      if (hasStart) result.push(formatStop(form, startLat, startLng, String(startReturnPos)))
+      return result
+    }
     if (formData.FORMLAYOUTID === strTransportDeGroupeFormLayoutID) {
       const startLat = formData.startLatitude
       const startLng = formData.startLongitude
@@ -413,6 +436,8 @@ async function getRouteWithOSRM (coords) {
 
 const main = async () => {
   showPopupLoading('Calcul des distances en cours')
+  // Toutes les données calculées sont accumulées ici et injectées une seule fois à la fin
+  const fillData = {}
   try {
     const calculateDistancesAndInjectData = async wayPointsCoordinates => {
       const getTerritoriesData = coordinates => {
@@ -588,9 +613,7 @@ const main = async () => {
         OutsideMRCCollinesDuration: OutsideMRCCollinesDuration.toString()
       }
       console.log('dataToInject', dataToInject)
-      injectDocData({
-        fillData: dataToInject
-      })
+      Object.assign(fillData, dataToInject)
     }
     const formatWayPointsForDistanceCalculation = stops => {
       const driverStart = [
@@ -654,14 +677,10 @@ const main = async () => {
       const osrmRouteWithoutDriver = await getRouteWithOSRM(coordsWithoutDriver)
       const distanceSansChauffeur = Math.round(osrmRouteWithoutDriver.routes[0].distance / 1000)
       console.log('TotalDistanceSansChauffeur', distanceSansChauffeur)
-      injectDocData({ fillData: { TotalDistanceSansChauffeur: distanceSansChauffeur.toString() } })
+      fillData.TotalDistanceSansChauffeur = distanceSansChauffeur.toString()
     }
-  } catch (error) {
-    console.log('Error during main function :', error)
-  }
 
-  // Calcul des VOYAGES BLANCS : domicile chauffeur -> point de départ de chaque transport
-  try {
+    // Calcul des VOYAGES BLANCS : domicile chauffeur -> point de départ de chaque transport
     let documentsVoyageBlanc = []
     try {
       documentsVoyageBlanc = await getDocumentsVoyageBlanc(driverName, date)
@@ -747,16 +766,19 @@ const main = async () => {
     // est remplacé en entier, donc les anciennes lignes disparaissent
     console.log('TotalDistanceVoyageBlanc', totalDistanceVoyageBlanc)
     console.log('voyageBlancCollection', voyageBlancCollection)
-    injectDocData({
-      fillData: {
-        TotalDistanceVoyageBlanc: totalDistanceVoyageBlanc.toString(),
-        TotalRenumerationVoyageBlanc:
-          Math.round(totalRenumerationVoyageBlanc * 100) / 100,
-        TotalVoyageBlanc: voyageBlancCollection
-      }
-    })
+    fillData.TotalDistanceVoyageBlanc = totalDistanceVoyageBlanc.toString()
+    fillData.TotalRenumerationVoyageBlanc = (
+      Math.round(totalRenumerationVoyageBlanc * 100) / 100
+    ).toString()
+    fillData.TotalVoyageBlanc = voyageBlancCollection
   } catch (error) {
-    console.log('Error during VOYAGE BLANC calculation :', error)
+    console.log('Error during main function :', error)
+  }
+
+  // Injection unique : la Function 400 ne se déclenche qu'une fois, avec toutes les données
+  if (Object.keys(fillData).length > 0) {
+    console.log('fillData', fillData)
+    injectDocData({ fillData })
   }
   hidePopupLoading()
 }
