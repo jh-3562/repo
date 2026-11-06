@@ -680,6 +680,7 @@ async function mettreAJourEnTraiteEtNotifier(api, docData, templateId) {
       base.FrequenceSequence = String(chosen.sequence.Frequence || "");
 
       base.Sequence = String(chosen.sequence.rowNumber || "");
+      base.CreeAutomatiquement = "true";
 
       base.InterventionDateCreationValide = sequencingIsFutureDate(
         base.CommandDate,

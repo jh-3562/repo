@@ -66,6 +66,7 @@ api({ local: true })
       DateHeureComplete,
       ...getDateCompletionAndYear(DateHeureComplete),
       DuppliquerNotif: true,
+      CreeAutomatiquement: "false",
       InterventionDateCreationValide: CommandDate && typeof isFutureDate === "function"
         ? isFutureDate(docData?.CommandDate)
         : "Non"
