@@ -2,3 +2,9 @@ CLAUDE.md
 CLAUDE.md.bak*
 
 *.md
+
+# Scripts et aperçus Metabase de TAP (outils de travail, pas du code client)
+TAP/Metabase/
+
+# Scripts SQL de travail de QBO
+QBO/SQL/
