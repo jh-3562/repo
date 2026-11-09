@@ -1,2 +1,4 @@
 console.log('251',context);
-return {Intervention_SectionCachée: true}
+return {
+  Intervention_SectionCachée: store.moduleStore.user.roles.includes('ADMIN') ? true : null
+}
