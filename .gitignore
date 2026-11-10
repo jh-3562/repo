@@ -8,3 +8,9 @@ TAP/Metabase/
 
 # Scripts SQL de travail de QBO
 QBO/SQL/
+
+# Scripts SQL de travail de TAP
+TAP/SQL/
+
+# Scripts SQL de travail de MCR-B
+MCR-B/SQL/

@@ -79,6 +79,54 @@ const showPopupLoading = loadingMessage => {
   }
 }
 
+const HOME_POSITIONS_KEY = 'PositionDomicileChauffeur'
+
+// Positions des retours au domicile lues dans la base (le formulaire ouvert peut ne plus être à jour)
+const getTourHomePositions = async () => {
+  const response = await api({ local: true }).post('document/id', { ids: [docData.FORMID] })
+  if (response.status !== 200) throw new Error('Problem during document/id api call (tour)')
+  const tourData = JSON.parse(response.data.documents?.[0]?.data || '{}')
+  const value = tourData[HOME_POSITIONS_KEY]
+  const values = Array.isArray(value) ? value : String(value || '').split('|')
+  return values.map(Number).filter(position => position > 0).sort((a, b) => a - b)
+}
+
+// Donne les prochaines positions libres en sautant celles des retours au domicile
+const createPositionAllocator = homePositions => {
+  let nextPosition = 1
+  const take = count => {
+    const positions = []
+    while (positions.length < count) {
+      if (!homePositions.includes(nextPosition)) positions.push(nextPosition)
+      nextPosition++
+    }
+    return positions
+  }
+  return { take, lastPosition: () => nextPosition - 1 }
+}
+
+// Les retours placés après le dernier arrêt sont ramenés juste après lui
+const placeHomesAfterLastStop = (homePositions, lastStopPosition) => {
+  let nextPosition = lastStopPosition + 1
+  return homePositions.map(position => (position <= lastStopPosition ? position : nextPosition++))
+}
+
+const saveTourHomePositions = async homePositions => {
+  const value = homePositions.join('|')
+  await api({ local: true }).put('document', {
+    document: {
+      documentID: docData.FORMID,
+      data: JSON.stringify({ [HOME_POSITIONS_KEY]: value }),
+      status: docData.STATUS,
+      active: true,
+      template: { templateId: docData.FORMLAYOUTID }
+    },
+    // Sans notification : évite l'alerte « modifié par un autre utilisateur » sur la tournée ouverte
+    preventNotify: 'DOCUMENT'
+  })
+  context.injectDocData?.({ fillData: { [HOME_POSITIONS_KEY]: value } })
+}
+
 const main = async () => {
   showPopupLoading('Attribution en cours')
   try {
@@ -113,7 +161,7 @@ const main = async () => {
       const transportationDocuments = await getDocuments(apiFilters)
       return transportationDocuments
     }
-    const prepareDocumentsToUpdate = transportationDocuments => {
+    const prepareDocumentsToUpdate = (transportationDocuments, allocator) => {
       const sortedTransportationDocuments = transportationDocuments.sort(
         (transportation1, transportation2) => {
           const data1 = JSON.parse(transportation1.data)
@@ -142,7 +190,6 @@ const main = async () => {
       )
 
       const documentsToUpdate = []
-      let stopPosition = 1
 
       for (const transportationDocument of sortedTransportationDocuments) {
         const current = JSON.parse(transportationDocument.data)
@@ -153,14 +200,13 @@ const main = async () => {
 
         // Groupe aller/retour : départ, destination puis retour, sans les arrêts intermédiaires pour l'instant
         if (isGroup && isGroupRoundTrip) {
-          const startPos = stopPosition
+          const [start, end, endReturn, startReturn] = allocator.take(4)
           const newData = {
-            startStopNumber: String(startPos),
-            endStopNumber: String(startPos + 1),
-            endStopNumberRetour: String(startPos + 2),
-            startStopNumberRetour: String(startPos + 3)
+            startStopNumber: String(start),
+            endStopNumber: String(end),
+            endStopNumberRetour: String(endReturn),
+            startStopNumberRetour: String(startReturn)
           }
-          stopPosition += 4
           documentsToUpdate.push({
             data: JSON.stringify(newData),
             status: transportationDocument.status,
@@ -179,12 +225,10 @@ const main = async () => {
             count = Number(current.StopoverLocations) || 0
           }
 
-          const startPos = stopPosition
-          const midPositions = Array.from({ length: count }, (_, i) =>
-            String(startPos + 1 + i)
-          )
-          const endPos = startPos + count + 1
-          stopPosition = endPos + 1
+          const groupPositions = allocator.take(count + 2)
+          const startPos = groupPositions[0]
+          const midPositions = groupPositions.slice(1, -1).map(String)
+          const endPos = groupPositions[groupPositions.length - 1]
           console.log(current)
           const newData = {}
           newData['startStopNumber'] = String(startPos)
@@ -216,42 +260,41 @@ const main = async () => {
           documentsToUpdate.push(document)
         } else {
           let newData
-          const startPos = stopPosition
           if (current.Destination2 === "true") {
             // Cas avec arrêt intermédiaire
             if (current.TypeTransport === 'ALLER/RETOUR') {
+              const [start, stopover, end, endReturn, startReturn] = allocator.take(5)
               newData = {
-                startStopNumber: String(startPos),
-                stopoverStopNumber: String(startPos + 1),
-                endStopNumber: String(startPos + 2),
-                endStopNumberRetour: String(startPos + 3),
-                startStopNumberRetour: String(startPos + 4)
+                startStopNumber: String(start),
+                stopoverStopNumber: String(stopover),
+                endStopNumber: String(end),
+                endStopNumberRetour: String(endReturn),
+                startStopNumberRetour: String(startReturn)
               }
-              stopPosition += 5
             } else {
+              const [start, stopover, end] = allocator.take(3)
               newData = {
-                startStopNumber: String(startPos),
-                stopoverStopNumber: String(startPos + 1),
-                endStopNumber: String(startPos + 2)
+                startStopNumber: String(start),
+                stopoverStopNumber: String(stopover),
+                endStopNumber: String(end)
               }
-              stopPosition += 3
             }
           } else {
             // Cas sans arrêt intermédiaire
             if (current.TypeTransport === 'ALLER/RETOUR') {
+              const [start, end, endReturn, startReturn] = allocator.take(4)
               newData = {
-                startStopNumber: String(startPos),
-                endStopNumber: String(startPos + 1),
-                endStopNumberRetour: String(startPos + 2),
-                startStopNumberRetour: String(startPos + 3)
+                startStopNumber: String(start),
+                endStopNumber: String(end),
+                endStopNumberRetour: String(endReturn),
+                startStopNumberRetour: String(startReturn)
               }
-              stopPosition += 4
             } else {
+              const [start, end] = allocator.take(2)
               newData = {
-                startStopNumber: String(startPos),
-                endStopNumber: String(startPos + 1)
+                startStopNumber: String(start),
+                endStopNumber: String(end)
               }
-              stopPosition += 2
             }
           }
           const document = {
@@ -267,13 +310,16 @@ const main = async () => {
 
       return documentsToUpdate
     }
-    const transportationDocuments = await getTransportationDocuments()
+    const [transportationDocuments, homePositions] = await Promise.all([getTransportationDocuments(), getTourHomePositions()])
     console.log('transportationDocuments', transportationDocuments)
-    const documentsToUpdate = prepareDocumentsToUpdate(transportationDocuments)
+    const allocator = createPositionAllocator(homePositions)
+    const documentsToUpdate = prepareDocumentsToUpdate(transportationDocuments, allocator)
     console.log('documentsToUpdate', documentsToUpdate)
     const updateResponse = await api({ local: true }).put('document/Many', {
       documents: documentsToUpdate
     })
+    const newHomePositions = placeHomesAfterLastStop(homePositions, allocator.lastPosition())
+    if (newHomePositions.join('|') !== homePositions.join('|')) await saveTourHomePositions(newHomePositions)
   } catch (error) {
     console.log('ERROR during function 368 :', error)
   }

@@ -14,7 +14,10 @@ const TRANSPORT_KEYS = {
 };
 
 // Couleurs reprises de la table Style de TAP (bordure : 16, 15, 29 ; fond pâle : 106, 108, 101)
-const TRIP_COLORS = { 'ALLER': '#449FDC', 'RETOUR': '#E7A438', 'ALLER/RETOUR': '#7A75CF' }; const TRIP_BACKGROUNDS = { 'ALLER': '#cfe2f3', 'RETOUR': '#fce5cd', 'ALLER/RETOUR': '#d9d2e9' };
+// Gabarit Tournée : la tournée est aussi dans la grille des cartes
+const TOUR_LAYOUT_ID = '94e653b0-9a07-4be6-ad9b-6efaa44d9982';
+
+const TRIP_COLORS ={ 'ALLER': '#449FDC', 'RETOUR': '#E7A438', 'ALLER/RETOUR': '#7A75CF' }; const TRIP_BACKGROUNDS = { 'ALLER': '#cfe2f3', 'RETOUR': '#fce5cd', 'ALLER/RETOUR': '#d9d2e9' };
 
 // Un transport de groupe porte son type dans la collection des clients
 const getTripType = transport => {
@@ -29,12 +32,12 @@ const getTransportRows = () => {
         return window.transportsData;
     }
 
-    const tableRows = store.moduleStore.tableDatas
-        ?.GridTourneeTransportations?.rows;
-    if (tableRows?.length) return tableRows;
+    // Transports de la grille des cartes (rechargée à chaque rafraîchissement), sans la tournée
+    const cardRows = (store.moduleStore.tableDatas?.Tournee_section_cards?.rows || [])
+        .filter(row => row.formLayoutId !== TOUR_LAYOUT_ID &&row.data?.FORMLAYOUTNAME !== 'Tournée');
+    if (cardRows.length) return cardRows;
 
-    const pageRows = store.pageContentStore?.maskRows;
-    return pageRows?.length ? pageRows : [];
+    return store.moduleStore.tableDatas?.GridTourneeTransportations?.rows || [];
 };
 
 const getPosition = value => {
@@ -118,6 +121,7 @@ const buildTransportCards = rows => rows
                 Stop_Type: occurrence.type,
                 Stop_Summary: `#${occurrence.position} • ${occurrence.type} • ${transport.TypeTransport || ''}`,
                 Stop_Destination: occurrence.address || '',
+                Stop_ClientLabel: 'Client : ',
                 Stop_Clients: clientName,
                 Stop_Heure: transport.Stop_Heure
                     || transport.EtablissementDest_HeureRDV
@@ -132,8 +136,57 @@ const buildTransportCards = rows => rows
     .sort((first, second) => Number(first.data.Stop_Position)
         - Number(second.data.Stop_Position));
 
+const HOME_TYPE = 'Retour au domicile';
+const HOME_BORDER_COLOR = '#408B30';
+const HOME_BACKGROUND_COLOR = '#d9ead3';
+
+const cleanText = value => String(value || '').split(' ').filter(Boolean).join(' ');
+
+const getTourId = row => row.documentID || row.rowID;
+
+// La tournée est dans la grille des cartes (mêmes chauffeur et date que ses transports)
+const getTourRow = () => {
+    const rows = store.moduleStore.tableDatas?.Tournee_section_cards?.rows || [];
+    const tourRows = rows.filter(row => row.formLayoutId === TOUR_LAYOUT_ID || row.data?.FORMLAYOUTNAME === 'Tournée');
+    return tourRows.find(row => window.location.href.includes(getTourId(row))) || tourRows[0];
+};
+
+const getHomePositions = tourRow => {
+    const savedAfterDrag = window.tourHomePositions?.[getTourId(tourRow)];
+    const value = savedAfterDrag !== undefined ? savedAfterDrag : tourRow.data?.PositionDomicileChauffeur;
+    const values = Array.isArray(value) ? value : String(value || '').split('|');
+    return values.map(getPosition).filter(position => position !== null && position > 0);
+};
+
+const buildHomeCards = () => {
+    const tourRow = getTourRow();
+    if (!tourRow) return [];
+    const tour = tourRow.data || {};
+    return getHomePositions(tourRow).map((position, index) => ({
+        ...tourRow,
+        key: `home-${getTourId(tourRow)}-${index}`,
+        rowID: undefined,
+        documentID: undefined,
+        borderColor: HOME_BORDER_COLOR,
+        backgroundColor: HOME_BACKGROUND_COLOR,
+        data: {
+            Stop_Position: String(position),
+            Stop_Type: HOME_TYPE,
+            Stop_Summary: `#${position} • Retour au domicile du chauffeur`,
+            Stop_ClientLabel: 'Chauffeur : ',
+            Stop_Clients: cleanText(tour['Contrainte|1|Chauffeur']),
+            Stop_Destination: tour.Chauffeur_Adresse || '',
+            Transport_RowID: getTourId(tourRow),
+            Transport_OccurrenceKey: `home-${index}`,
+            Tour_Status: tourRow.status,
+            Tour_FormLayoutId: tourRow.formLayoutId || TOUR_LAYOUT_ID,
+        },
+    }));
+};
+
 try {
-    return buildTransportCards(getTransportRows());
+    return [...buildTransportCards(getTransportRows()), ...buildHomeCards()]
+        .sort((first, second) => Number(first.data.Stop_Position) - Number(second.data.Stop_Position));
 } catch (error) {
     console.log('Erreur', 'Une erreur est survenue : ' + error.message);
     return [];
