@@ -40,19 +40,8 @@ if (baseDate && heureStr) {
     return {};
   }
 
-  const jourEcart = Number(
-    (
-      Math.abs(dateDemande.getTime() - Date.now()) /
-      (1000 * 60 * 60 * 24)
-    ).toFixed(6)
-  );
-
-  console.log("[DEBUG] Date+Heure (récurrence prioritaire, heure normale) →", iso);
-  console.log("[DEBUG] Jour d'écart →", jourEcart);
-
   return {
     [OUT_FIELD]: iso,
-    JOUR_ECART: jourEcart
   };
 }
 

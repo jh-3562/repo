@@ -57,7 +57,6 @@ const common = {
   Demande_RaisonAttente: true,
   NomTransporteurSearch: true,
   Demande_AccompagnateurMatricule: !canEditMatriculeConfirme,
-  JOUR_ECART : true,
   Facturation_Transporteur : true,
   
 };
@@ -98,6 +97,8 @@ switch (docData.FORMLAYOUTID) {
       Demande_SuggestionTransRoutierVersAeroportAlt: true,
       Demande_SuggestionTransRoutierVersAeroportAlt2: true,
       CiviereChaise2Chauffeur: true,
+      Demande_TransportTransportSimpleHeureDepartSouhaitee: true, // [FIX16 HeuresCalculees 2026-11-07]
+      Demande_TransportTransportSimpleHeureArriveeSouhaite: true, // [FIX16 HeuresCalculees 2026-11-07]
       Demande_TransportTransportSimpleHeurePriseEnCharge: isMedical
         ? true
         : null,
