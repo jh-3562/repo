@@ -198,14 +198,33 @@ const main = async () => {
         const isGroupRoundTrip =
           current['CollectionClientsTA|4|TypeTransportTA'] === 'ALLER/RETOUR'
 
-        // Groupe aller/retour : départ, destination puis retour, sans les arrêts intermédiaires pour l'instant
+        // Groupe aller/retour : départ, destinations intermédiaires, destination, puis retour (les dépôts du retour sont placés par « Calcul des km »)
         if (isGroup && isGroupRoundTrip) {
-          const [start, end, endReturn, startReturn] = allocator.take(4)
+          const stopoverCount = Array.isArray(current.StopoverLocations)
+            ? current.StopoverLocations.length
+            : Number(current.StopoverLocations) || 0
+          const groupPositions = allocator.take(stopoverCount + 4)
+          const start = groupPositions[0]
+          const midPositions = groupPositions.slice(1, stopoverCount + 1).map(String)
+          const [end, endReturn, startReturn] = groupPositions.slice(stopoverCount + 1)
           const newData = {
             startStopNumber: String(start),
             endStopNumber: String(end),
             endStopNumberRetour: String(endReturn),
             startStopNumberRetour: String(startReturn)
+          }
+          if (stopoverCount > 0) {
+            newData['StopPosStopsCollec'] = midPositions.join('|')
+            if (Array.isArray(current.StopoverLocations)) {
+              newData['StopoverLocations'] = current.StopoverLocations.map((row, index) => ({
+                ...row,
+                'StopoverLocations|4000|StopPos': midPositions[index] || ''
+              }))
+            } else {
+              midPositions.forEach((pos, index) => {
+                newData[`StopoverLocations|4000|StopPos|${index + 1}`] = pos
+              })
+            }
           }
           documentsToUpdate.push({
             data: JSON.stringify(newData),

@@ -136,6 +136,44 @@ const isDocumentOrRow = form => {
   }
   return result
 }
+/**
+ * Destinations intermédiaires d'un groupe, lues dans les lignes de la collection (toujours à jour).
+ * Les listes LatitudeStopsCollec… ne sont pas recalculées quand on retire une ligne : elles ne servent qu'en secours.
+ */
+const getGroupStopoverPoints = formData => {
+  const count = Number(formData.StopoverLocations) || 0
+  if (count === 0) return []
+  const poss = String(formData.StopPosStopsCollec || '').split('|')
+  const fromRows = Array.from({ length: count }, (_, index) => ({
+    lat: formData[`StopoverLocations|3000|Latitude|${index + 1}`],
+    lng: formData[`StopoverLocations|2000|Longitude|${index + 1}`],
+    stored: Number(formData[`StopoverLocations|4000|StopPos|${index + 1}`] || poss[index]),
+    index
+  }))
+  if (fromRows.some(point => !fieldIsEmpty(point.lat) && !fieldIsEmpty(point.lng))) return fromRows
+  const lats = String(formData.LatitudeStopsCollec || '').split('|')
+  const lngs = String(formData.LongitudeStopsCollec || '').split('|')
+  return lats
+    .slice(0, count)
+    .map((lat, index) => ({ lat, lng: lngs[index], stored: Number(poss[index]), index }))
+}
+
+/**
+ * Destinations intermédiaires d'un groupe aller/retour, dans l'ordre de passage.
+ * Leurs numéros de tournée sont gardés s'ils sont tous entre le départ et la destination ; sinon elles sont placées entre les deux.
+ */
+const getGroupRoundTripStopovers = (formData, startPos, endPos) => {
+  const points = getGroupStopoverPoints(formData)
+    .filter(point => !fieldIsEmpty(point.lat) && !fieldIsEmpty(point.lng))
+  const orderOf = point => (Number.isFinite(point.stored) && point.stored > 0 ? point.stored : point.index + 1)
+  points.sort((a, b) => orderOf(a) - orderOf(b))
+  const storedAreValid = points.every(point => point.stored > startPos && point.stored < endPos)
+  return points.map((point, order) => ({
+    ...point,
+    pos: storedAreValid ? point.stored : startPos + (order + 1) / (points.length + 1)
+  }))
+}
+
 const stop = {
   formatStops (form) {
     const formatStop = (form, Latitude, Longitude, stopNumber) => {
@@ -167,7 +205,7 @@ const stop = {
     const isGroupRoundTrip =
       formData['CollectionClientsTA|4|TypeTransportTA'] === 'ALLER/RETOUR'
 
-    // Groupe aller/retour : départ, destination puis retour, sans les arrêts intermédiaires pour l'instant
+    // Groupe aller/retour : départ, destinations intermédiaires, destination, retour par les mêmes destinations en ordre inverse
     if (isGroup && isGroupRoundTrip) {
       const startLat = formData.startLatitude
       const startLng = formData.startLongitude
@@ -180,9 +218,18 @@ const stop = {
       const hasStart = !fieldIsEmpty(startLat) && !fieldIsEmpty(startLng)
       const hasEnd = !fieldIsEmpty(endLat) && !fieldIsEmpty(endLng)
 
+      const stopovers = getGroupRoundTripStopovers(formData, startPos, endPos)
+
       if (hasStart) result.push(formatStop(form, startLat, startLng, String(startPos)))
+      for (const s of stopovers) {
+        result.push(formatStop(form, s.lat, s.lng, String(s.pos)))
+      }
       if (hasEnd) result.push(formatStop(form, endLat, endLng, String(endPos)))
       if (hasEnd) result.push(formatStop(form, endLat, endLng, String(endReturnPos)))
+      // Les dépôts du retour n'ont pas de position enregistrée : ils suivent le départ de la destination, avant le retour au départ
+      stopovers.slice().reverse().forEach((s, index) => {
+        result.push(formatStop(form, s.lat, s.lng, String(endReturnPos + (index + 1) / (stopovers.length + 1))))
+      })
       if (hasStart) result.push(formatStop(form, startLat, startLng, String(startReturnPos)))
       return result
     }
@@ -194,20 +241,11 @@ const stop = {
       const startPos = formData.startStopNumber ? formData.startStopNumber : 1
       const endPos = formData.endStopNumber ? formData.endStopNumber : 1
 
-      const count = Number(formData.StopoverLocations) || 0
-      const lngs = formData.LongitudeStopsCollec.split('|')
-      const lats = formData.LatitudeStopsCollec.split('|')
-      const poss = formData.StopPosStopsCollec.split('|')
-
       const mids = []
-      for (let i = 0; i < count; i++) {
-        const lat = lats[i]
-        const lng = lngs[i]
-        if (!fieldIsEmpty(lat) && !fieldIsEmpty(lng)) {
-          const posRaw = poss[i]
-          const posNum = Number(posRaw)
-          const pos = posNum ? posNum : i + startPos
-          mids.push({ lat, lng, pos })
+      for (const point of getGroupStopoverPoints(formData)) {
+        if (!fieldIsEmpty(point.lat) && !fieldIsEmpty(point.lng)) {
+          const pos = point.stored ? point.stored : point.index + startPos
+          mids.push({ lat: point.lat, lng: point.lng, pos })
         }
       }
       mids.sort((a, b) => a.pos - b.pos)
