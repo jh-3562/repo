@@ -30,6 +30,42 @@ const getGroupDocument = async groupId => {
     return groupDocument;
 };
 
+// Ordre inchangé : les destinations déposées gardent des numéros croissants
+const isDisplayedOrderUnchanged = stopovers => stopovers
+    .every((stopover, offset) => offset === 0 || Number(stopover.Stop_Position) > Number(stopovers[offset - 1].Stop_Position));
+
+const readPosition = (value, fallback) => {
+    const position = value === undefined || value === null || value === '' ? NaN : Number(value);
+    return Number.isFinite(position) ? position : fallback;
+};
+
+// Lignes du groupe dans l'ordre des cartes (même tri que leur affichage)
+const getDisplayedRowOrder = data => {
+    const latitudes = String(data.LatitudeStopsCollec || '').split('|').filter(Boolean);
+    const count = Array.isArray(data[COLLECTION_KEY]) ? data[COLLECTION_KEY].length : (Number(data[COLLECTION_KEY]) || latitudes.length);
+    const positions = String(data.StopPosStopsCollec || '').split('|');
+    return Array.from({ length: count }, (_, offset) => offset + 1)
+        .map(index => ({ index, position: readPosition(positions[index - 1], index) }))
+        .sort((first, second) => first.position - second.position)
+        .map(row => row.index);
+};
+
+const isCompleteOrder = (order, rowCount) => rowCount > 0 && order.length === rowCount && new Set(order).size === rowCount
+    && order.every(index => Number.isInteger(index) && index >= 1 && index <= rowCount);
+
+// Avec une recherche active, seules les destinations visibles changent d'ordre, entre les places qu'elles occupaient
+const buildFullOrder = (data, visibleStopovers) => {
+    const newOrder = getDisplayedRowOrder(data);
+    const rowCount = newOrder.length;
+    const visibleOrder = visibleStopovers.map(stopover => Number(stopover.Stopover_Index));
+    visibleStopovers
+        .map(stopover => Number(stopover.Stop_Position))
+        .sort((first, second) => first - second)
+        .forEach((slot, offset) => { newOrder[slot - 1] = visibleOrder[offset]; });
+    if (!isCompleteOrder(newOrder, rowCount)) throw new Error('Ordre de passage incomplet : ' + newOrder.join(','));
+    return newOrder;
+};
+
 const reorderPipeList = (value, newOrder) => {
     const values = String(value || '').split('|');
     return newOrder.map(oldIndex => values[oldIndex - 1] ?? '').join('|');
@@ -86,7 +122,7 @@ const buildFormCollection = (newData, count) => Array.from({ length: count }, (_
 });
 
 const saveGroup = async (groupDocument, newData) => {
-    await api({ local: true }).put('document', {
+    const response = await api({ local: true }).put('document', {
         document: {
             documentID: groupDocument.documentID,
             data: JSON.stringify(newData),
@@ -97,6 +133,7 @@ const saveGroup = async (groupDocument, newData) => {
         // Sans notification : évite l'alerte « modifié par un autre utilisateur » sur le groupe ouvert
         preventNotify: 'DOCUMENT'
     });
+    if (!response || response.status < 200 || response.status >= 300) throw new Error('document : statut ' + response?.status);
 };
 
 // Le départ et la destination ne se verrouillent pas : un enregistrement vide recharge les cartes dans l'ordre enregistré
@@ -110,15 +147,15 @@ const main = async () => {
         const groupId = dnd.drop.items.map(item => item.row?.data?.Group_RowID).find(Boolean);
         if (!groupId) return;
         const newStopoverOrder = getNewStopoverOrder();
-        const newOrder = newStopoverOrder.map(data => Number(data.Stopover_Index));
-        const isUnchanged = newOrder.every((oldIndex, offset) => newStopoverOrder[offset].Stop_Position === String(offset + 1));
-        if (!newOrder.length || isUnchanged) {
+        if (!newStopoverOrder.length || isDisplayedOrderUnchanged(newStopoverOrder)) {
             await reloadSavedOrder(groupId);
             return;
         }
 
         const groupDocument = await getGroupDocument(groupId);
-        const newData = buildReorderedData(JSON.parse(groupDocument.data), newOrder);
+        const groupData = JSON.parse(groupDocument.data);
+        const newOrder = buildFullOrder(groupData, newStopoverOrder);
+        const newData = buildReorderedData(groupData, newOrder);
         await saveGroup(groupDocument, newData);
         injectDocData({
             fillData: {

@@ -17,7 +17,7 @@
             const TOUR_LAYOUT_ID = '94e653b0-9a07-4be6-ad9b-6efaa44d9982';
 
             const getTransportRows = () => {
-                if (Array.isArray(window.transportsData) && window.transportsData.length) return window.transportsData;
+                if (Array.isArray(window.transportsData) && window.transportsData.length && window.location.href.includes(window.transportsDataTourId)) return window.transportsData;
                 const cardRows = (store.moduleStore.tableDatas?.Tournee_section_cards?.rows || [])
                     .filter(row => row.formLayoutId !== TOUR_LAYOUT_ID && row.data?.FORMLAYOUTNAME !== 'Tournée');
                 return cardRows.length ? cardRows : (store.moduleStore.tableDatas?.GridTourneeTransportations?.rows || []);
@@ -79,12 +79,8 @@
             };
 
             const updateManyDocument = async (docs) => {
-                try {
-                    await api({ local: true }).put('document/Many', { documents: docs });
-                    console.log('FINI');
-                } catch (e) {
-                    console.error(e);
-                }
+                const response = await api({ local: true }).put('document/Many', { documents: docs });
+                if (!response || response.status < 200 || response.status >= 300) throw new Error('document/Many : statut ' + response?.status);
             };
 
             // ============================================================================
@@ -104,7 +100,43 @@
                 .filter(key => key.startsWith(STOPOVER_ROW_POSITION) && Number(key.slice(STOPOVER_ROW_POSITION.length)) > 0)
                 .reduce((rows, key) => ({ ...rows, [key]: transport[key] }), {});
 
-            const buildNewTransportsCollection = () => {
+            // Avec une recherche active, les cartes visibles gardent les numéros qu'elles occupaient déjà
+            const isPosition = value => value !== undefined && value !== null && value !== '' && Number.isFinite(Number(value));
+
+            const countTransportCards = () => getTransportRows().reduce((count, row) => {
+                const transport = row.data || row;
+                const positions = Object.values(TRANSPORT_KEYS)
+                    .filter(key => key !== TRANSPORT_KEYS.STOP_POSITIONS_STOPOVERS)
+                    .map(key => transport[key]);
+                const stopovers = String(transport[TRANSPORT_KEYS.STOP_POSITIONS_STOPOVERS] || '').split('|').filter(Boolean);
+                return count + [...positions, ...stopovers].filter(isPosition).length;
+            }, 0);
+
+            const findTourRow = () => {
+                const tourRows = (store.moduleStore.tableDatas?.Tournee_section_cards?.rows || [])
+                    .filter(row => row.formLayoutId === TOUR_LAYOUT_ID || row.data?.FORMLAYOUTNAME === 'Tournée');
+                return tourRows.find(row => window.location.href.includes(row.documentID || row.rowID)) || tourRows[0];
+            };
+
+            const countHomeCards = () => {
+                const tourRow = findTourRow();
+                if (!tourRow) return 0;
+                const savedAfterDrag = window.tourHomePositions?.[tourRow.documentID || tourRow.rowID];
+                const value = savedAfterDrag !== undefined ? savedAfterDrag : tourRow.data?.PositionDomicileChauffeur;
+                return (Array.isArray(value) ? value : String(value || '').split('|'))
+                    .filter(position => isPosition(position) && Number(position) > 0).length;
+            };
+
+            const getDropPositions = () => {
+                const previousPositions = dnd.drop.items
+                    .map(item => Number(item.row?.data?.Stop_Position))
+                    .sort((first, second) => first - second);
+                const isFiltered = dnd.drop.items.length < countTransportCards() + countHomeCards();
+                const keepPreviousPositions = isFiltered && previousPositions.every(Number.isFinite);
+                return dnd.drop.items.map((item, index) => (keepPreviousPositions ? previousPositions[index] : index + 1));
+            };
+
+            const buildNewTransportsCollection = dropPositions => {
                 const transports = JSON.parse(JSON.stringify(getTransportRows()));
                 const updatedTransports = JSON.parse(JSON.stringify(transports));
 
@@ -121,7 +153,7 @@
                     const data = item.row?.data || {};
                     const occurrenceKey = data.Transport_OccurrenceKey || item.key;
                     if (occurrenceKey && stopIDs[String(occurrenceKey)]) {
-                        stopIDs[String(occurrenceKey)].finalPosition = index + 1;
+                        stopIDs[String(occurrenceKey)].finalPosition = dropPositions[index];
                     }
                 });
 
@@ -135,7 +167,7 @@
                     dnd.drop.items.forEach((item, index) => {
                         const data = item.row?.data || {};
                         if (String(data.Transport_RowID) !== String(transportID)) return;
-                        finalPositions[data.Transport_OccurrenceKey] = index + 1;
+                        finalPositions[data.Transport_OccurrenceKey] = dropPositions[index];
                     });
 
                     const positionKeys = [
@@ -197,9 +229,9 @@
 
             const HOME_TYPE = 'Retour au domicile';
 
-            const buildHomeUpdate = () => {
+            const buildHomeUpdate = dropPositions => {
                 const homeStops = dnd.drop.items
-                    .map((item, index) => ({ data: item.row?.data || {}, position: index + 1 }))
+                    .map((item, index) => ({ data: item.row?.data || {}, position: dropPositions[index] }))
                     .filter(stop => stop.data.Stop_Type === HOME_TYPE);
                 if (!homeStops.length) return null;
                 const { Transport_RowID, Tour_Status, Tour_FormLayoutId } = homeStops[0].data;
@@ -227,12 +259,28 @@
                 window.tourHomePositions = { ...(window.tourHomePositions || {}), [homeUpdate.tourId]: homeUpdate.positions };
             };
 
+            const MOVE_FAILED_MESSAGE = 'Le déplacement n’a pas pu être effectué. Actualisez la page puis réessayez.';
+
+            const getCurrentTourId = () => {
+                const tourRow = findTourRow();
+                return tourRow ? tourRow.documentID || tourRow.rowID : null;
+            };
+
+            // En cas d'échec, les cartes reprennent l'ordre enregistré
+            const clearDisplayedOrder = () => {
+                window.transportsData = null;
+                const tourId = getCurrentTourId();
+                if (tourId && window.tourHomePositions) delete window.tourHomePositions[tourId];
+            };
+
             const main = async () => {
                 try {
-                    const updatedTransports = buildNewTransportsCollection();
-                    const homeUpdate = buildHomeUpdate();
+                    const dropPositions = getDropPositions();
+                    const updatedTransports = buildNewTransportsCollection(dropPositions);
+                    const homeUpdate = buildHomeUpdate(dropPositions);
                     // Affichage mis à jour avant d'enregistrer : le rafraîchissement des cartes relit ces valeurs
                     window.transportsData = updatedTransports;
+                    window.transportsDataTourId = getCurrentTourId();
                     if (homeUpdate) window.tourHomePositions = { ...(window.tourHomePositions || {}), [homeUpdate.tourId]: homeUpdate.positions };
                     await saveHomePositions(homeUpdate);
                     await updateTransports(updatedTransports);
@@ -249,8 +297,9 @@
                     });
 
                 } catch (error) {
-                    console.log('Erreur', 'Une erreur est survenue : ' + error.message);
-                    showErrorBanner(error.userMessage || 'Une erreur est survenue.');
+                    console.error('Erreur glisser-déposer tournée :', error);
+                    clearDisplayedOrder();
+                    showErrorBanner(MOVE_FAILED_MESSAGE);
                 }
             }
 

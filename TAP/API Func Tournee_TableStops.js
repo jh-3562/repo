@@ -20,7 +20,7 @@
         const getTripType = transport => { if (transport.TypeTransport) return transport.TypeTransport; const groupType = transport['CollectionClientsTA|4|TypeTransportTA']; if (Array.isArray(groupType)) return groupType[0] || ''; return String(groupType || '').split('|')[0]; };
 
         const getTransportRows = () => {
-            if (Array.isArray(window.transportsData) && window.transportsData.length) {
+            if (Array.isArray(window.transportsData) && window.transportsData.length && window.location.href.includes(window.transportsDataTourId)) {
                 return window.transportsData;
             }
 
