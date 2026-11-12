@@ -24,6 +24,12 @@ const apiFilters = [
     value: user,
     type: "TEXT",
   },
+  {
+    key: "STATUS",
+    operator: "EQUALS",
+    value: "Enregistré",
+    type: "TEXT",
+  },
 ];
 
 //sync functions

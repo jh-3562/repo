@@ -271,6 +271,12 @@ const hasVolontaireForm = async () => {
       value: store.moduleStore.user.username,
       type: "TEXT",
     },
+    {
+      key: "STATUS",
+      operator: "EQUALS",
+      value: "Enregistré",
+      type: "TEXT",
+    },
   ];
   const res = await api({ local: true }).post("document/id/filter", {
     filters: apiFilters,
