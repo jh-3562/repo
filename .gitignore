@@ -15,5 +15,8 @@ TAP/SQL/
 # Scripts SQL de travail de MCR-B
 MCR-B/SQL/
 
+# Dossiers de revue de tickets (notes et captures de test, pas du code client)
+*-review/
+
 # Scripts SQL de travail de CIA-GTU
 CIA-GTU/SQL/
