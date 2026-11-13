@@ -17,10 +17,28 @@ const showErrorBanner = errorMessage => {
     setTimeout(() => { banner.style.display = 'none'; }, 5000);
 };
 
-// Nouvel ordre de passage = ordre des cartes « destination intermédiaire » après le dépôt
-const getNewStopoverOrder = () => dnd.drop.items
-    .map(item => item.row?.data || {})
-    .filter(data => data.Stop_Type === 'stopover');
+// Chaque carte reste dans sa zone : départ, aller, destination, retour, retour au départ (aussi avec une recherche active)
+const ZONES = { start: 0, stopover: 1, end: 2, returnStopover: 3, returnEnd: 4 };
+const isDropValid = droppedCards => droppedCards
+    .map(data => ZONES[data.Stop_Type])
+    .every((zone, index, zones) => zone !== undefined && (index === 0 || zone >= zones[index - 1]));
+
+// Rangs croissants : les cartes déposées gardent leur ordre
+const isRankOrderUnchanged = (cards, rankKey) => cards
+    .every((card, offset) => offset === 0 || Number(card[rankKey]) > Number(cards[offset - 1][rankKey]));
+
+// P. Dest. : nouvel ordre du retour s'il a été déplacé, sinon l'ordre enregistré (lignes ajoutées en premier), renuméroté de 1 à n
+const getDropoffRanks = (data, newOrder, newReturnOrder) => {
+    const count = newOrder.length;
+    if (data['CollectionClientsTA|4|TypeTransportTA'] !== 'ALLER/RETOUR') return newOrder.map(() => '');
+    const reverseRanks = newOrder.map((_, offset) => String(count - offset));
+    const isComplete = ranks => ranks.every(rank => Number.isInteger(rank) && rank >= 1 && rank <= count) && new Set(ranks).size === count;
+    const returnOrder = newReturnOrder || getReturnRowOrder(data, newOrder);
+    const rankByOldIndex = {};
+    returnOrder.forEach((oldIndex, offset) => { rankByOldIndex[oldIndex] = offset + 1; });
+    const ranks = newOrder.map(oldIndex => rankByOldIndex[oldIndex]);
+    return isComplete(ranks) ? ranks.map(String) : reverseRanks;
+};
 
 const getGroupDocument = async groupId => {
     const response = await api({ local: true }).post('document/id', { ids: [groupId] });
@@ -30,39 +48,48 @@ const getGroupDocument = async groupId => {
     return groupDocument;
 };
 
-// Ordre inchangé : les destinations déposées gardent des numéros croissants
-const isDisplayedOrderUnchanged = stopovers => stopovers
-    .every((stopover, offset) => offset === 0 || Number(stopover.Stop_Position) > Number(stopovers[offset - 1].Stop_Position));
-
 const readPosition = (value, fallback) => {
     const position = value === undefined || value === null || value === '' ? NaN : Number(value);
     return Number.isFinite(position) ? position : fallback;
 };
 
-// Lignes du groupe dans l'ordre des cartes (même tri que leur affichage)
+const isCompleteOrder = (order, rowCount) => rowCount > 0 && order.length === rowCount && new Set(order).size === rowCount
+    && order.every(index => Number.isInteger(index) && index >= 1 && index <= rowCount);
+
+// Lignes du groupe dans l'ordre des cartes de l'aller (même tri que leur affichage)
 const getDisplayedRowOrder = data => {
     const latitudes = String(data.LatitudeStopsCollec || '').split('|').filter(Boolean);
     const count = Array.isArray(data[COLLECTION_KEY]) ? data[COLLECTION_KEY].length : (Number(data[COLLECTION_KEY]) || latitudes.length);
     const positions = String(data.StopPosStopsCollec || '').split('|');
     return Array.from({ length: count }, (_, offset) => offset + 1)
-        .map(index => ({ index, position: readPosition(positions[index - 1], index) }))
+        .map(index => ({ index, position: readPosition(data[`${COLLECTION_KEY}|${STOP_POSITION_FIELD}|${index}`], readPosition(positions[index - 1], index)) }))
         .sort((first, second) => first.position - second.position)
         .map(row => row.index);
 };
 
-const isCompleteOrder = (order, rowCount) => rowCount > 0 && order.length === rowCount && new Set(order).size === rowCount
-    && order.every(index => Number.isInteger(index) && index >= 1 && index <= rowCount);
+// Ordre du retour (lignes) : « P. Dest. » ; les lignes sans P. Dest. (ajoutées depuis) passent en premier, dans l'ordre inverse de l'aller
+const hasDropoffRank = rank => Number.isInteger(rank) && rank >= 1;
+const getReturnRowOrder = (data, pickupOrder) => {
+    const rankByIndex = {};
+    pickupOrder.forEach(index => { rankByIndex[index] = readPosition(data[`${COLLECTION_KEY}|${DROPOFF_ORDER_FIELD}|${index}`], NaN); });
+    const ranked = pickupOrder.filter(index => hasDropoffRank(rankByIndex[index]));
+    if (new Set(ranked.map(index => rankByIndex[index])).size !== ranked.length) return pickupOrder.slice().reverse();
+    const added = pickupOrder.filter(index => !hasDropoffRank(rankByIndex[index])).reverse();
+    return [...added, ...ranked.sort((first, second) => rankByIndex[first] - rankByIndex[second])];
+};
 
-// Avec une recherche active, seules les destinations visibles changent d'ordre, entre les places qu'elles occupaient
-const buildFullOrder = (data, visibleStopovers) => {
-    const newOrder = getDisplayedRowOrder(data);
-    const rowCount = newOrder.length;
-    const visibleOrder = visibleStopovers.map(stopover => Number(stopover.Stopover_Index));
-    visibleStopovers
-        .map(stopover => Number(stopover.Stop_Position))
+// Ordre du retour affiché
+const getSavedReturnOrder = data => getReturnRowOrder(data, getDisplayedRowOrder(data));
+
+// Avec une recherche active, seules les cartes visibles changent d'ordre, entre les places qu'elles occupaient
+const placeVisibleCards = (fullOrder, visibleCards, rankKey) => {
+    const newOrder = fullOrder.slice();
+    const visibleOrder = visibleCards.map(card => Number(card.Stopover_Index));
+    visibleCards
+        .map(card => Number(card[rankKey]))
         .sort((first, second) => first - second)
         .forEach((slot, offset) => { newOrder[slot - 1] = visibleOrder[offset]; });
-    if (!isCompleteOrder(newOrder, rowCount)) throw new Error('Ordre de passage incomplet : ' + newOrder.join(','));
+    if (!isCompleteOrder(newOrder, fullOrder.length)) throw new Error('Ordre de passage incomplet : ' + newOrder.join(','));
     return newOrder;
 };
 
@@ -80,7 +107,7 @@ const getSortedPositions = (data, count) => {
     return positions.sort((a, b) => a - b).map(String);
 };
 
-const buildReorderedData = (data, newOrder) => {
+const buildReorderedData = (data, newOrder, newReturnOrder) => {
     const oldToNew = {};
     newOrder.forEach((oldIndex, offset) => { oldToNew[oldIndex] = offset + 1; });
     const newData = {};
@@ -95,12 +122,12 @@ const buildReorderedData = (data, newOrder) => {
         newData[COLLECTION_KEY] = newOrder.map(oldIndex => data[COLLECTION_KEY][oldIndex - 1]);
     }
     const positions = getSortedPositions(data, newOrder.length);
-    // P. Dép. = ordre de passage à l'aller ; P. Dest. = ordre inverse au retour, seulement pour un aller/retour
-    const isRoundTrip = data['CollectionClientsTA|4|TypeTransportTA'] === 'ALLER/RETOUR';
+    // P. Dép. = ordre de passage à l'aller ; P. Dest. = ordre de dépôt au retour (aller/retour seulement)
+    const dropoffRanks = getDropoffRanks(data, newOrder, newReturnOrder);
     positions.forEach((position, offset) => {
         newData[`${COLLECTION_KEY}|${STOP_POSITION_FIELD}|${offset + 1}`] = position;
         newData[`${COLLECTION_KEY}|${PICKUP_ORDER_FIELD}|${offset + 1}`] = String(offset + 1);
-        newData[`${COLLECTION_KEY}|${DROPOFF_ORDER_FIELD}|${offset + 1}`] = isRoundTrip ? String(newOrder.length - offset) : '';
+        newData[`${COLLECTION_KEY}|${DROPOFF_ORDER_FIELD}|${offset + 1}`] = dropoffRanks[offset];
     });
     // Listes reconstruites depuis les lignes (toujours à jour) ; l'ancienne liste ne sert qu'en secours
     const oldLatitudes = reorderPipeList(data.LatitudeStopsCollec, newOrder).split('|');
@@ -136,7 +163,7 @@ const saveGroup = async (groupDocument, newData) => {
     if (!response || response.status < 200 || response.status >= 300) throw new Error('document : statut ' + response?.status);
 };
 
-// Le départ et la destination ne se verrouillent pas : un enregistrement vide recharge les cartes dans l'ordre enregistré
+// Les cartes ne se verrouillent pas : un enregistrement vide recharge les cartes dans l'ordre enregistré
 const reloadSavedOrder = async groupId => {
     const groupDocument = await getGroupDocument(groupId);
     await saveGroup(groupDocument, {});
@@ -144,18 +171,24 @@ const reloadSavedOrder = async groupId => {
 
 const main = async () => {
     try {
-        const groupId = dnd.drop.items.map(item => item.row?.data?.Group_RowID).find(Boolean);
+        const droppedCards = dnd.drop.items.map(item => item.row?.data || {});
+        const groupId = droppedCards.map(data => data.Group_RowID).find(Boolean);
         if (!groupId) return;
-        const newStopoverOrder = getNewStopoverOrder();
-        if (!newStopoverOrder.length || isDisplayedOrderUnchanged(newStopoverOrder)) {
+        const pickupCards = droppedCards.filter(data => data.Stop_Type === 'stopover');
+        const dropoffCards = droppedCards.filter(data => data.Stop_Type === 'returnStopover');
+        const pickupChanged = !isRankOrderUnchanged(pickupCards, 'Stop_Position');
+        const dropoffChanged = !isRankOrderUnchanged(dropoffCards, 'Return_Rank');
+        if (!isDropValid(droppedCards) || (!pickupChanged && !dropoffChanged)) {
             await reloadSavedOrder(groupId);
             return;
         }
 
         const groupDocument = await getGroupDocument(groupId);
         const groupData = JSON.parse(groupDocument.data);
-        const newOrder = buildFullOrder(groupData, newStopoverOrder);
-        const newData = buildReorderedData(groupData, newOrder);
+        const pickupOrder = getDisplayedRowOrder(groupData);
+        const newOrder = pickupChanged ? placeVisibleCards(pickupOrder, pickupCards, 'Stop_Position') : pickupOrder;
+        const newReturnOrder = dropoffChanged ? placeVisibleCards(getSavedReturnOrder(groupData), dropoffCards, 'Return_Rank') : null;
+        const newData = buildReorderedData(groupData, newOrder, newReturnOrder);
         await saveGroup(groupDocument, newData);
         injectDocData({
             fillData: {

@@ -78,15 +78,35 @@ const getPositions = stopovers => {
   return positions.sort((a, b) => a - b).map(String)
 }
 
-// P. Dép. = ordre de passage à l'aller ; P. Dest. = ordre inverse au retour, seulement pour un aller/retour
+const isRanked = rank => Number.isInteger(rank) && rank >= 1
+
+// Ordre du retour (numéros de ligne) : les destinations sans P. Dest. (ajoutées) en premier, dans l'ordre inverse de l'aller, puis les autres dans l'ordre P. Dest.
+const getReturnOrder = ranks => {
+  const indexes = ranks.map((_, index) => index)
+  const ranked = indexes.filter(index => isRanked(ranks[index]))
+  if (new Set(ranked.map(index => ranks[index])).size !== ranked.length) return indexes.reverse()
+  const added = indexes.filter(index => !isRanked(ranks[index])).reverse()
+  return [...added, ...ranked.sort((a, b) => ranks[a] - ranks[b])]
+}
+
+// P. Dest. renuméroté de 1 à n en gardant l'ordre du retour choisi
+const getDropoffRanks = stopovers => {
+  const newRanks = []
+  getReturnOrder(stopovers.map(row => Number(row[DROPOFF_ORDER_KEY])))
+    .forEach((index, offset) => { newRanks[index] = String(offset + 1) })
+  return newRanks
+}
+
+// P. Dép. = ordre de passage à l'aller ; P. Dest. = ordre de dépôt au retour, seulement pour un aller/retour
 const withOrders = stopovers => {
   const positions = getPositions(stopovers)
   const isRoundTrip = docData['CollectionClientsTA|4|TypeTransportTA'] === 'ALLER/RETOUR'
+  const dropoffRanks = getDropoffRanks(stopovers)
   return stopovers.map((row, index) => ({
     ...row,
     [POSITION_KEY]: positions[index],
     [PICKUP_ORDER_KEY]: String(index + 1),
-    [DROPOFF_ORDER_KEY]: isRoundTrip ? String(stopovers.length - index) : ''
+    [DROPOFF_ORDER_KEY]: isRoundTrip ? dropoffRanks[index] : ''
   }))
 }
 

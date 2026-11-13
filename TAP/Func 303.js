@@ -174,6 +174,22 @@ const getGroupRoundTripStopovers = (formData, startPos, endPos) => {
   }))
 }
 
+/**
+ * Ordre de dépôt au retour d'un groupe aller/retour : ordre « P. Dest. » des destinations qui en ont un ;
+ * celles sans P. Dest. (ajoutées depuis) passent en premier, dans l'ordre inverse de l'aller.
+ */
+const getGroupReturnStopovers = (formData, stopovers) => {
+  const isRanked = rank => Number.isInteger(rank) && rank >= 1
+  const withRanks = stopovers.map(point => ({
+    ...point,
+    returnRank: Number(formData[`StopoverLocations|120|PositionRetour|${point.index + 1}`])
+  }))
+  const ranked = withRanks.filter(point => isRanked(point.returnRank))
+  if (new Set(ranked.map(point => point.returnRank)).size !== ranked.length) return stopovers.slice().reverse()
+  const added = withRanks.filter(point => !isRanked(point.returnRank)).reverse()
+  return [...added, ...ranked.sort((a, b) => a.returnRank - b.returnRank)]
+}
+
 const stop = {
   formatStops (form) {
     const formatStop = (form, Latitude, Longitude, stopNumber) => {
@@ -205,7 +221,7 @@ const stop = {
     const isGroupRoundTrip =
       formData['CollectionClientsTA|4|TypeTransportTA'] === 'ALLER/RETOUR'
 
-    // Groupe aller/retour : départ, destinations intermédiaires, destination, retour par les mêmes destinations en ordre inverse
+    // Groupe aller/retour : départ, destinations intermédiaires, destination, retour par les mêmes destinations dans l'ordre « P. Dest. »
     if (isGroup && isGroupRoundTrip) {
       const startLat = formData.startLatitude
       const startLng = formData.startLongitude
@@ -227,7 +243,7 @@ const stop = {
       if (hasEnd) result.push(formatStop(form, endLat, endLng, String(endPos)))
       if (hasEnd) result.push(formatStop(form, endLat, endLng, String(endReturnPos)))
       // Les dépôts du retour n'ont pas de position enregistrée : ils suivent le départ de la destination, avant le retour au départ
-      stopovers.slice().reverse().forEach((s, index) => {
+      getGroupReturnStopovers(formData, stopovers).forEach((s, index) => {
         result.push(formatStop(form, s.lat, s.lng, String(endReturnPos + (index + 1) / (stopovers.length + 1))))
       })
       if (hasStart) result.push(formatStop(form, startLat, startLng, String(startReturnPos)))

@@ -6,6 +6,8 @@ const COLORS = {
     start: { border: '#9A9999', background: '#eeeeee' },
     stopover: { border: '#449FDC', background: '#cfe2f3' },
     end: { border: '#9A9999', background: '#eeeeee' },
+    returnStopover: { border: '#E7A438', background: '#fce5cd' },
+    returnEnd: { border: '#9A9999', background: '#eeeeee' },
 };
 
 const getRowId = row => row.rowID || row.key || row.documentID;
@@ -22,6 +24,8 @@ const toNumber = value => {
     const number = Number(value);
     return Number.isFinite(number) ? number : null;
 };
+
+const isRoundTripGroup = data => data['CollectionClientsTA|4|TypeTransportTA'] === 'ALLER/RETOUR';
 
 const parseCollection = value => {
     if (Array.isArray(value)) return value;
@@ -48,7 +52,8 @@ const getStopovers = data => {
     return Array.from({ length: count }, (_, offset) => offset + 1)
         .map(index => ({
             index,
-            position: toNumber(positions[index - 1]) ?? index,
+            position: toNumber(readStopoverField(data, rowObjects, '4000|StopPos', index)) ?? toNumber(positions[index - 1]) ?? index,
+            returnRank: toNumber(readStopoverField(data, rowObjects, '120|PositionRetour', index)),
             client: String(readStopoverField(data, rowObjects, '50|NomClient', index) || '').split(' ').filter(Boolean).join(' '),
             address: readStopoverField(data, rowObjects, '100|Address', index) || '',
             absent: String(readStopoverField(data, rowObjects, '10|Absent', index)) === 'true',
@@ -56,7 +61,16 @@ const getStopovers = data => {
         .sort((first, second) => first.position - second.position);
 };
 
-const buildCard = (row, type, order, summary, clientLabel, client, address, stopoverIndex) => ({
+// Ordre du retour : « P. Dest. » ; les destinations sans P. Dest. (ajoutées depuis) passent en premier, dans l'ordre inverse de l'aller
+const isRanked = rank => Number.isInteger(rank) && rank >= 1;
+const getReturnOrder = stopovers => {
+    const ranked = stopovers.filter(stopover => isRanked(stopover.returnRank));
+    if (new Set(ranked.map(stopover => stopover.returnRank)).size !== ranked.length) return stopovers.slice().reverse();
+    const added = stopovers.filter(stopover => !isRanked(stopover.returnRank)).reverse();
+    return [...added, ...ranked.sort((first, second) => first.returnRank - second.returnRank)];
+};
+
+const buildCard = (row, type, order, summary, clientLabel, client, address, stopoverIndex, extraData = {}) => ({
     ...row,
     key: `${row.key || row.rowID}-${type}-${order}`,
     rowID: undefined,
@@ -72,26 +86,37 @@ const buildCard = (row, type, order, summary, clientLabel, client, address, stop
         Stop_Address: address,
         Group_RowID: getRowId(row),
         Stopover_Index: stopoverIndex,
+        ...extraData,
     },
 });
 
+const absentText = stopover => (stopover.absent ? ' (absent)' : '');
+
+// Aller : départ, destinations, destination ; aller/retour : puis les mêmes destinations dans l'ordre du retour et le retour au départ
 const buildGroupCards = row => {
     if (!row) return [];
     const data = row.data || {};
     const stopovers = getStopovers(data);
-    return [
+    const cards = [
         buildCard(row, 'start', 0, 'Départ', '', 'Point de départ du groupe', data.Visiteurs_adresse || '', null),
         ...stopovers.map((stopover, order) => buildCard(
-            row,
-            'stopover',
-            order + 1,
-            `#${order + 1} • Destination intermédiaire${stopover.absent ? ' (absent)' : ''}`,
-            'Client : ',
-            stopover.client,
-            stopover.address,
-            stopover.index
+            row, 'stopover', order + 1,
+            `#${order + 1} • Destination intermédiaire${absentText(stopover)}`,
+            'Client : ', stopover.client, stopover.address, stopover.index
         )),
         buildCard(row, 'end', stopovers.length + 1, 'Destination', '', 'Point d’arrivée du groupe', data.Stop_Destination || '', null),
+    ];
+    if (!isRoundTripGroup(data)) return cards;
+    const returnOrder = getReturnOrder(stopovers);
+    return [
+        ...cards,
+        ...returnOrder.map((stopover, order) => buildCard(
+            row, 'returnStopover', stopovers.length + 2 + order,
+            `#${stopovers.length + order + 1} • Retour - destination intermédiaire${absentText(stopover)}`,
+            'Client : ', stopover.client, stopover.address, stopover.index,
+            { Return_Rank: String(order + 1) }
+        )),
+        buildCard(row, 'returnEnd', 2 * stopovers.length + 2, 'Retour au départ', '', 'Fin du retour du groupe', data.Visiteurs_adresse || '', null),
     ];
 };
 
